@@ -19,7 +19,7 @@ class MyListModel(QAbstractListModel):
 		else:
 			return QVariant()
 
-	def  headerData(self, section, index,  role):
+	def headerData(self, section, index,  role):
 		return "WTF"
 
 	def add(self, objects):
