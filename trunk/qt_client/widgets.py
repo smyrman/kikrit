@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from sys import argv
-
 from PyQt4.QtCore import SIGNAL
-from PyQt4.QtGui import QWidget, QApplication, QLineEdit, QLabel,\
-		QPushButton, QListView, QGridLayout
+from PyQt4.QtGui import QWidget, QLineEdit, QLabel, QPushButton, QListView,\
+		QGridLayout
 
-from list_model import MyListModel
+from qt_client.models import MyListModel
+
 
 class MyWidget(QWidget):
 	search_line = None
@@ -73,11 +72,3 @@ class MyWidget(QWidget):
 	def search(self):
 		self.status_text.setText(self.search_line.text())
 
-def main():
-	app = QApplication(argv)
-	widget = MyWidget()
-	widget.show()
-	return app.exec_()
-
-if __name__ == "__main__":
-	main()
