@@ -10,7 +10,6 @@ class LimitGroup(models.Model):
 
 	"""
 	grey_limit = 0 # Hard coded limit (for now).
-	message = ""
 
 	name = models.CharField(max_length=50)
 	black_limit = models.IntegerField(default=0,
@@ -41,9 +40,6 @@ class Account(models.Model):
 			(COLOR_BLACK, "black"),
 			)
 
-	MSG_TRANSACTIN_SUCCSEED = ""
-	MSG_NOT_ENOUGH_MONEY = ""
-
 	user = models.OneToOneField(User, null=True, blank=True,
 			help_text="Needed to enable login and, to send emails to user.")
 	name = models.CharField(max_length=50, help_text="Account name",)
@@ -60,7 +56,7 @@ class Account(models.Model):
 		super(self.__class__, self).save(*args, **kwargs)
 
 
-	def internal_price(self):
+	def has_internal_price(self):
 		"""Returns True if the user should get an internal price on
 		merchandise, or False if not.
 
@@ -118,8 +114,8 @@ class Account(models.Model):
 	def withdraw(self, amount):
 		"""Try to withdraw an amount. Returns True on sucsess, and False on
 		failure. Succsess is only possible if the new color equals
-		self.COLOR_WHITE or self.COLOR_GREY. In any case self.message will be
-		updated. (Also saves the object, and updates the color field!)
+		self.COLOR_WHITE or self.COLOR_GREY.(Also saves the object, and updates
+		the color field!)
 
 
 		"""
@@ -140,10 +136,8 @@ class Account(models.Model):
 			self.balance -= amount
 			self.save()
 
-			self.message = self.MSG_TRANSACTON_SUCCSEED
 			return True
 		else:
-			self.message = self.MSG_NOT_ENOUGH_MONEY
 			return False
 
 
@@ -160,7 +154,6 @@ class Account(models.Model):
 		self.balance += amount
 		self.save()
 
-		self.message = self.MSG_TRANSACTON_SUCCSEED
 		return True
 
 
