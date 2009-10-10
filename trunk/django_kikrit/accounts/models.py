@@ -4,26 +4,26 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-
 class LimitGroup(models.Model):
 	"""A user might be a member of ONE LimitGroup. This determin how negative
-	saldo he can have without going black.
+	balance he can have without going black.
 
 	"""
-	MSG_TRANSACTIN_SUCCSEED = ""
-	MSG_NOT_ENOUGH_MONEY = ""
-
 	grey_limit = 0 # Hard coded limit (for now).
 	message = ""
 
 	name = models.CharField(max_length=50)
 	black_limit = models.IntegerField(default=0,
-			help_text="Minimum saldo where transactions are still allowed.")
+			help_text="Minimum balance where transactions are still allowed.")
 	max_grey_hours = models.SmallIntegerField(default=24,
 			help_text="The maximum number of hours a person migth have a "
 			"'grey' (negative) saldo before he goes black. (-1 implies no "
 			"limit)")
-	internal_price = models.BooleanField(default=False, blank=True)
+	internal_price = models.BooleanField(default=False, blank=True,
+			help_text="Give members of this group a 'special price'.")
+
+	def __unicode__(self):
+		return self.name
 
 
 
@@ -35,11 +35,30 @@ class Account(models.Model):
 	COLOR_GREY = 1
 	COLOR_BLACK = 0
 
-	user = models.OneToOneField(User)
+	COLOR_CHOICES = (
+			(COLOR_WHITE, "white"),
+			(COLOR_GREY, "grey"),
+			(COLOR_BLACK, "black"),
+			)
+
+	MSG_TRANSACTIN_SUCCSEED = ""
+	MSG_NOT_ENOUGH_MONEY = ""
+
+	user = models.OneToOneField(User, null=True, blank=True,
+			help_text="Needed to enable login and, to send emails to user.")
+	name = models.CharField(max_length=50, help_text="Account name",)
 	balance = models.IntegerField(default=0)
 	limit_group = models.ForeignKey(LimitGroup, null=True, blank=True)
-	last_color_change = models.DateTimeField(null=True, blank=True,
-	                    editable=False)
+	color = models.SmallIntegerField(choices=COLOR_CHOICES, editable=False)
+	# Timestamp for when the user last whent grey:
+	timestamp_grey = models.DateTimeField(editable=False, null=True, blank=True)
+
+	def save(self, *args, **kwargs):
+		# Update color:
+		self.color = self.get_color()
+
+		super(self.__class__, self).save(*args, **kwargs)
+
 
 	def internal_price(self):
 		"""Returns True if the user should get an internal price on
@@ -53,10 +72,11 @@ class Account(models.Model):
 		return self.limit_group.internal_price
 
 
-	def get_user_color(self, amount=0):
-		"""Returns an integer representing the current color, or if an integer
-		for amount is given, returns the color you will get if amount is
-		added to the current balance.
+	def get_color(self, amount=0):
+		"""Returns the current color, or if an integer for amount is given,
+		returns the color you will get if amount is added to the current
+		balance. The color will be either self.COLOR_WHITE, self.COLOR_GREY, or
+		self.COLOR_BLACK.
 
 		"""
 		# Input check:
@@ -73,25 +93,34 @@ class Account(models.Model):
 			black_limit = 0
 			grey_hours = 0
 
-		new_balance = self.balance + amout
+		# Get new_balance, time_now, and time_black:
+		new_balance = self.balance + amount
 		time_now = datetime.now()
-		time_black = self.last_color_change + timedelta(hours=grey_hours)
+		if self.timestamp_grey != None:
+			time_black = self.timestamp_grey + timedelta(hours=grey_hours)
+		else:
+			time_black = time_now - timedelta(1)
 
 		# Return color:
-		if new_balance >= self.grey_limit:
+		if new_balance >= grey_limit:
 			return self.COLOR_WHITE
-		elif new_balance >= self.black_limit and (grey_hours == -1 \
-		     or time_now <= time_black):
+		elif new_balance >= black_limit \
+		and (grey_hours == -1 or time_now <= time_black):
 			return self.COLOR_GREY
 		else:
 			return self.COLOR_BLACK
+
+
+	def __unicode__(self):
+		return self.name
 
 
 	def withdraw(self, amount):
 		"""Try to withdraw an amount. Returns True on sucsess, and False on
 		failure. Succsess is only possible if the new color equals
 		self.COLOR_WHITE or self.COLOR_GREY. In any case self.message will be
-		updated.
+		updated. (Also saves the object, and updates the color field!)
+
 
 		"""
 		# Input check:
@@ -99,11 +128,18 @@ class Account(models.Model):
 			raise ValueError("'amount' must be an Integer greater then, or "
 			                 "equal to, 0.")
 
-		color = self.get_color(-amount)
+		new_color = self.get_color(-amount)
 
-		if color != self.COLOR_BLACK:
+		if new_color != self.COLOR_BLACK:
+			# Set grey timestamp?
+			if self.color == self.COLOR_WHITE \
+			and new_color != self.COLOR_WHITE:
+				self.timestamp_grey = dateime.now()
+
+			# Update color and balance:
 			self.balance -= amount
 			self.save()
+
 			self.message = self.MSG_TRANSACTON_SUCCSEED
 			return True
 		else:
@@ -112,21 +148,43 @@ class Account(models.Model):
 
 
 	def deposit(self, amount):
-		"""Add amount to a user's balance, and return True.
+		"""Add amount to a user's balance, and return True. (Also saves the
+		object, and updates the color field!)
 
 		"""
 		# Input check:
 		if amount.__class__ != int or amount <= 0:
 			raise ValueError("'amount' must be an Integer greater then 0.")
 
+		# Update color and balance:
 		self.balance += amount
 		self.save()
+
 		self.message = self.MSG_TRANSACTON_SUCCSEED
 		return True
+
+
+	class Meta:
+		unique_together = (("name", "user",),)
 
 
 
 class RFIDCard(models.Model):
 	account = models.ForeignKey(Account)
-	code = models.CharField(max_length=100)
+	code = models.CharField(max_length=100, unique=True)
+
+
+
+# Signals:
+def create_user_account(signal, instance, **kwargs):
+	"""Signal for automatically creating an Account upon user creation/save.
+
+	"""
+	account, new = Account.objects.get_or_create(user=instance)
+	if new:
+		account.name = instance.username
+		account.save()
+
+models.signals.post_save.connect(create_user_account, sender=User)
+
 
