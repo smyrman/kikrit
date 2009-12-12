@@ -1,38 +1,60 @@
+# -*- coding="utf-8"
 from PyQt4.QtCore import QAbstractListModel, QModelIndex, QVariant, Qt
+class Item(): # TODO better name
+	def __init__(self, name, price, ean):
+		self.name = name
+		self.price = price
+		self.ean = ean
+	
+	def getName(self):
+		return "%s - %d,-" % (self.name, self.price)
+
+
+
 
 class MyListModel(QAbstractListModel):
-	words = [] # TODO utvid til navn, pris og ean
+	items = [] # array of Item(s)
 
-	def __init__(self, parent=None, words=[]):
+	def __init__(self, parent=None, items=[]):
 		QAbstractListModel.__init__(self, parent)
-		self.words = words
+		self.items = items
 
 	def rowCount(self, parent=QModelIndex()):
-		return len(self.words)
+		return len(self.items)
 
 	#def columnCount(self, index=QModelIndex()):
 	#	 return 1
 
 	def data(self, index, role):
 		if index.isValid() and role == Qt.DisplayRole:
-			return QVariant(self.words[index.row()])
+			item = self.items[index.row()]
+			return QVariant(item.getName())
 		else:
 			return QVariant()
+	
+	def getItemsByName(self, names):
+		ret = []
+		for n in names:
+			for i in self.items:
+				if i.getName() == n:
+					ret.append(i)
+		print names
+		return ret
 
 	def headerData(self, section, index,  role):
 		return "WTF"
 
 	def add(self, objects):
-		self.words.extend(objects)
-		self.words.sort()
+		self.items.extend(objects)
+		self.items.sort()
 		self.reset()
 
 	def remove(self, objects):
 		for o in objects:
-			self.words.remove(o)
+			self.items.remove(o)
 		self.reset()
 
-	def setAllData(self, new_list):
+	def setAllData(self, new):
 		"""replace old list with new list"""
-		self.words = new_list
+		self.items = new_list
 		self.reset()

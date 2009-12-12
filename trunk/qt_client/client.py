@@ -3,7 +3,6 @@
 
 import sys
 from os.path import dirname, abspath
-
 from PyQt4.QtGui import QApplication
 
 BASEPATH = abspath(dirname(__file__))+"/.."
