@@ -5,7 +5,7 @@ from PyQt4.QtCore import SIGNAL
 from PyQt4.QtGui import QWidget, QLineEdit, QLabel, QPushButton, QListView,\
 		QGridLayout
 
-from qt_client.models import MyListModel
+from qt_client.models import MyListModel, Item
 
 
 class MyWidget(QWidget):
@@ -20,7 +20,7 @@ class MyWidget(QWidget):
 	def __init__(self, parent=None):
 		QWidget.__init__(self, parent)
 
-		self.search_line = QLineEdit()
+		self.search_line = QLineEdit(u"Sindre fix ascii øl")
 		self.search_line.grabKeyboard()
 		self.connect(self.search_line, SIGNAL("textChanged(QString)"),
 		             self.search)
@@ -34,9 +34,9 @@ class MyWidget(QWidget):
 		self.connect(self.rem_button, SIGNAL("clicked()"), self.remove)
 
 		self.left_list = QListView()
-		self.left_list.setModel(MyListModel(self, ["A", "B", "C"]))
+		self.left_list.setModel(MyListModel(self, self.getItems()))
 		self.right_list = QListView()
-		self.right_list.setModel(MyListModel(self))
+		self.right_list.setModel(MyListModel(self, []))
 
 		grid = QGridLayout()
 		grid.addWidget(self.search_line, 0, 0)
@@ -47,26 +47,41 @@ class MyWidget(QWidget):
 		grid.addWidget(self.status_text, 3, 1)
 		self.setLayout(grid)
 
-		self.setWindowTitle('Laughing app')
-		self.resize(300, 100)
-		self.move(400, 400)
+		self.setWindowTitle('Kikrit')
+		self.resize(400, 400)
+		self.move(200, 200)
 
-	def selected(self, list):
-		selected = []
+	def getItems(self):
+		items = []
+		# TODO probe en database...
+		items.append( Item(u"Øl", 16, 403) ) # TODO python elsker tydligvis asci
+		items.append( Item("Vin", 16, 80) )
+		return items
+		
+
+	def getSelected(self, list):
+		"""Returnerer en liste med valgte objekter av typen Item"""
+		names = []
 		for i in list.selectedIndexes():
-			selected.append(i.data().toString())
-			print i.data().toString()
+			names.append(i.data().toString())
+		selected = list.model().getItemsByName(names)
+	
+		# DEBUG:
+		for s in selected:
+			print "selected:", s.name, s.price, s.ean
 		return selected
 
 	def add(self):
-		selected = self.selected(self.left_list)
-		self.left_list.model().remove(selected)
-		self.right_list.model().add(selected)
+		"""Called when the user presses the add-button"""
+		sel = self.getSelected(self.left_list)
+		self.left_list.model().remove(sel)
+		self.right_list.model().add(sel)
 
 	def remove(self):
-		selected = self.selected(self.right_list)
-		self.right_list.model().remove(selected)
-		self.left_list.model().add(selected)
+		"""Called when the user presses the remove-button"""
+		sel = self.getSelected(self.right_list)
+		removed = self.right_list.model().remove(sel)
+		self.left_list.model().add(sel)
 
 
 	def search(self):
