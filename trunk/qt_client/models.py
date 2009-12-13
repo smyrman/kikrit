@@ -1,15 +1,14 @@
-# -*- coding="utf-8"
+# -*- coding: utf-8 -*-
+
 from PyQt4.QtCore import QAbstractListModel, QModelIndex, QVariant, Qt
 class Item(): # TODO better name
 	def __init__(self, name, price, ean):
-		self.name = name
+		self.name = unicode(name)
 		self.price = price
 		self.ean = ean
-	
+
 	def getName(self):
-		return "%s - %d,-" % (self.name, self.price)
-
-
+		return u"%s - %d,-" % (self.name, self.price)
 
 
 class MyListModel(QAbstractListModel):
@@ -31,12 +30,12 @@ class MyListModel(QAbstractListModel):
 			return QVariant(item.getName())
 		else:
 			return QVariant()
-	
+
 	def getItemsByName(self, names):
 		ret = []
 		for n in names:
 			for i in self.items:
-				if i.getName() == n:
+				if i.getName() == unicode(n):
 					ret.append(i)
 		print names
 		return ret

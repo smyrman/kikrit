@@ -47,7 +47,7 @@ class MyWidget(QWidget):
 		grid.addWidget(self.status_text, 3, 1)
 		self.setLayout(grid)
 
-		self.setWindowTitle('Kikrit')
+		self.setWindowTitle('KiKrit')
 		self.resize(400, 400)
 		self.move(200, 200)
 
@@ -55,9 +55,9 @@ class MyWidget(QWidget):
 		items = []
 		# TODO probe en database...
 		items.append( Item(u"Øl", 16, 403) ) # TODO python elsker tydligvis asci
-		items.append( Item("Vin", 16, 80) )
+		items.append( Item(u"Vin", 16, 80) )
 		return items
-		
+
 
 	def getSelected(self, list):
 		"""Returnerer en liste med valgte objekter av typen Item"""
@@ -65,23 +65,23 @@ class MyWidget(QWidget):
 		for i in list.selectedIndexes():
 			names.append(i.data().toString())
 		selected = list.model().getItemsByName(names)
-	
+
 		# DEBUG:
 		for s in selected:
-			print "selected:", s.name, s.price, s.ean
+			print u"selected:", s.name, s.price, s.ean
 		return selected
 
 	def add(self):
 		"""Called when the user presses the add-button"""
 		sel = self.getSelected(self.left_list)
-		self.left_list.model().remove(sel)
+		#self.left_list.model().remove(sel)
 		self.right_list.model().add(sel)
 
 	def remove(self):
 		"""Called when the user presses the remove-button"""
 		sel = self.getSelected(self.right_list)
 		removed = self.right_list.model().remove(sel)
-		self.left_list.model().add(sel)
+		#self.left_list.model().add(sel)
 
 
 	def search(self):
