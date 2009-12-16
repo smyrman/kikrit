@@ -30,9 +30,9 @@ class Merchandise(models.Model):
 		"""Return True if object matches filter_str, and False if not.
 
 		"""
-		filter_str = unicode(filter_str)
+		filter_str = unicode(filter_str).lower()
 		for attr in self.search_fields:
-			if filter_str in unicode(getattr(self, attr)):
+			if filter_str in unicode(getattr(self, attr)).lower():
 				return True
 		return False
 
