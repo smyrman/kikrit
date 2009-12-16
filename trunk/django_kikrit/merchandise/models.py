@@ -14,14 +14,27 @@ class MerchandiseTag(models.Model):
 
 
 class Merchandise(models.Model):
-	name = models.CharField(max_length=50)
+	search_fields = ('name', 'ordinary_price', 'internal_price', 'ean')
+	name = models.CharField(max_length=50, unique=True)
 	ordinary_price = models.PositiveIntegerField()
 	internal_price = models.PositiveIntegerField()
 	ean = models.CharField(max_length=20, unique=True)
 	tags = models.ManyToManyField(MerchandiseTag, null=True, blank=True)
 
 	def __unicode__(self):
-		return self.name
+		return "%s -  %d,- (%d,-)" % (self.name, self.ordinary_price,
+				self.internal_price)
+
+
+	def filter(self, filter_str):
+		"""Return True if object matches filter_str, and False if not.
+
+		"""
+		filter_str = unicode(filter_str)
+		for attr in self.search_fields:
+			if filter_str in unicode(getattr(self, attr)):
+				return True
+		return False
 
 
 

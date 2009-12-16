@@ -1,59 +1,70 @@
 # -*- coding: utf-8 -*-
-
 from PyQt4.QtCore import QAbstractListModel, QModelIndex, QVariant, Qt
-class Item(): # TODO better name
-	def __init__(self, name, price, ean):
-		self.name = unicode(name)
-		self.price = price
-		self.ean = ean
-
-	def getName(self):
-		return u"%s - %d,-" % (self.name, self.price)
 
 
-class MyListModel(QAbstractListModel):
+class MerchandiseListModel(QAbstractListModel):
 	items = [] # array of Item(s)
+	all_items = []
+	last_filter_str = ""
+
 
 	def __init__(self, parent=None, items=[]):
 		QAbstractListModel.__init__(self, parent)
 		self.items = items
+		self.all_items = items
+
 
 	def rowCount(self, parent=QModelIndex()):
 		return len(self.items)
 
+
 	#def columnCount(self, index=QModelIndex()):
 	#	 return 1
+
 
 	def data(self, index, role):
 		if index.isValid() and role == Qt.DisplayRole:
 			item = self.items[index.row()]
-			return QVariant(item.getName())
+			return QVariant(item.__unicode__())
 		else:
 			return QVariant()
 
-	def getItemsByName(self, names):
-		ret = []
-		for n in names:
-			for i in self.items:
-				if i.getName() == unicode(n):
-					ret.append(i)
-		print names
-		return ret
+
+	def filter(self, filter_str):
+		"""Reduce items to only list those that match the filter_str
+
+		"""
+		if self.last_filter_str in filter_str:
+			filter_items = self.items
+		else:
+			filter_items = self.all_items
+
+		self.last_filter_str = filter_str
+		self.items = [item for item in filter_items if item.filter(filter_str)]
+		self.reset()
+
 
 	def headerData(self, section, index,  role):
 		return "WTF"
+
 
 	def add(self, objects):
 		self.items.extend(objects)
 		self.items.sort()
 		self.reset()
 
+
 	def remove(self, objects):
 		for o in objects:
 			self.items.remove(o)
 		self.reset()
 
-	def setAllData(self, new):
-		"""replace old list with new list"""
+
+	def setAllData(self, new_list):
+		"""replace old list with new list
+
+		"""
 		self.items = new_list
 		self.reset()
+
+
