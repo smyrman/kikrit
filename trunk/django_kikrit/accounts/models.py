@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
 from django.db import models
@@ -30,19 +31,19 @@ class Account(models.Model):
 	"""A profile object, adding extra fields to a django User object.
 
 	"""
-	COLOR_WHITE = 2
-	COLOR_GREY = 1
 	COLOR_BLACK = 0
+	COLOR_GREY = 1
+	COLOR_WHITE = 2
 
 	COLOR_CHOICES = (
-			(COLOR_WHITE, "white"),
-			(COLOR_GREY, "grey"),
 			(COLOR_BLACK, "black"),
+			(COLOR_GREY, "grey"),
+			(COLOR_WHITE, "white"),
 			)
 
 	user = models.OneToOneField(User, null=True, blank=True,
 			help_text="Needed to enable login and, to send emails to user.")
-	name = models.CharField(max_length=50, help_text="Account name",)
+	name = models.CharField(max_length=50, help_text="Account name", unique=True)
 	balance = models.IntegerField(default=0)
 	limit_group = models.ForeignKey(LimitGroup, null=True, blank=True)
 	color = models.SmallIntegerField(choices=COLOR_CHOICES, editable=False)
@@ -158,13 +159,14 @@ class Account(models.Model):
 
 
 	class Meta:
-		unique_together = (("name", "user",),)
+		pass
+	#	unique_together = (("name", "user",),)
 
 
 
 class RFIDCard(models.Model):
 	account = models.ForeignKey(Account)
-	code = models.CharField(max_length=100, unique=True)
+	rfid_string = models.CharField(max_length=50, unique=True)
 
 
 
