@@ -47,5 +47,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
 	'django_kikrit.accounts',
+	'django_kikrit.merchandise',
+	'django_kikrit.utils',
 )
 AUTH_PROFILE_MODULE = 'auth.Account'
