@@ -3,7 +3,7 @@ from PyQt4.QtCore import QAbstractListModel, QModelIndex, QVariant, Qt
 
 
 class MerchandiseListModel(QAbstractListModel):
-	items = [] # array of Item(s)
+	items = []
 	all_items = []
 	last_filter_str = ""
 
