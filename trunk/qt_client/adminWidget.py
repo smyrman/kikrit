@@ -9,7 +9,8 @@ class AdminWidget(QWidget):
 		QWidget.__init__(self, parent)
 
 		self.web = QWebView()
-		self.web.load(QUrl("http://omegav.no/"))
+		# FIXME: Get port from django_kikrit.settings
+		self.web.load(QUrl("http://localhost:8081/"))
 
 		grid = QGridLayout()
 		grid.addWidget(self.web, 0, 0)
