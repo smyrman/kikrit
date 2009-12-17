@@ -48,7 +48,7 @@ class MainWidget(QWidget):
 
 		# Connect signals:
 		self.connect(self.search_line, SIGNAL("textChanged(QString)"),
- 				self.left_list.model().filter)
+				self.search_line_changed)
 		self.connect(self.add_button, SIGNAL("clicked()"), self.add_clicked)
 		self.connect(self.rem_button, SIGNAL("clicked()"), self.remove_clicked)
 		self.connect(self.test_button, SIGNAL("clicked()"), self.show_image)
@@ -113,5 +113,8 @@ class MainWidget(QWidget):
 			self.status.setText("OK")
 		else:
 			self.status.setText("Waiting...")
+
+	def search_line_changed(self):
+ 		self.left_list.model().filter
 
 
