@@ -72,12 +72,6 @@ class MainWidget(QWidget):
 
 		self.setLayout(grid)
 
-		# Set widget parameters:
-		self.setWindowTitle('KiKrit')
-		#self.showFullScreen() # Should be used in final release
-		self.resize(600, 400)
-		self.move(200, 200)
-
 
 	def getItems(self):
 		""" Queries the database for all Merchandise objects, and return them
