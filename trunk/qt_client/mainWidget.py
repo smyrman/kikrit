@@ -1,14 +1,14 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from PyQt4.QtCore import SIGNAL, Qt 
+from PyQt4.QtCore import SIGNAL, Qt
 from PyQt4.QtGui import QWidget, QLineEdit, QLabel, QPushButton, QListView,\
-		QGridLayout, QStackedWidget, QPixmap, QGraphicsView, QGraphicsScene
+		QGridLayout, QStackedWidget, QPixmap, QGraphicsView, QGraphicsScene,\
+		QShortcut, QKeySequence
 
 from django_kikrit.merchandise.models import Merchandise
 
 from qt_client.models import MerchandiseListModel
-
+from qt_client.myLineEdit import MyLineEdit
 
 class MainWidget(QWidget):
 	search_line = None
@@ -24,7 +24,7 @@ class MainWidget(QWidget):
 		QWidget.__init__(self, parent)
 
 		# Initialize views and models:
-		self.search_line = QLineEdit(u"")
+		self.search_line = MyLineEdit()
 		self.search_line.grabKeyboard()
 
 		self.status = QLabel()
@@ -38,7 +38,7 @@ class MainWidget(QWidget):
 		self.add_button = QPushButton("Add")
 		self.rem_button = QPushButton("Remove")
 		self.test_button = QPushButton("Test")
-		
+
 		# Test image
 		self.graphics = QGraphicsView()
 		scene = QGraphicsScene()
@@ -52,7 +52,10 @@ class MainWidget(QWidget):
 		self.connect(self.add_button, SIGNAL("clicked()"), self.add_clicked)
 		self.connect(self.rem_button, SIGNAL("clicked()"), self.remove_clicked)
 		self.connect(self.test_button, SIGNAL("clicked()"), self.show_image)
-		
+
+		self.connect(self.search_line, SIGNAL("RightPressed()"), self.add_clicked)
+		self.connect(self.search_line, SIGNAL("LeftPressed()"), self.remove_clicked)
+
 		# Create layout:
 		self.stack = QStackedWidget()
 		self.stack.insertWidget(0, self.right_list)
@@ -102,7 +105,7 @@ class MainWidget(QWidget):
 		sel = self.getSelected(self.right_list)
 		removed = self.right_list.model().remove(sel)
 		#self.left_list.model().add(sel)
-	
+
 	def show_image(self):
 		cur = not(self.stack.currentIndex())
 		self.stack.setCurrentIndex(cur)
