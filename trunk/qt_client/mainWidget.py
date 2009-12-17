@@ -114,7 +114,7 @@ class MainWidget(QWidget):
 		else:
 			self.status.setText("Waiting...")
 
-	def search_line_changed(self):
- 		self.left_list.model().filter
+	def search_line_changed(self, filter_str):
+		self.left_list.model().filter(filter_str)
 
 
