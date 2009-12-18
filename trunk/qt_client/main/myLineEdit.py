@@ -21,7 +21,9 @@ class MyLineEdit(QLineEdit):
 			elif k == Qt.Key_Down:
 				self.emit(SIGNAL("DownPressed()"))
 				return True
-			elif k == Qt.Key_Enter:
-				self.emit(SIGNAL("EnterPressed()"))
+			elif k == Qt.Key_Return:
+				self.emit(SIGNAL("ReturnPressed()"))
 				return True
+
 		return QLineEdit.event(self, event)
+
