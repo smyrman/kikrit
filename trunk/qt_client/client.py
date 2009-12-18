@@ -8,8 +8,8 @@ os_environ['DJANGO_SETTINGS_MODULE'] = 'django_kikrit.settings'
 
 from PyQt4.QtGui import QApplication, QTabWidget
 
-from qt_client.mainWidget import MainWidget
-from qt_client.adminWidget import AdminWidget
+from qt_client.main.widget import MainWidget
+from qt_client.admin.widget import AdminWidget
 from qt_client.debugWidget import DebugWidget
 
 
@@ -19,17 +19,17 @@ def main():
 
 	tabs.addTab(MainWidget(), "Main")
 	tabs.addTab(AdminWidget(), "Admin")
+	
 	# Set widget parameters:
 	tabs.setWindowTitle('KiKrit')
 	#tabs.showFullScreen() # Should be used in final release
 	tabs.resize(600, 400)
 	tabs.move(200, 200)
-
 	tabs.show()
 
 	#FIXME: Check arv for "--debug".
-	debug_panel = DebugWidget()
-	debug_panel.show()
+	#debug_panel = DebugWidget()
+	#debug_panel.show()
 
 	return app.exec_()
 

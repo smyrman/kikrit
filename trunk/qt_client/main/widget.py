@@ -7,8 +7,8 @@ from PyQt4.QtGui import QWidget, QLineEdit, QLabel, QPushButton, QListView,\
 
 from django_kikrit.merchandise.models import Merchandise
 
-from qt_client.models import MerchandiseListModel
-from qt_client.myLineEdit import MyLineEdit
+from qt_client.main.models import MerchandiseListModel
+from qt_client.main.myLineEdit import MyLineEdit
 
 class MainWidget(QWidget):
 	search_line = None
@@ -52,9 +52,12 @@ class MainWidget(QWidget):
 		self.connect(self.add_button, SIGNAL("clicked()"), self.add_clicked)
 		self.connect(self.rem_button, SIGNAL("clicked()"), self.remove_clicked)
 		self.connect(self.test_button, SIGNAL("clicked()"), self.show_image)
-
-		self.connect(self.search_line, SIGNAL("RightPressed()"), self.add_clicked)
-		self.connect(self.search_line, SIGNAL("LeftPressed()"), self.remove_clicked)
+		
+		self.connect(self.search_line, SIGNAL("RightPressed()"), self.right_pressed)
+		self.connect(self.search_line, SIGNAL("LeftPressed()"), self.left_pressed)
+		self.connect(self.search_line, SIGNAL("UpPressed()"), self.up_pressed)
+		self.connect(self.search_line, SIGNAL("DownPressed()"), self.down_pressed)
+		self.connect(self.search_line, SIGNAL("ReturnPressed()"), self.return_pressed)
 
 		# Create layout:
 		self.stack = QStackedWidget()
@@ -90,7 +93,6 @@ class MainWidget(QWidget):
 	def add_clicked(self):
 		"""Called when the user presses the add-button"""
 		sel = self.getSelected(self.left_list)
-		#self.left_list.model().remove(sel)
 		self.right_list.model().add(sel)
 
 
@@ -98,7 +100,6 @@ class MainWidget(QWidget):
 		"""Called when the user presses the remove-button"""
 		sel = self.getSelected(self.right_list)
 		removed = self.right_list.model().remove(sel)
-		#self.left_list.model().add(sel)
 
 	def show_image(self):
 		cur = not(self.stack.currentIndex())
@@ -110,5 +111,27 @@ class MainWidget(QWidget):
 
 	def search_line_changed(self, filter_str):
 		self.left_list.model().filter(filter_str)
+
+	def left_pressed(self):
+		self.left_list.setFocus()
+
+	def right_pressed(self):
+		self.right_list.setFocus()
+
+	def up_pressed(self):
+		# Find selected list
+		list = None
+		if self.right_list.hasFocus():
+			list = self.right_list
+		else:
+			list = self.left_list
+
+		# TODO: iterate with "QListViewItemIterator"
+
+	def down_pressed(self):
+		print "down"
+
+	def return_pressed(self):
+		print "return"
 
 
