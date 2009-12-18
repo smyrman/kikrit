@@ -22,6 +22,9 @@ class KeyEmulator(object):
 
 
 	def sendKeyPress(self, key):
+		"""Please see Xlib.XStringToKeysym for valid strings for key
+
+		"""
 		sym = Xlib.XStringToKeysym(str(key))
 		code = Xlib.XKeysymToKeycode(self.dpy, sym)
 		Xtst.XTestFakeKeyEvent(self.dpy, code, True, 0)
@@ -29,6 +32,9 @@ class KeyEmulator(object):
 
 
 	def sendKeyRelease(self, key):
+		"""Please see Xlib.XStringToKeysym for valid strings for key
+
+		"""
 		sym = Xlib.XStringToKeysym(str(key))
 		code = Xlib.XKeysymToKeycode(self.dpy, sym)
 		Xtst.XTestFakeKeyEvent(self.dpy, code, False, 0)

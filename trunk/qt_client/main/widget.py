@@ -231,7 +231,9 @@ class DebugWidget(QWidget):
 		#str = self.barcode_line.getText()
 		str = u"001"
 		e = KeyEmulator()
-		e.sendInput(str+'\n')
+		e.sendInput(str)
+		e.sendKeyPress("Return")
+		e.sendKeyRelease("Return")
 
 		# TODO: Append barcode_line.text to MainWidget.search_line
 		# TODO: Send signal to MainWidget
