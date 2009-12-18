@@ -16,8 +16,8 @@ def main():
 	app = QApplication(sys.argv)
 	tabs = QTabWidget()
 
-	tabs.addTab(MainWidget(), "Main")
-	tabs.addTab(AdminWidget(), "Admin")
+	tabs.addTab(MainWidget(tabs), "Main")
+	tabs.addTab(AdminWidget(tabs), "Admin")
 
 	# Set widget parameters:
 	tabs.setWindowTitle('KiKrit')

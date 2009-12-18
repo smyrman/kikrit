@@ -43,6 +43,7 @@ class MainWidget(QWidget):
 		self.add_button = QPushButton("Add")
 		self.rem_button = QPushButton("Remove")
 		self.test_button = QPushButton("Test")
+		self.setFocusPolicy(Qt.StrongFocus)
 
 		# Test image
 		self.graphics = QGraphicsView()
@@ -52,17 +53,20 @@ class MainWidget(QWidget):
 		self.graphics.setScene(scene)
 
 		# Connect signals:
-		self.connect(self.search_line, SIGNAL("textChanged(QString)"),
-				self.search_line_changed)
-		self.connect(self.add_button, SIGNAL("clicked()"), self.add_clicked)
-		self.connect(self.rem_button, SIGNAL("clicked()"), self.remove_clicked)
-		self.connect(self.test_button, SIGNAL("clicked()"), self.show_image)
+		self.connect(self.parentWidget(), SIGNAL("currentChanged(int)"),
+				self.tabChanged)
 
-		self.connect(self.search_line, SIGNAL("RightPressed()"), self.right_pressed)
-		self.connect(self.search_line, SIGNAL("LeftPressed()"), self.left_pressed)
-		self.connect(self.search_line, SIGNAL("UpPressed()"), self.up_pressed)
-		self.connect(self.search_line, SIGNAL("DownPressed()"), self.down_pressed)
-		self.connect(self.search_line, SIGNAL("ReturnPressed()"), self.return_pressed)
+		self.connect(self.search_line, SIGNAL("textChanged(QString)"),
+				self.searchLineChanged)
+		self.connect(self.add_button, SIGNAL("clicked()"), self.addClicked)
+		self.connect(self.rem_button, SIGNAL("clicked()"), self.removeClicked)
+		self.connect(self.test_button, SIGNAL("clicked()"), self.showImage)
+
+		self.connect(self.search_line, SIGNAL("RightPressed()"), self.rightPressed)
+		self.connect(self.search_line, SIGNAL("LeftPressed()"), self.leftPressed)
+		self.connect(self.search_line, SIGNAL("UpPressed()"), self.upPressed)
+		self.connect(self.search_line, SIGNAL("DownPressed()"), self.downPressed)
+		self.connect(self.search_line, SIGNAL("ReturnPressed()"), self.returnPressed)
 
 		# Create layout:
 		self.stack = QStackedWidget()
@@ -88,25 +92,31 @@ class MainWidget(QWidget):
 		"""
 		return list(Merchandise.objects.all())
 
-
 	def getSelected(self, list_view):
 		"""Return a list of selected items"""
 		mdl = list_view.model()
 		return [mdl.items[i.row()] for i in list_view.selectedIndexes()]
 
 
-	def add_clicked(self):
+	def tabChanged(self, index):
+		if index == 0:
+			self.search_line.grabKeyboard()
+		else:
+			self.search_line.releaseKeyboard()
+
+
+	def addClicked(self):
 		"""Called when the user presses the add-button"""
 		sel = self.getSelected(self.left_list)
 		self.right_list.model().add(sel)
 
 
-	def remove_clicked(self):
+	def removeClicked(self):
 		"""Called when the user presses the remove-button"""
 		sel = self.getSelected(self.right_list)
 		removed = self.right_list.model().remove(sel)
 
-	def show_image(self):
+	def showImage(self):
 		cur = not(self.stack.currentIndex())
 		self.stack.setCurrentIndex(cur)
 		if cur:
@@ -114,16 +124,16 @@ class MainWidget(QWidget):
 		else:
 			self.status.setText("Waiting...")
 
-	def search_line_changed(self, filter_str):
+	def searchLineChanged(self, filter_str):
 		self.left_list.model().filter(filter_str)
 
-	def left_pressed(self):
+	def leftPressed(self):
 		self.left_list.setFocus()
 
-	def right_pressed(self):
+	def rightPressed(self):
 		self.right_list.setFocus()
 
-	def up_pressed(self):
+	def upPressed(self):
 		# Find selected list
 		list = None
 		if self.right_list.hasFocus():
@@ -133,10 +143,10 @@ class MainWidget(QWidget):
 
 		# TODO: iterate with "QListViewItemIterator"
 
-	def down_pressed(self):
+	def downPressed(self):
 		print "down"
 
-	def return_pressed(self):
+	def returnPressed(self):
 		print "return"
 
 
@@ -235,7 +245,5 @@ class DebugWidget(QWidget):
 		e.sendKeyPress("Return")
 		e.sendKeyRelease("Return")
 
-		# TODO: Append barcode_line.text to MainWidget.search_line
-		# TODO: Send signal to MainWidget
 		print "barcode submit clicked"
 
