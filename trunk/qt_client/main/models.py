@@ -8,7 +8,7 @@ class MerchandiseListModel(QAbstractListModel):
 	last_filter_str = ""
 
 
-	def __init__(self, parent=None, items=[]):
+	def __init__(self, items=[], parent=None):
 		QAbstractListModel.__init__(self, parent)
 		self.items = items
 		self.all_items = items
