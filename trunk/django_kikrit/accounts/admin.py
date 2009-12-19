@@ -11,7 +11,7 @@ class RFIDCardInline(admin.TabularInline):
 
 class AccountAdmin(admin.ModelAdmin):
 	#select_related = True
-	list_display = ('name', 'user', 'limit_group','color')
+	list_display = ('name', 'user', 'limit_group', 'balance', 'color')
 	list_filter = ('limit_group','color')
 	oredring = ('id',)
 	inlines = (RFIDCardInline,)

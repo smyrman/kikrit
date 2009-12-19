@@ -53,20 +53,18 @@ class MainWidget(QWidget):
 		self.graphics.setScene(scene)
 
 		# Connect signals:
-		self.connect(self.parentWidget(), SIGNAL("currentChanged(int)"),
-				self.tabChanged)
+		self.parentWidget().currentChanged.connect(self.tabChanged)
 
-		self.connect(self.search_line, SIGNAL("textChanged(QString)"),
-				self.searchLineChanged)
-		self.connect(self.add_button, SIGNAL("clicked()"), self.addClicked)
-		self.connect(self.rem_button, SIGNAL("clicked()"), self.removeClicked)
-		self.connect(self.test_button, SIGNAL("clicked()"), self.showImage)
+		self.search_line.textChanged.connect(self.searchLineChanged)
+		self.add_button.clicked.connect(self.addClicked)
+		self.rem_button.clicked.connect(self.removeClicked)
+		self.test_button.clicked.connect(self.showImage)
 
-		self.connect(self.search_line, SIGNAL("RightPressed()"), self.rightPressed)
-		self.connect(self.search_line, SIGNAL("LeftPressed()"), self.leftPressed)
-		self.connect(self.search_line, SIGNAL("UpPressed()"), self.upPressed)
-		self.connect(self.search_line, SIGNAL("DownPressed()"), self.downPressed)
-		self.connect(self.search_line, SIGNAL("ReturnPressed()"), self.returnPressed)
+		self.search_line.right_pressed.connect(self.rightPressed)
+		self.search_line.left_pressed.connect(self.leftPressed)
+		self.search_line.up_pressed.connect(self.upPressed)
+		self.search_line.down_pressed.connect(self.downPressed)
+		self.search_line.return_pressed.connect(self.returnPressed)
 
 		# Create layout:
 		self.stack = QStackedWidget()
