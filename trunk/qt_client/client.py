@@ -26,6 +26,7 @@ def main():
 	tabs.setWindowTitle('KiKrit')
 	#tabs.showFullScreen() # Should be used in final release
 	tabs.resize(600, 400)
+	tabs.setMinimumSize(600, 400)
 	tabs.move(200, 200)
 	tabs.show()
 

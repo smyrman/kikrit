@@ -16,24 +16,25 @@ class KeyEmulator(object):
 
 		"""
 		special_key = False
-		key = ""
-
+		key = u""
+		txt = unicode(txt)
 		for c in txt:
 			# Get special keys, like Return, Esc osv:
-			if c == '{':
-				special_key=True
+			if c == u'{':
+				special_key = True
 				continue
-			elif c == '}':
+			elif c == u'}':
 				special_key = False
 
 			if special_key:
 				key += c
 				continue
-			elif key == "":
+			elif key == u"":
 				key = c
 
+			print key
 			sym = Xlib.XStringToKeysym(key)
-			key = ""
+			key = u""
 			code = Xlib.XKeysymToKeycode(self.display, sym)
 			Xtst.XTestFakeKeyEvent(self.display, code, True, 0)
 			Xtst.XTestFakeKeyEvent(self.display, code, False, 0)
