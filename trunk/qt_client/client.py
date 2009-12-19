@@ -3,14 +3,17 @@
 import sys
 from os import environ as os_environ
 from os.path import dirname, abspath, join as path_join
-sys.path.append(path_join(abspath(dirname(__file__)), ".."))
+BASEDIR = path_join(abspath(dirname(__file__)), "..")
+sys.path.insert(0, BASEDIR)
 os_environ['DJANGO_SETTINGS_MODULE'] = 'django_kikrit.settings'
 
 from PyQt4.QtGui import QApplication, QTabWidget
 
-from qt_client.main.widget import MainWidget, DebugWidget
-from qt_client.admin.widget import AdminWidget
+from qt_client.main.widgets import MainWidget, DebugWidget
+from qt_client.admin.widgets import AdminWidget
+#from qt_client.utils.threads import RFIDThread
 
+from subprocess import Popen
 
 def main():
 	app = QApplication(sys.argv)

@@ -3,14 +3,16 @@ from PyQt4.QtCore import QUrl
 from PyQt4.QtGui import QWidget, QGridLayout
 from PyQt4.QtWebKit import QWebView
 
+from django_kikrit.settings import RUNSERVER_PORT
+
+
 class AdminWidget(QWidget):
 	web = None
 	def __init__(self, parent=None):
 		QWidget.__init__(self, parent)
 
 		self.web = QWebView()
-		# FIXME: Get port from django_kikrit.settings
-		self.web.load(QUrl("http://localhost:8081/"))
+		self.web.load(QUrl("http://localhost:%s/" % RUNSERVER_PORT))
 
 		grid = QGridLayout()
 		grid.addWidget(self.web, 0, 0)

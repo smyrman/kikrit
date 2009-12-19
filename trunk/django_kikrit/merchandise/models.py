@@ -31,9 +31,16 @@ class Merchandise(models.Model):
 
 		"""
 		filter_str = unicode(filter_str).lower()
+		# Search attributes:
 		for attr in self.search_fields:
 			if filter_str in unicode(getattr(self, attr)).lower():
 				return True
+
+		# Search tags:
+		for tag in self.tags.all():
+			if filter_str in unicode(tag).lower():
+				return True
+
 		return False
 
 

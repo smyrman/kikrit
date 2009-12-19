@@ -6,7 +6,7 @@
 # PS! The device must be set for this driver to work.
 import serial
 
-DEVICE = ""
+DEVICE = "/dev/ttyS0"
 SER_RFID = serial.Serial(DEVICE, 9600, timeout=0.1)
 
 def read_rfid(timeout=None):
@@ -19,3 +19,4 @@ def read_rfid(timeout=None):
 		if char == "\x80": str+="1"
 	return str
 
+print read_rfid()

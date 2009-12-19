@@ -3,22 +3,41 @@ Xtst = CDLL("libXtst.so.6")
 Xlib = CDLL("libX11.so.6")
 
 class KeyEmulator(object):
-	dpy = None
+	display = None
 
 	def __init__(self, display=None):
-		self.dpy = Xtst.XOpenDisplay(display)
+		self.display = Xtst.XOpenDisplay(display)
 
 
 	def sendInput(self, txt):
-		"""Takes a string. Emulate keypresses for all symbols in string
+		"""Emulate keypresses for all symbols in txt.  Special keys, as Return,
+		Esc etc., can be encapsled by Curly baracses like this: {Return}. Pleas
+		see Xlib.XStringToKeysym for where to find reference of valid symbols.
 
 		"""
+		special_key = False
+		key = ""
+
 		for c in txt:
-			sym = Xlib.XStringToKeysym(c)
-			code = Xlib.XKeysymToKeycode(self.dpy, sym)
-			Xtst.XTestFakeKeyEvent(self.dpy, code, True, 0)
-			Xtst.XTestFakeKeyEvent(self.dpy, code, False, 0)
-		Xlib.XFlush(self.dpy)
+			# Get special keys, like Return, Esc osv:
+			if c == '{':
+				special_key=True
+				continue
+			elif c == '}':
+				special_key = False
+
+			if special_key:
+				key += c
+				continue
+			elif key == "":
+				key = c
+
+			sym = Xlib.XStringToKeysym(key)
+			key = ""
+			code = Xlib.XKeysymToKeycode(self.display, sym)
+			Xtst.XTestFakeKeyEvent(self.display, code, True, 0)
+			Xtst.XTestFakeKeyEvent(self.display, code, False, 0)
+		Xlib.XFlush(self.display)
 
 
 	def sendKeyPress(self, key):
@@ -26,9 +45,9 @@ class KeyEmulator(object):
 
 		"""
 		sym = Xlib.XStringToKeysym(str(key))
-		code = Xlib.XKeysymToKeycode(self.dpy, sym)
-		Xtst.XTestFakeKeyEvent(self.dpy, code, True, 0)
-		Xlib.XFlush(self.dpy)
+		code = Xlib.XKeysymToKeycode(self.display, sym)
+		Xtst.XTestFakeKeyEvent(self.display, code, True, 0)
+		Xlib.XFlush(self.display)
 
 
 	def sendKeyRelease(self, key):
@@ -36,7 +55,7 @@ class KeyEmulator(object):
 
 		"""
 		sym = Xlib.XStringToKeysym(str(key))
-		code = Xlib.XKeysymToKeycode(self.dpy, sym)
-		Xtst.XTestFakeKeyEvent(self.dpy, code, False, 0)
-		Xlib.XFlush(self.dpy)
+		code = Xlib.XKeysymToKeycode(self.display, sym)
+		Xtst.XTestFakeKeyEvent(self.display, code, False, 0)
+		Xlib.XFlush(self.display)
 
