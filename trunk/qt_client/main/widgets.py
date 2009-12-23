@@ -159,7 +159,6 @@ class MainWidget(QWidget):
 				QItemSelectionModel.ClearAndSelect)
 
 
-
 	def showImage(self):
 		cur = not(self.stack.currentIndex())
 		self.stack.setCurrentIndex(cur)

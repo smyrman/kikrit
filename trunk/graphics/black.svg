@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.0"
+   width="200"
+   height="200"
+   id="svg2">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3234">
+      <stop
+         id="stop3236"
+         style="stop-color:#1a1a1a;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop3238"
+         style="stop-color:#1a1a1a;stop-opacity:0"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="90"
+       y1="100"
+       x2="90"
+       y2="50"
+       id="linearGradient3240"
+       xlink:href="#linearGradient3234"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="layer1">
+    <path
+       d="M 49.999999,30 L 140,30 C 142.77,30 145,32.22997 145,34.999934 L 164,110 C 164,112.76996 162.77,120 160,120 L 29.999999,120 C 27.23,120 26,112.76996 26,110 L 45,34.999934 C 45,32.22997 47.23,30 49.999999,30 z"
+       id="rect2457"
+       style="fill:#000000;stroke:#1a1a1a;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4" />
+    <path
+       d="M 26,110 L 164,110 L 146,40 L 44,40 L 26,110 z"
+       id="path3232"
+       style="fill:url(#linearGradient3240);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <g
+       transform="matrix(1.6784827,0,0,1.1579438,-35.419839,-25.467593)"
+       id="g2447"
+       style="opacity:0.20973786">
+      <path
+         d="M 180,70 L 171.18322,52.135255 L 151.4683,49.270511 L 165.73415,35.364744 L 162.36644,15.729491 L 180,24.999999 L 197.63356,15.72949 L 194.26585,35.364745 L 208.5317,49.270509 L 188.81678,52.135256 L 180,70 z"
+         transform="translate(-101.4683,40.729489)"
+         id="path2403"
+         style="fill:#1a1a1a;stroke:#f9f9f9;stroke-width:0.71729505;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         d="M 180,180 L 165.22831,165.07418 L 144.55847,168.78108 L 154.18907,150.12003 L 144.27627,131.60734 L 165,135 L 179.54339,119.85164 L 182.72076,140.60946 L 201.62187,149.75995 L 182.86186,159.19633 L 180,180 z"
+         transform="translate(-92.561357,-68.742597)"
+         id="path2407"
+         style="fill:#1a1a1a;stroke:#f9f9f9;stroke-width:0.71729505;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+      <path
+         d="M 40,20 L 31.106159,16.984012 L 23.579605,22.600735 L 23.699632,13.210198 L 16.031978,7.7876826 L 25,4.9999996 L 27.787683,-3.9680225 L 33.210198,3.699632 L 42.600735,3.5796047 L 36.984012,11.106159 L 40,20 z"
+         transform="translate(48.13531,70.264009)"
+         id="path2401"
+         style="fill:#1a1a1a;stroke:#f9f9f9;stroke-width:0.71729505;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none" />
+    </g>
+    <text
+       x="94"
+       y="154"
+       id="text3242"
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"><tspan
+         x="94"
+         y="154"
+         id="tspan3244"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;font-family:Arabia;-inkscape-font-specification:Arabia">BLACK</tspan></text>
+  </g>
+</svg>

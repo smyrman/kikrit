@@ -1,7 +1,7 @@
 # Django settings for django_kikrit project.
-from os.path import dirname, abspath, join as join_path
+from os.path import dirname, abspath, join as path_join
 
-PROJECT_ROOT = join_path(dirname(abspath(__file__)), "..", "..")
+PROJECT_ROOT = path_join(dirname(abspath(__file__)), "..", "..")
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -17,9 +17,10 @@ LANGUAGE_CODE = 'en-us'
 SITE_ID = 1
 USE_I18N = False
 
-MEDIA_ROOT = join_path(PROJECT_ROOT, 'django_kikrit', 'media')
+MEDIA_ROOT = path_join(PROJECT_ROOT, 'django_kikrit', 'media')
 MEDIA_URL = '/media'
 ADMIN_MEDIA_PREFIX = '/media/'
+UPLOAD_PATH = path_join(MEDIA_ROOT, 'upload')
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

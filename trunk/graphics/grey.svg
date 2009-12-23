@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   version="1.0"
+   width="200"
+   height="200"
+   id="svg2">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3234">
+      <stop
+         id="stop3236"
+         style="stop-color:#c2c2c2;stop-opacity:1"
+         offset="0" />
+      <stop
+         id="stop3238"
+         style="stop-color:#ababab;stop-opacity:0"
+         offset="1" />
+    </linearGradient>
+    <linearGradient
+       x1="90"
+       y1="100"
+       x2="90"
+       y2="50"
+       id="linearGradient3240"
+       xlink:href="#linearGradient3234"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="layer1">
+    <path
+       d="M 49.999999,30 L 140,30 C 142.77,30 145,32.22997 145,34.999934 L 164,110 C 164,112.76996 162.77,120 160,120 L 29.999999,120 C 27.23,120 26,112.76996 26,110 L 45,34.999934 C 45,32.22997 47.23,30 49.999999,30 z"
+       id="rect2457"
+       style="fill:#999999;stroke:#808080;stroke-width:1;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4" />
+    <text
+       x="94"
+       y="154"
+       id="text3242"
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;text-anchor:middle;fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"><tspan
+         x="94"
+         y="154"
+         id="tspan3244"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:center;text-anchor:middle;fill:#4d4d4d;font-family:Arabia;-inkscape-font-specification:Arabia">GREY</tspan></text>
+    <path
+       d="M 133.92856,81.785714 C 142.48579,82.002369 145.27695,71.050968 140.62926,65.052988 C 136.96582,56.811114 127.46892,53.521608 119.57226,57.050352 C 113.0485,55.23589 116.49251,44.864741 108.72912,42.400599 C 101.11196,36.593223 89.176997,33.543041 81.560143,41.002936 C 76.873475,45.200557 72.173139,57.830996 76.877265,59.535587 C 70.325742,53.224735 58.904124,54.634098 52.027431,59.771514 C 42.230403,65.889828 46.053892,80.535339 56.078697,84.073148 C 65.577925,88.346004 76.165711,89.123562 86.192285,91.670944 C 99.667594,94.842214 113.4995,91.358164 125.87498,85.866583 C 128.743,84.895313 131.52421,83.659193 133.92856,81.785714 z"
+       id="path3330"
+       style="fill:#ececec;fill-rule:evenodd;stroke:#cccccc;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       d="M 26,110 L 164,110 L 146,40 L 44,40 L 26,110 z"
+       id="path3232"
+       style="fill:url(#linearGradient3240);fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+  </g>
+</svg>

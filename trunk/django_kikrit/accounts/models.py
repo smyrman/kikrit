@@ -1,19 +1,24 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
+from random import random
+from os.path import sep as path_sep
 
 from django.db import models
 from django.contrib.auth.models import User
 
+import django_kikrit.accounts.signals
+from django_kikrit.accounts.fields import NegativeIntegerField
+from django_kikrit.settings import UPLOAD_PATH
 
 class LimitGroup(models.Model):
 	"""A user might be a member of ONE LimitGroup. This determin how negative
-	balance he can have without going black.
+	balance he can have (and for how long) without going black.
 
 	"""
 	grey_limit = 0 # Hard coded limit (for now).
 
-	name = models.CharField(max_length=50)
-	black_limit = models.IntegerField(default=0,
+	name = models.CharField(max_length=50, unique=True)
+	black_limit = NegativeIntegerField(default=0,
 			help_text="Minimum balance where transactions are still allowed.")
 	max_grey_hours = models.SmallIntegerField(default=24,
 			help_text="The maximum number of hours a person migth have a "
@@ -158,28 +163,60 @@ class Account(models.Model):
 		return True
 
 
-	class Meta:
-		pass
-	#	unique_together = (("name", "user",),)
+	def get_image(self):
+		"""Query for images matching current balance and color. Then return a
+		random image from those that does. If no matching images is found, a
+		BalanceImage.DoesNotExist exception is thrown.
 
+		"""
+		# Filter based on balance:
+		q1 = BalanceImage.objects.filter(minimum_balance__lte=self.balance,
+				maximum_balance__gte=self.balance)
+		q2 = BalanceImage.objects.filter(minimum_balance=None,
+				maximum_balance__gte=self.balance)
+		q3 = BalanceImage.objects.filter(minimum_balance__lte=self.balance,
+				maximum_balance=None)
+		q4 = BalanceImage.objects.filter(minimum_balance=None,
+				maximum_balance=None)
+
+		# Filter based on color:
+		if self.color == self.BLACK_COLOR:
+			q_color = BalanceImage.objects.filter(black=True)
+		elif self.color == self.BLACK_GREY:
+			q_color = BalanceImage.objects.filter(grey=True)
+		elif self.color == self.BLACK_WHITE:
+			q_color = BalanceImage.objects.filter(white=True)
+		imgs = list(q1) + list(q2) + list(q3) + list(q4)
+
+		# GUARD: image does not exist?
+		if len(imgs) == 0:
+			raise BalanceImage.DoesNotExist()
+
+		# Return a random image:
+		return imgs[int(random()*len(imgs))]
+
+
+
+class BalanceImage(models.Model):
+	image = models.ImageField(upload_to=UPLOAD_PATH)
+	minimum_balance = models.IntegerField(null=True, blank=True,
+			help_text="Minimum balance for when the image can be shown. Can be"
+			" left empty.")
+	maximum_balance = models.IntegerField(null=True, blank=True,
+			help_text="Maximum balance for when the image can be shown. Can be"
+			" left empty.")
+	white = models.BooleanField(blank=True)
+	grey = models.BooleanField(blank=True)
+	black = models.BooleanField(blank=True)
+
+	def __unicode__(self):
+		return unicode(self.image).split(path_sep)[-1]
 
 
 class RFIDCard(models.Model):
 	account = models.ForeignKey(Account)
 	rfid_string = models.CharField(max_length=50, unique=True)
 
-
-
-# Signals:
-def create_user_account(signal, instance, **kwargs):
-	"""Signal for automatically creating an Account upon user creation/save.
-
-	"""
-	account, new = Account.objects.get_or_create(user=instance)
-	if new:
-		account.name = instance.username
-		account.save()
-
-models.signals.post_save.connect(create_user_account, sender=User)
-
+	def __unicode__(self):
+		return unicode(self.rfid_string)
 
