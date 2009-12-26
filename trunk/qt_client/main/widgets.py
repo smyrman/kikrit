@@ -5,8 +5,8 @@ from PyQt4.QtGui import QWidget, QLineEdit, QLabel, QPushButton, QListView,\
 		QGridLayout, QStackedWidget, QPixmap, QGraphicsView, QGraphicsScene,\
 		QKeyEvent, QApplication, QItemSelectionModel
 
-from django_kikrit.merchandise.models import Merchandise
-from django_kikrit.accounts.models import RFIDCard
+from django_kikrit.merchandise.models import Merchandise, buy_merchandise
+from django_kikrit.accounts.models import Account, RFIDCard
 
 from qt_client.utils.key_emu import KeyEmulator
 from qt_client.main.models import MerchandiseListModel
@@ -26,10 +26,12 @@ class MainWidget(QWidget):
 	stack = None
 	graphics = None
 
-	def __init__(self, parent=None):
+	def __init__(self, rfid_thread, parent=None):
 		QWidget.__init__(self, parent)
 
 		# Initialize views and models:
+		self.rfid_thread = rfid_thread
+
 		self.search_line = MyLineEdit(self)
 		self.search_line.grabKeyboard()
 
@@ -59,7 +61,8 @@ class MainWidget(QWidget):
 		self.graphics.setScene(scene)
 
 		# Connect signals:
-		self.parentWidget().currentChanged.connect(self.tabChanged)
+		if parent != None:
+			self.parentWidget().currentChanged.connect(self.tabChanged)
 
 		self.search_line.textChanged.connect(self.searchLineChanged)
 		self.add_button.clicked.connect(self.addClicked)
@@ -71,6 +74,9 @@ class MainWidget(QWidget):
 		self.search_line.up_pressed.connect(self.upPressed)
 		self.search_line.down_pressed.connect(self.downPressed)
 		self.search_line.return_pressed.connect(self.returnPressed)
+		self.search_line.escape_pressed.connect(self.escapePressed)
+
+		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
 
 		# Create layout:
 		self.stack = QStackedWidget()
@@ -202,6 +208,35 @@ class MainWidget(QWidget):
 		else:
 			self.addClicked()
 
+	def escapePressed(self):
+		self.right_list.setData([])
+		self.serach_line.setText("")
+		self.status.setText("Order Canceled")
+
+
+	def rfidEvent(self, rfid_str):
+		try:
+			card = RFIDCard.objects.get(rfid_string=unicode(rfid_str))
+		except RFIDCard.DoesNotExist:
+			self.status.setText("No transaction: RFID card not found!")
+			return False
+
+		if buy_merchandise(card.account, self.right_list.model().items):
+			self.right_list.model().setData([])
+			self.search_line.setText("")
+			color = Account.COLOR_CHOICES[card.account.color][0]
+			self.status.setText("Transaction sucsessfull: Your are %s." %
+					color)
+			return True
+
+		else:
+			color = Account.COLOR_CHOICES[card.account.color][0]
+			self.status.setText("No transaction: Your are %s." %
+					color)
+			return False
+
+
+
 
 
 class DebugWidget(QWidget):
@@ -219,10 +254,12 @@ class DebugWidget(QWidget):
 	barcode_submit = None
 	barcode_get_button = None
 
-	def __init__(self, parent=None):
+	def __init__(self, rfid_thread, parent=None):
 		QWidget.__init__(self, parent)
 
 		# Initialize views and models:
+		self.rfid_thread = rfid_thread
+
 		self.rfid_line = QLineEdit()
 		self.barcode_line = QLineEdit()
 
@@ -233,15 +270,11 @@ class DebugWidget(QWidget):
 		self.barcode_submit = QPushButton("Bip barcode")
 
 		# Connect signals:
-		self.connect(self.rfid_get_button, SIGNAL("clicked()"),
-				self.rfidGetClicked)
-		self.connect(self.barcode_get_button, SIGNAL("clicked()"),
-				self.barcodeGetClicked)
+		self.rfid_get_button.clicked.connect(self.rfidGetClicked)
+		self.barcode_get_button.clicked.connect(self.barcodeGetClicked)
 
-		self.connect(self.rfid_submit, SIGNAL("clicked()"),
-				self.rfidSubmitClicked)
-		self.connect(self.barcode_submit, SIGNAL("clicked()"),
-				self.barcodeSubmitClicked)
+		self.rfid_submit.clicked.connect(self.rfidSubmitClicked)
+		self.barcode_submit.clicked.connect(self.barcodeSubmitClicked)
 
 		# Create layout:
 		grid = QGridLayout()
@@ -286,7 +319,8 @@ class DebugWidget(QWidget):
 
 
 	def rfidSubmitClicked(self):
-		# TODO: Send RFID signal
+		str = self.rfid_line.text()
+		self.rfid_thread.rfid_signal.emit(str)
 		print "rfid submit clicked"
 
 

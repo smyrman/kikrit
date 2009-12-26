@@ -22,7 +22,7 @@ class Merchandise(models.Model):
 	tags = models.ManyToManyField(MerchandiseTag, null=True, blank=True)
 
 	def __unicode__(self):
-		return "%s -  %d,- (%d,-)" % (self.name, self.ordinary_price,
+		return u"%s -  %d,- (%d,-)" % (self.name, self.ordinary_price,
 				self.internal_price)
 
 
@@ -55,7 +55,7 @@ class Transaction(models.Model):
 	amount = models.IntegerField()
 
 	def __unicode__(self):
-		return self.timestamp
+		return unicode(self.timestamp)
 
 
 
@@ -78,7 +78,8 @@ def buy_merchandise(account, merchandise_list):
 		# ManyToManyFields must be set after save:
 		transaction.merchandise = merchandise_list
 		return True
+		print "TATA"
+	print "Ohh.."
 	return False
-
 
 

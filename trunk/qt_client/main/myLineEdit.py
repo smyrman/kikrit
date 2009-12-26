@@ -8,6 +8,7 @@ class MyLineEdit(QLineEdit):
 	up_pressed = pyqtSignal(name="upPressed")
 	down_pressed = pyqtSignal(name="downPressed")
 	return_pressed = pyqtSignal(name="returnPressed")
+	escape_pressed = pyqtSignal(name="escapePressed")
 
 	def __init__(self, *args):
 		QLineEdit.__init__(self, *args)
@@ -33,8 +34,12 @@ class MyLineEdit(QLineEdit):
 				self.down_pressed.emit()
 				return True
 
-			elif k == Qt.Key_Return:
+			elif k in (Qt.Key_Return, Qt.Key_Enter):
 				self.return_pressed.emit()
+				return True
+
+			elif k == Qt.Key_Escape:
+				self.esacape_pressed.emit()
 				return True
 
 		return QLineEdit.event(self, event)

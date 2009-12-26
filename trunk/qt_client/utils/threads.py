@@ -5,17 +5,17 @@ from PyQt4.QtCore import QThread, pyqtSignal
 
 
 class RFIDThread(QThread):
-	"""A thread to check for bibed RFIDCards. Nothe that the device attribute
+	"""A thread to check for bibed RFIDCards. Note that the device attribute
 	must point to the right device for this driver to work.
 
 	"""
 	rfid_serial = None
-	rfid_card_signal = None
+	rfid_signal = pyqtSignal(str, name="rfidSignal")
 
 	def __init__(self, parent=None, device="/dev/ttyS0", timeout=0.1):
 		QThread.__init__(self, parent)
-		self.rfid_serial = serial.Serial(device, 9600, timeout=timeout)
-		self.rfid_card_signal = pyqtSignal()
+		if device != None:
+			self.setDevice(device)
 
 
 	def setDevice(self, device, timeout=0.1):
@@ -23,21 +23,32 @@ class RFIDThread(QThread):
 
 
 	def readRfid(self):
-		"""Try to read RFID card
+		"""Try to read RFID card. Return encoded
+
 		"""
-		raw_str = self.serial_rfid.read(100)
+		raw_str = self.rfid_serial.read(100)
 		str = ""
 		for char in raw_str:
 			if char == "\x00": str+="0"
 			elif char == "\x80": str+="1"
-			else: raise Exception("Unknown char: %s" % char)
+			else: raise self.RFIDException("Unknown char: %s" % char)
+
 		return str
 
 
 	def run(self):
+		# GUARD: Device not set?
+		if self.rfid_serial == None:
+			print "no device set. Entering 'debug' mode.. (a.k.a. deep sleep)"
+			while 1: self.sleep(30)
+
+		# Main loop:
 		while 1:
 			str = self.readRfid()
 			if str:
-				self.rfid_card_signal.emit(str)
+				self.rfid_signal.emit(str)
+
+	class RFIDException(Exception):
+		pass
 
 
