@@ -32,7 +32,6 @@ class KeyEmulator(object):
 			elif key == u"":
 				key = c
 
-			print key
 			sym = Xlib.XStringToKeysym(key)
 			key = u""
 			code = Xlib.XKeysymToKeycode(self.display, sym)

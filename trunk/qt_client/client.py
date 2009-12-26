@@ -9,34 +9,37 @@ os_environ['DJANGO_SETTINGS_MODULE'] = 'django_kikrit.settings'
 
 from PyQt4.QtGui import QApplication, QTabWidget
 
+# FIXME: Get DEVICE from settings
+#from settings import DEVICE
+DEVICE = None
 from qt_client.main.widgets import MainWidget, DebugWidget
 from qt_client.admin.widgets import AdminWidget
 from qt_client.utils.threads import RFIDThread
 
-from subprocess import Popen
 
 def main():
 	app = QApplication(sys.argv)
+
 	tabs = QTabWidget()
-
-	# FIXME: Get DEVICE from settings
 	rfid_thread = RFIDThread(device=None)
-	rfid_thread.start()
+	main_widget = MainWidget(rfid_thread, parent=tabs)
+	admin_widget = AdminWidget(rfid_thread, parent=tabs)
 
-	tabs.addTab(MainWidget(rfid_thread, parent=tabs), "Main")
-	tabs.addTab(AdminWidget(rfid_thread, parent=tabs), "Admin")
+	tabs.addTab(main_widget, "Main")
+	tabs.addTab(admin_widget, "Admin")
 
-	# Set widget parameters:
 	tabs.setWindowTitle('KiKrit')
 	#tabs.showFullScreen() # Should be used in final release
 	tabs.resize(600, 400)
 	tabs.setMinimumSize(600, 400)
 	tabs.move(200, 200)
+
+	rfid_thread.start()
 	tabs.show()
 
 	#FIXME: Better argv check?
 	if "--debug" in sys.argv[1:]:
-		debug_panel = DebugWidget(rfid_thread)
+		debug_panel = DebugWidget(main_widget)
 		debug_panel.show()
 
 	return app.exec_()
