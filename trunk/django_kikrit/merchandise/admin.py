@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.contrib import admin
 
-from django_kikrit.merchandise.models import Merchandise, MerchandiseTag
+from django_kikrit.merchandise.models import Merchandise, MerchandiseTag,\
+		Transaction
 
 
 class MerchandiseAdmin(admin.ModelAdmin):
@@ -20,3 +21,4 @@ class MerchandiseAdmin(admin.ModelAdmin):
 
 admin.site.register(Merchandise, MerchandiseAdmin)
 admin.site.register(MerchandiseTag)
+admin.site.register(Transaction)

@@ -60,7 +60,7 @@ class MerchandiseListModel(QAbstractListModel):
 		self.reset()
 
 
-	def setAllData(self, new_list):
+	def setData(self, new_list):
 		"""replace old list with new list
 
 		"""

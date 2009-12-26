@@ -11,7 +11,7 @@ from PyQt4.QtGui import QApplication, QTabWidget
 
 from qt_client.main.widgets import MainWidget, DebugWidget
 from qt_client.admin.widgets import AdminWidget
-#from qt_client.utils.threads import RFIDThread
+from qt_client.utils.threads import RFIDThread
 
 from subprocess import Popen
 
@@ -19,8 +19,12 @@ def main():
 	app = QApplication(sys.argv)
 	tabs = QTabWidget()
 
-	tabs.addTab(MainWidget(tabs), "Main")
-	tabs.addTab(AdminWidget(tabs), "Admin")
+	# FIXME: Get DEVICE from settings
+	rfid_thread = RFIDThread(device=None)
+	rfid_thread.start()
+
+	tabs.addTab(MainWidget(rfid_thread, parent=tabs), "Main")
+	tabs.addTab(AdminWidget(rfid_thread, parent=tabs), "Admin")
 
 	# Set widget parameters:
 	tabs.setWindowTitle('KiKrit')
@@ -32,7 +36,7 @@ def main():
 
 	#FIXME: Better argv check?
 	if "--debug" in sys.argv[1:]:
-		debug_panel = DebugWidget()
+		debug_panel = DebugWidget(rfid_thread)
 		debug_panel.show()
 
 	return app.exec_()
