@@ -39,7 +39,7 @@ def main():
 
 	#FIXME: Better argv check?
 	if "--debug" in sys.argv[1:]:
-		debug_panel = DebugWidget(main_widget)
+		debug_panel = DebugWidget(tabs, rfid_thread)
 		debug_panel.show()
 
 	return app.exec_()

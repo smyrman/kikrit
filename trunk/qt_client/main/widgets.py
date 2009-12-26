@@ -134,8 +134,10 @@ class MainWidget(QWidget):
 	def tabChanged(self, index):
 		if index == 0:
 			self.search_line.grabKeyboard()
+			self.rfid_thread.rfid_signal.connect(self.rfidEvent)
 		else:
 			self.search_line.releaseKeyboard()
+			self.rfid_thread.rfid_signal.disconnect(self.rfidEvent)
 
 
 	def addClicked(self):
@@ -253,11 +255,12 @@ class DebugWidget(QWidget):
 	barcode_submit = None
 	barcode_get_button = None
 
-	def __init__(self, main_widget, parent=None):
+	def __init__(self, main_window, rfid_thread, parent=None):
 		QWidget.__init__(self, parent)
 
 		# Initialize views and models:
-		self.main_widget = main_widget
+		self.rfid_thread = rfid_thread
+		self.main_window = main_window
 
 		self.rfid_line = QLineEdit()
 		self.barcode_line = QLineEdit()
@@ -319,8 +322,8 @@ class DebugWidget(QWidget):
 
 	def rfidSubmitClicked(self):
 		str = self.rfid_line.text()
-		self.main_widget.setFocus()
-		self.main_widget.rfid_thread.rfid_signal.emit(str)
+		self.main_window.setFocus()
+		self.rfid_thread.rfid_signal.emit(str)
 		print "rfid submit clicked"
 
 
@@ -328,7 +331,7 @@ class DebugWidget(QWidget):
 		str = self.barcode_line.text()
 		e = KeyEmulator()
 
-		self.main_widget.setFocus()
+		self.main_window.setFocus()
 		e.sendInput(str)
 		e.sendKeyPress("Return")
 		e.sendKeyRelease("Return")
