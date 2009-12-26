@@ -39,7 +39,7 @@ class MyLineEdit(QLineEdit):
 				return True
 
 			elif k == Qt.Key_Escape:
-				self.esacape_pressed.emit()
+				self.escape_pressed.emit()
 				return True
 
 		return QLineEdit.event(self, event)

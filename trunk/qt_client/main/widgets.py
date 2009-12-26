@@ -209,9 +209,10 @@ class MainWidget(QWidget):
 			self.addClicked()
 
 	def escapePressed(self):
-		self.right_list.setData([])
-		self.serach_line.setText("")
+		self.right_list.model().setData([])
+		self.search_line.setText("")
 		self.status.setText("Order Canceled")
+		self.left_list.setFocus()
 
 
 	def rfidEvent(self, rfid_str):
@@ -224,7 +225,7 @@ class MainWidget(QWidget):
 		if buy_merchandise(card.account, self.right_list.model().items):
 			self.right_list.model().setData([])
 			self.search_line.setText("")
-			color = Account.COLOR_CHOICES[card.account.color][0]
+			color = Account.COLOR_CHOICES[card.account.color][1]
 			self.status.setText("Transaction sucsessfull: Your are %s." %
 					color)
 			return True
@@ -234,8 +235,6 @@ class MainWidget(QWidget):
 			self.status.setText("No transaction: Your are %s." %
 					color)
 			return False
-
-
 
 
 
@@ -254,11 +253,11 @@ class DebugWidget(QWidget):
 	barcode_submit = None
 	barcode_get_button = None
 
-	def __init__(self, rfid_thread, parent=None):
+	def __init__(self, main_widget, parent=None):
 		QWidget.__init__(self, parent)
 
 		# Initialize views and models:
-		self.rfid_thread = rfid_thread
+		self.main_widget = main_widget
 
 		self.rfid_line = QLineEdit()
 		self.barcode_line = QLineEdit()
@@ -320,16 +319,18 @@ class DebugWidget(QWidget):
 
 	def rfidSubmitClicked(self):
 		str = self.rfid_line.text()
-		self.rfid_thread.rfid_signal.emit(str)
+		self.main_widget.setFocus()
+		self.main_widget.rfid_thread.rfid_signal.emit(str)
 		print "rfid submit clicked"
 
 
 	def barcodeSubmitClicked(self):
 		str = self.barcode_line.text()
 		e = KeyEmulator()
+
+		self.main_widget.setFocus()
 		e.sendInput(str)
 		e.sendKeyPress("Return")
 		e.sendKeyRelease("Return")
-
 		print "barcode submit clicked"
 
