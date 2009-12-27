@@ -1,18 +1,13 @@
 # -*- coding: utf-8 -*-
-
-from PyQt4.QtCore import SIGNAL, Qt, QModelIndex
-from PyQt4.QtGui import QWidget, QLineEdit, QLabel, QPushButton, QListView,\
-		QGridLayout, QStackedWidget, QPixmap, QGraphicsView, QGraphicsScene,\
-		QKeyEvent, QApplication, QItemSelectionModel
+from PyQt4 import QtCore, QtGui
 
 from django_kikrit.merchandise.models import Merchandise, buy_merchandise
 from django_kikrit.accounts.models import Account, RFIDCard
 
-from qt_client.utils.key_emu import KeyEmulator
 from qt_client.main.models import MerchandiseListModel
-from qt_client.main.myLineEdit import MyLineEdit
+from qt_client.main.gui_components import MyLineEdit
 
-class MainWidget(QWidget):
+class MainWidget(QtGui.QWidget):
 	"""The main tab, featuring the KiKrit client GUI.
 
 	"""
@@ -27,7 +22,7 @@ class MainWidget(QWidget):
 	graphics = None
 
 	def __init__(self, rfid_thread, parent=None):
-		QWidget.__init__(self, parent)
+		QtGui.QWidget.__init__(self, parent)
 
 		# Initialize views and models:
 		self.rfid_thread = rfid_thread
@@ -35,28 +30,28 @@ class MainWidget(QWidget):
 		self.search_line = MyLineEdit(self)
 		self.search_line.grabKeyboard()
 
-		self.status = QLabel(self)
-		self.status.setAlignment(Qt.AlignRight)
+		self.status = QtGui.QLabel(self)
+		self.status.setAlignment(QtCore.Qt.AlignRight)
 
-		self.left_list = QListView(self)
+		self.left_list = QtGui.QListView(self)
 		self.left_list.setModel(MerchandiseListModel(self.getItems(), self))
-		self.left_list.setSelectionMode(QListView.SingleSelection)
-		#self.left_list.setSelectionMode(QListView.ExtendedSelection)
+		self.left_list.setSelectionMode(QtGui.QListView.SingleSelection)
+		#self.left_list.setSelectionMode(QtGui.QListView.ExtendedSelection)
 
-		self.right_list = QListView(self)
+		self.right_list = QtGui.QListView(self)
 		self.right_list.setModel(MerchandiseListModel([], self))
-		self.right_list.setSelectionMode(QListView.SingleSelection)
-		#self.right_list.setSelectionMode(QListView.ExtendedSelection)
+		self.right_list.setSelectionMode(QtGui.QListView.SingleSelection)
+		#self.right_list.setSelectionMode(QtGui.QListView.ExtendedSelection)
 
-		self.add_button = QPushButton("Add", self)
-		self.rem_button = QPushButton("Remove", self)
-		self.test_button = QPushButton("Test", self)
-		#self.setFocusPolicy(Qt.StrongFocus)
+		self.add_button = QtGui.QPushButton("Add", self)
+		self.rem_button = QtGui.QPushButton("Remove", self)
+		self.test_button = QtGui.QPushButton("Test", self)
+		#self.setFocusPolicy(QtCore.Qt.StrongFocus)
 
 		# Test image
-		self.graphics = QGraphicsView(self)
-		scene = QGraphicsScene(self)
-		map = QPixmap("img/test.jpg") # hardcoded path, images should be in db?
+		self.graphics = QtGui.QGraphicsView(self)
+		scene = QtGui.QGraphicsScene(self)
+		map = QtGui.QPixmap("img/test.jpg") # hardcoded path, images should be in db?
 		scene.addPixmap(map)
 		self.graphics.setScene(scene)
 
@@ -79,11 +74,11 @@ class MainWidget(QWidget):
 		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
 
 		# Create layout:
-		self.stack = QStackedWidget()
+		self.stack = QtGui.QStackedWidget()
 		self.stack.insertWidget(0, self.right_list)
 		self.stack.insertWidget(1, self.graphics)
 
-		grid = QGridLayout()
+		grid = QtGui.QGridLayout()
 		grid.addWidget(self.search_line, 0, 0)
 		grid.addWidget(self.test_button, 0, 1)
 		grid.addWidget(self.left_list, 1, 0)
@@ -128,7 +123,7 @@ class MainWidget(QWidget):
 		# Update selection:
 		mdl_index = list_view.model().index(new_index, 0)
 		list_view.selectionModel().select(mdl_index,
-				QItemSelectionModel.ClearAndSelect)
+				QtGui.QItemSelectionModel.ClearAndSelect)
 
 
 	def tabChanged(self, index):
@@ -164,7 +159,7 @@ class MainWidget(QWidget):
 
 			# Reset selection:
 			self.right_list.selectionModel().select(indexes[0],
-				QItemSelectionModel.ClearAndSelect)
+				QtGui.QItemSelectionModel.ClearAndSelect)
 
 
 	def showImage(self):
@@ -239,101 +234,4 @@ class MainWidget(QWidget):
 			return False
 
 
-
-class DebugWidget(QWidget):
-	"""A small gui, used to debug the main/admin GUI
-
-	"""
-	last_merchandise_id = 0
-	last_rfidcard_id = 0
-
-	rfid_line = None
-	rfid_submit = None
-	rfid_get_button = None
-
-	barcode_line = None
-	barcode_submit = None
-	barcode_get_button = None
-
-	def __init__(self, main_window, rfid_thread, parent=None):
-		QWidget.__init__(self, parent)
-
-		# Initialize views and models:
-		self.rfid_thread = rfid_thread
-		self.main_window = main_window
-
-		self.rfid_line = QLineEdit()
-		self.barcode_line = QLineEdit()
-
-		self.rfid_get_button = QPushButton("Get next rfid")
-		self.barcode_get_button = QPushButton("Get next barcode")
-
-		self.rfid_submit = QPushButton("Bib card")
-		self.barcode_submit = QPushButton("Bip barcode")
-
-		# Connect signals:
-		self.rfid_get_button.clicked.connect(self.rfidGetClicked)
-		self.barcode_get_button.clicked.connect(self.barcodeGetClicked)
-
-		self.rfid_submit.clicked.connect(self.rfidSubmitClicked)
-		self.barcode_submit.clicked.connect(self.barcodeSubmitClicked)
-
-		# Create layout:
-		grid = QGridLayout()
-		grid.addWidget(self.rfid_get_button, 0, 0)
-		grid.addWidget(self.rfid_line, 0, 1)
-		grid.addWidget(self.rfid_submit, 0, 2)
-
-		grid.addWidget(self.barcode_get_button, 1, 0)
-		grid.addWidget(self.barcode_line, 1, 1)
-		grid.addWidget(self.barcode_submit, 1, 2)
-
-		self.setLayout(grid)
-
-		# Set widget parameters:
-		self.setWindowTitle('KiKrit Debug')
-		self.resize(600, 100)
-		self.move(200, 60)
-
-
-	def rfidGetClicked(self):
-		id = self.last_rfidcard_id + 1
-		try:
-			rfid_card = RFIDCard.objects.get(id=id)
-		except RFIDCard.DoesNotExist:
-			id = 1
-			rfid_card = RFIDCard.objects.get(id=id)
-
-		self.last_rfidcard_id = id
-		self.rfid_line.setText(rfid_card.rfid_string)
-
-
-	def barcodeGetClicked(self):
-		id = self.last_merchandise_id + 1
-		try:
-			merchandise = Merchandise.objects.get(id=id)
-		except Merchandise.DoesNotExist:
-			id = 1
-			merchandise = Merchandise.objects.get(id=id)
-
-		self.last_merchandise_id = id
-		self.barcode_line.setText(merchandise.ean)
-
-
-	def rfidSubmitClicked(self):
-		str = self.rfid_line.text()
-		self.main_window.setFocus()
-		self.rfid_thread.rfid_signal.emit(str)
-		print "rfid submit clicked"
-
-
-	def barcodeSubmitClicked(self):
-		str = self.barcode_line.text()
-		e = KeyEmulator()
-
-		self.main_window.setFocus()
-		e.sendInput(str)
-		e.sendKeyPress("Return")
-		e.sendKeyRelease("Return")
-		print "barcode submit clicked"
 

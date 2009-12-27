@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QAbstractListModel, QModelIndex, QVariant, Qt
+from PyQt4 import QtCore
 
 
-class MerchandiseListModel(QAbstractListModel):
+class MerchandiseListModel(QtCore.QAbstractListModel):
 	items = []
 	all_items = []
 	last_filter_str = ""
 
 
 	def __init__(self, items=[], parent=None):
-		QAbstractListModel.__init__(self, parent)
+		QtCore.QAbstractListModel.__init__(self, parent)
 		self.items = items
 		self.all_items = items
 
 
-	def rowCount(self, parent=QModelIndex()):
+	def rowCount(self, parent=QtCore.QModelIndex()):
 		return len(self.items)
 
 
@@ -23,11 +23,11 @@ class MerchandiseListModel(QAbstractListModel):
 
 
 	def data(self, index, role):
-		if index.isValid() and role == Qt.DisplayRole:
+		if index.isValid() and role == QtCore.Qt.DisplayRole:
 			item = self.items[index.row()]
-			return QVariant(item.__unicode__())
+			return QtCore.QVariant(item.__unicode__())
 		else:
-			return QVariant()
+			return QtCore.QVariant()
 
 
 	def filter(self, filter_str):

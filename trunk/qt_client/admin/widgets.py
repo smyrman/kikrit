@@ -1,30 +1,28 @@
 # -*- coding: utf-8 -*-
-from PyQt4.QtCore import QUrl
-from PyQt4.QtGui import QWidget, QGridLayout
-from PyQt4.QtWebKit import QWebView
+from PyQt4 import QtCore, QtGui, QtWebKit
 
 from django_kikrit.settings import RUNSERVER_PORT
 from qt_client.utils.key_emu import KeyEmulator
 
 
-class AdminWidget(QWidget):
+class AdminWidget(QtGui.QWidget):
 	web = None
 
 	def __init__(self, rfid_thread, parent=None):
-		QWidget.__init__(self, parent)
+		QtGui.QWidget.__init__(self, parent)
 
 		# Define views and models:
 		self.rfid_thread = rfid_thread
 
-		self.web = QWebView()
-		self.web.load(QUrl("http://localhost:%s/" % RUNSERVER_PORT))
+		self.web = QtWebKit.QWebView()
+		self.web.load(QtCore.QUrl("http://localhost:%s/" % RUNSERVER_PORT))
 
 		# Connect signals:
 		if parent != None:
 			self.parentWidget().currentChanged.connect(self.tabChanged)
 
 		# Layout:
-		grid = QGridLayout()
+		grid = QtGui.QGridLayout()
 		grid.addWidget(self.web, 0, 0)
 		self.setLayout(grid)
 
