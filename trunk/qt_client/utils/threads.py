@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 import serial
 
-from PyQt4.QtCore import QThread, pyqtSignal
+from PyQt4 import QtCore
 
 
-class RFIDThread(QThread):
+class RFIDThread(QtCore.QThread):
 	"""A thread to check for bibed RFIDCards. Note that the device attribute
 	must point to the right device for this driver to work.
 
 	"""
 	rfid_serial = None
-	rfid_signal = pyqtSignal(str, name="rfidSignal")
+	rfid_signal = QtCore.pyqtSignal(str, name="rfidSignal")
 
 	def __init__(self, parent=None, device="/dev/ttyS0", timeout=0.1):
-		QThread.__init__(self, parent)
+		QtCore.QThread.__init__(self, parent)
 		if device != None:
 			self.setDevice(device)
 
