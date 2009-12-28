@@ -20,20 +20,35 @@ class AdminWidget(QtGui.QWidget):
 		# Connect signals:
 		if parent != None:
 			self.parentWidget().currentChanged.connect(self.tabChanged)
+		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
 
 		# Layout:
 		grid = QtGui.QGridLayout()
 		grid.addWidget(self.web, 0, 0)
 		self.setLayout(grid)
 
+
+	def _tabHasFocus(self):
+		"""Returns true if self is the parrents current widget, or if there is
+		no parent.
+
+		"""
+		parent = self.parentWidget()
+		if parent == None or parent.currentWidget() == self:
+			return True
+		return False
+
+
 	def tabChanged(self, index):
-		if index == 1:
-			self.rfid_thread.rfid_signal.connect(self.rfidEvent)
-		else:
-			self.rfid_thread.rfid_signal.disconnect(self.rfidEvent)
+		#if self.parentWidget().indexOf(self) == index:
+		pass
 
 
 	def rfidEvent(self, rfid_str):
+		# Guard: This widget has focus?
+		if not self._tabHasFocus():
+			return
+
 		e = KeyEmulator()
 		e.sendInput(rfid_str)
 

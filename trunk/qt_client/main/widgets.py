@@ -5,64 +5,59 @@ from django_kikrit.merchandise.models import Merchandise, buy_merchandise
 from django_kikrit.accounts.models import Account, RFIDCard
 
 from qt_client.main.models import MerchandiseListModel
-from qt_client.main.gui_components import MyLineEdit
+from qt_client.main.gui_components import SearchLine, OrderPage, BalancePage
+
 
 class MainWidget(QtGui.QWidget):
 	"""The main tab, featuring the KiKrit client GUI.
 
 	"""
 	search_line = None
-	status = None
-	add_button = None
-	rem_button = None
-	test_button = None
-	left_list = None
-	right_list = None
+	merchandise_list = None
+
 	stack = None
-	graphics = None
+	order_page = None
+	balance_page = None
+
+	add_button = None
+	remove_button = None
+
+	status = None
 
 	def __init__(self, rfid_thread, parent=None):
 		QtGui.QWidget.__init__(self, parent)
-
-		# Initialize views and models:
 		self.rfid_thread = rfid_thread
 
-		self.search_line = MyLineEdit(self)
+		# Views:
+		self.search_line = SearchLine(self)
 		self.search_line.grabKeyboard()
 
+		self.merchandise_list = QtGui.QListView(self)
+		self.merchandise_list.setModel(MerchandiseListModel(self._getItems(),
+			self))
+		self.merchandise_list.setSelectionMode(QtGui.QListView.SingleSelection)
+		#self.merchandise_list.setSelectionMode(QtGui.QListView.ExtendedSelection)
+
+		self.stack = QtGui.QStackedWidget()
+		self.order_page = OrderPage(self.stack)
+		self.balance_page = BalancePage(self.stack)
+		self.stack.insertWidget(0, self.order_page)
+		self.stack.insertWidget(1, self.balance_page)
+
+		self.add_button = QtGui.QPushButton("Add", self)
+		self.remove_button = QtGui.QPushButton("Remove", self)
+
+		# TODO: Replace self.status with an instance of a custom class.
 		self.status = QtGui.QLabel(self)
 		self.status.setAlignment(QtCore.Qt.AlignRight)
 
-		self.left_list = QtGui.QListView(self)
-		self.left_list.setModel(MerchandiseListModel(self.getItems(), self))
-		self.left_list.setSelectionMode(QtGui.QListView.SingleSelection)
-		#self.left_list.setSelectionMode(QtGui.QListView.ExtendedSelection)
-
-		self.right_list = QtGui.QListView(self)
-		self.right_list.setModel(MerchandiseListModel([], self))
-		self.right_list.setSelectionMode(QtGui.QListView.SingleSelection)
-		#self.right_list.setSelectionMode(QtGui.QListView.ExtendedSelection)
-
-		self.add_button = QtGui.QPushButton("Add", self)
-		self.rem_button = QtGui.QPushButton("Remove", self)
-		self.test_button = QtGui.QPushButton("Test", self)
-		#self.setFocusPolicy(QtCore.Qt.StrongFocus)
-
-		# Test image
-		self.graphics = QtGui.QGraphicsView(self)
-		scene = QtGui.QGraphicsScene(self)
-		map = QtGui.QPixmap("img/test.jpg") # hardcoded path, images should be in db?
-		scene.addPixmap(map)
-		self.graphics.setScene(scene)
-
-		# Connect signals:
+		# Signals:
 		if parent != None:
 			self.parentWidget().currentChanged.connect(self.tabChanged)
 
 		self.search_line.textChanged.connect(self.searchLineChanged)
 		self.add_button.clicked.connect(self.addClicked)
-		self.rem_button.clicked.connect(self.removeClicked)
-		self.test_button.clicked.connect(self.showImage)
+		self.remove_button.clicked.connect(self.removeClicked)
 
 		self.search_line.right_pressed.connect(self.rightPressed)
 		self.search_line.left_pressed.connect(self.leftPressed)
@@ -73,24 +68,35 @@ class MainWidget(QtGui.QWidget):
 
 		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
 
-		# Create layout:
-		self.stack = QtGui.QStackedWidget()
-		self.stack.insertWidget(0, self.right_list)
-		self.stack.insertWidget(1, self.graphics)
-
-		grid = QtGui.QGridLayout()
+		# Layout:
+		grid = QtGui.QGridLayout(self)
 		grid.addWidget(self.search_line, 0, 0)
-		grid.addWidget(self.test_button, 0, 1)
-		grid.addWidget(self.left_list, 1, 0)
-		grid.addWidget(self.stack, 1, 1)
+		grid.addWidget(self.merchandise_list, 1, 0)
 		grid.addWidget(self.add_button, 2, 0)
-		grid.addWidget(self.rem_button, 2, 1)
+		grid.addWidget(self.stack, 1, 1)
+		grid.addWidget(self.remove_button, 2, 1)
 		grid.addWidget(self.status, 3, 1)
 
 		self.setLayout(grid)
 
+	def _reset(self):
+		self.stack.setCurrentWidget(self.order_page)
+		self.order_page.emptyList()
+		self.search_line.setText("")
+		self.merchandise_list.setFocus()
 
-	def getItems(self):
+
+	def _tabHasFocus(self):
+		"""Returns true if self is the parrents current widget, or if there is
+		no parent.
+
+		"""
+		parent = self.parentWidget()
+		if parent == None or parent.currentWidget() == self:
+			return True
+		return False
+
+	def _getItems(self):
 		""" Queries the database for all Merchandise objects, and return them
 		as one large list.
 
@@ -98,7 +104,7 @@ class MainWidget(QtGui.QWidget):
 		return list(Merchandise.objects.all())
 
 
-	def setSelected(self, list_view, new_index=None, next=False):
+	def _setSelected(self, list_view, new_index=None, next=False):
 		"""Takes a QListView object, and int and a bool. Changes selection to
 		new_index, or to prev or next item in list view.
 
@@ -127,111 +133,102 @@ class MainWidget(QtGui.QWidget):
 
 
 	def tabChanged(self, index):
-		if index == 0:
+		if self.parentWidget().indexOf(self) == index:
 			self.search_line.grabKeyboard()
-			self.rfid_thread.rfid_signal.connect(self.rfidEvent)
 		else:
 			self.search_line.releaseKeyboard()
-			self.rfid_thread.rfid_signal.disconnect(self.rfidEvent)
 
 
 	def addClicked(self):
 		"""Called when the user presses the add-button"""
-		indexes = self.left_list.selectedIndexes()
+		# Set stack index:
+		self.stack.setCurrentWidget(self.order_page)
+
+		indexes = self.merchandise_list.selectedIndexes()
 
 		if len(indexes) > 0:
-			# Add items to right_list:
-			mdl = self.left_list.model()
+			# Add items to order_page:
+			mdl = self.merchandise_list.model()
 			sel = [mdl.items[i.row()] for i in indexes]
-			self.right_list.model().add(sel)
+			self.order_page.addItems(sel)
 		self.search_line.selectAll()
 
 
 	def removeClicked(self):
 		"""Called when the user presses the remove-button"""
-		indexes = self.right_list.selectedIndexes()
+		indexes = self.order_page.list_view.selectedIndexes()
 
 		if len(indexes) > 0:
-			# Remove items from right_list:
-			mdl = self.right_list.model()
-			sel = [mdl.items[i.row()] for i in indexes]
-			removed = mdl.remove(sel)
+			# Remove items from order_page:
+			sel = self.order_page.items(indexes)
+			self.order_page.removeItems(sel)
 
 			# Reset selection:
-			self.right_list.selectionModel().select(indexes[0],
-				QtGui.QItemSelectionModel.ClearAndSelect)
-
-
-	def showImage(self):
-		cur = not(self.stack.currentIndex())
-		self.stack.setCurrentIndex(cur)
-		if cur:
-			self.status.setText("OK")
-		else:
-			self.status.setText("Waiting...")
+			self.order_page.list_view.selectionModel().select(indexes[0],
+					QtGui.QItemSelectionModel.ClearAndSelect)
 
 
 	def searchLineChanged(self, filter_str):
-		self.left_list.setFocus()
-		self.left_list.model().filter(filter_str)
-		self.setSelected(self.left_list, new_index=0)
+		self.merchandise_list.model().filter(filter_str)
+		self._setSelected(self.merchandise_list, new_index=0)
 
 
 	def leftPressed(self):
-		self.left_list.setFocus()
+		self.merchandise_list.setFocus()
 
 
 	def rightPressed(self):
-		self.right_list.setFocus()
+		self.order_page.list_view.setFocus()
 
 
 	def upPressed(self):
-		if self.right_list.hasFocus():
-			self.setSelected(self.right_list, next=False)
+		if self.order_page.list_view.hasFocus():
+			self._setSelected(self.order_page.list_view, next=False)
 		else:
-			self.setSelected(self.left_list, next=False)
+			self._setSelected(self.merchandise_list, next=False)
 
 
 	def downPressed(self):
-		if self.right_list.hasFocus():
-			self.setSelected(self.right_list, next=True)
+		if self.order_page.list_view.hasFocus():
+			self._setSelected(self.order_page.list_view, next=True)
 		else:
-			self.setSelected(self.left_list, next=True)
+			self._setSelected(self.merchandise_list, next=True)
 
 
 	def returnPressed(self):
-		if self.right_list.hasFocus():
+		if self.order_page.list_view.hasFocus():
 			self.removeClicked()
 		else:
 			self.addClicked()
 
 	def escapePressed(self):
-		self.right_list.model().setData([])
-		self.search_line.setText("")
+		self._reset()
 		self.status.setText("Order Canceled")
-		self.left_list.setFocus()
 
 
 	def rfidEvent(self, rfid_str):
+		# GUARD: tab has focus?
+		if not self._tabHasFocus():
+			return
+
+		# Get card:
 		try:
 			card = RFIDCard.objects.get(rfid_string=unicode(rfid_str))
 		except RFIDCard.DoesNotExist:
-			self.status.setText("No transaction: RFID card not found!")
-			return False
+			self.status.setText("RFID card not found!")
+			card = None
 
-		if buy_merchandise(card.account, self.right_list.model().items):
-			self.right_list.model().setData([])
-			self.search_line.setText("")
-			color = Account.COLOR_CHOICES[card.account.color][1]
-			self.status.setText("Transaction sucsessfull: Your are %s." %
-					color)
-			return True
+		# Execute purchase:
+		if card != None:
+			if buy_merchandise(card.account, self.order_page.items()):
+				color = Account.COLOR_CHOICES[card.account.color][1]
+				self._reset()
+				self.status.setText("A sucsessfull purchace mr. "+ color)
+				self.balance_page.showPage(card.account)
+			else:
+				color = Account.COLOR_CHOICES[card.account.color][1]
+				self.status.setText("Transaction was disallowed mr. "+ color)
 
-		else:
-			color = Account.COLOR_CHOICES[card.account.color][0]
-			self.status.setText("No transaction: Your are %s." %
-					color)
-			return False
 
 
 

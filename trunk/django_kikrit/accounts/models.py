@@ -180,13 +180,15 @@ class Account(models.Model):
 				maximum_balance=None)
 
 		# Filter based on color:
-		if self.color == self.BLACK_COLOR:
+		if self.color == self.COLOR_BLACK:
 			q_color = BalanceImage.objects.filter(black=True)
-		elif self.color == self.BLACK_GREY:
+		elif self.color == self.COLOR_GREY:
 			q_color = BalanceImage.objects.filter(grey=True)
-		elif self.color == self.BLACK_WHITE:
+		elif self.color == self.COLOR_WHITE:
 			q_color = BalanceImage.objects.filter(white=True)
-		imgs = list(q1) + list(q2) + list(q3) + list(q4)
+
+		# Combine and pickle (execute) queries:
+		imgs = list((q1 | q2 | q3 | q4) & q_color)
 
 		# GUARD: image does not exist?
 		if len(imgs) == 0:
