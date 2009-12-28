@@ -56,9 +56,19 @@ class Account(models.Model):
 	timestamp_grey = models.DateTimeField(editable=False, null=True, blank=True)
 
 	def save(self, *args, **kwargs):
-		# Update color:
-		self.color = self.get_color()
+		"""Customized save function that updates color and grey_time_stamp.
 
+		"""
+		new_color = self.get_color()
+
+		# Update grey time stamp:
+		if self.color == self.COLOR_WHITE and new_color != self.COLOR_WHITE:
+				self.timestamp_grey = datetime.now()
+		elif new_color == self.COLOR_WHITE:
+			self.timestamp_grey = None
+
+		# Update color and save:
+		self.color = new_color
 		super(self.__class__, self).save(*args, **kwargs)
 
 
@@ -86,7 +96,7 @@ class Account(models.Model):
 			raise ValueError("'amount' must be an Integer.")
 
 		# Get limits:
-		if self.limit_group:
+		if self.limit_group != None:
 			grey_limit = self.limit_group.grey_limit
 			black_limit = self.limit_group.black_limit
 			grey_hours = self.limit_group.max_grey_hours
@@ -98,23 +108,24 @@ class Account(models.Model):
 		# Get new_balance, time_now, and time_black:
 		new_balance = self.balance + amount
 		time_now = datetime.now()
-		if self.timestamp_grey != None:
-			time_black = self.timestamp_grey + timedelta(hours=grey_hours)
+		if self.timestamp_grey == None:
+			time_black = time_now + timedelta(hours=1)
 		else:
-			time_black = time_now - timedelta(1)
+			time_black = self.timestamp_grey + timedelta(hours=grey_hours)
 
 		# Return color:
+		color = self.COLOR_BLACK
+
 		if new_balance >= grey_limit:
-			return self.COLOR_WHITE
-		elif new_balance >= black_limit \
-		and (grey_hours == -1 or time_now <= time_black):
-			return self.COLOR_GREY
-		else:
-			return self.COLOR_BLACK
+			color = self.COLOR_WHITE
+		elif new_balance >= black_limit:
+			if grey_hours == -1 or time_now < time_black:
+				color = self.COLOR_GREY
+		return color
 
 
 	def __unicode__(self):
-		return self.name
+		return unicode(self.name)
 
 
 	def withdraw(self, amount):
@@ -126,25 +137,19 @@ class Account(models.Model):
 
 		"""
 		# Input check:
-		if amount.__class__ != int or amount < 0:
-			raise ValueError("'amount' must be an Integer greater then, or "
-			                 "equal to, 0.")
+		if amount.__class__ != int or amount <= 0:
+			raise ValueError("'amount' must be an Integer greater then zero")
 
+		ret = False
 		new_color = self.get_color(-amount)
 
 		if new_color != self.COLOR_BLACK:
-			# Set grey timestamp?
-			if self.color == self.COLOR_WHITE \
-			and new_color != self.COLOR_WHITE:
-				self.timestamp_grey = dateime.now()
-
-			# Update color and balance:
+			# Update balance and color:
 			self.balance -= amount
 			self.save()
+			ret = True
 
-			return True
-		else:
-			return False
+		return ret
 
 
 	def deposit(self, amount):
@@ -154,9 +159,9 @@ class Account(models.Model):
 		"""
 		# Input check:
 		if amount.__class__ != int or amount <= 0:
-			raise ValueError("'amount' must be an Integer greater then 0.")
+			raise ValueError("'amount' must be an Integer greater then zero.")
 
-		# Update color and balance:
+		# Update balance snd color:
 		self.balance += amount
 		self.save()
 

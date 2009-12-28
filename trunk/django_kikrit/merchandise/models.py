@@ -64,22 +64,33 @@ def buy_merchandise(account, merchandise_list):
 	sucsess, or False upon failure.
 
 	"""
-	# WARNING: No input check written, as I am rather lazy..
+	# Input cheks are done in the Account class.
 
 	if account.has_internal_price():
 		price = sum((m.internal_price for m in merchandise_list))
 	else:
 		price = sum((m.ordinary_price for m in merchandise_list))
 
-	if account.withdraw(price):
+	ret = False
+	if price == 0 or account.withdraw(price):
 		transaction = Transaction(account=account, amount=-price)
 		transaction.save()
 
 		# ManyToManyFields must be set after save:
 		transaction.merchandise = merchandise_list
-		return True
-		print "TATA"
-	print "Ohh.."
-	return False
+		ret = True
 
+	return ret
+
+
+def deposit_money(account, amount):
+	# Input cheks are done in the Account class.
+
+	ret = False
+	if account.deposit(amount):
+		transaction = Transaction(account=account, amount=amonut)
+		transaction.save()
+		ret = True
+
+	return ret
 

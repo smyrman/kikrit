@@ -220,7 +220,10 @@ class MainWidget(QtGui.QWidget):
 
 		# Execute purchase:
 		if card != None:
-			if buy_merchandise(card.account, self.order_page.items()):
+			items = self.order_page.items()
+			if len(items) == 0:
+				self.balance_page.showPage(card.account)
+			elif buy_merchandise(card.account, items):
 				color = Account.COLOR_CHOICES[card.account.color][1]
 				self._reset()
 				self.status.setText("A sucsessfull purchace mr. "+ color)
