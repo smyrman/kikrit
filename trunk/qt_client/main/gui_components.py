@@ -183,7 +183,7 @@ class BalancePage(QtGui.QWidget):
 
 		# Set image:
 		try:
-			map = QtGui.QPixmap(account.get_image())
+			map = QtGui.QPixmap(account.get_image().image.name)
 			self.image.setPixmap(map)
 		except BalanceImage.DoesNotExist:
 			self.image.setText("image not found")
