@@ -146,16 +146,17 @@ class BalancePage(QtGui.QWidget):
 		self.label2 = QtGui.QLabel("Account balance goes here", self)
 		self.label2.setAlignment(QtCore.Qt.AlignCenter)
 
-		self.image = QtGui.QLabel(self)
+		self.image = QtGui.QGraphicsView(self)
 		self.image.setAlignment(QtCore.Qt.AlignCenter)
 
 		self.timer = QtCore.QTimer()
 
 		# Layout:
 		grid = QtGui.QGridLayout(self)
-		grid.addWidget(self.label1, 0, 0, 1, 1)
-		grid.addWidget(self.image, 1, 0, 5, 1)
-		grid.addWidget(self.label2, 6, 0, 1, 1)
+		grid.setMargin(0)
+		grid.addWidget(self.label1, 0, 0)
+		grid.addWidget(self.image, 1, 0)
+		grid.addWidget(self.label2, 2, 0)
 		self.setLayout(grid)
 
 		# Signals:
@@ -182,11 +183,13 @@ class BalancePage(QtGui.QWidget):
 		self.label1.setText(txt1)
 
 		# Set image:
+		scene = QtGui.QGraphicsScene()
 		try:
 			map = QtGui.QPixmap(account.get_image().image.name)
-			self.image.setPixmap(map)
+			scene.addPixmap(map)
 		except BalanceImage.DoesNotExist:
-			self.image.setText("image not found")
+			scene.addText("image not found")
+		self.image.setScene(scene)
 
 		# Start timer:
 		self.timer.start(BALANCE_PAGE_TIME_SEC*1000)
