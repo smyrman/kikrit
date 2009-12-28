@@ -24,37 +24,65 @@ class SearchLine(QtGui.QLineEdit):
 		QtGui.QLineEdit.__init__(self, *args)
 
 
+	def _validateKey(self, key_event):
+		if unicode(key_event.text()) != "":
+			return True
+		return False
+
+
 	def event(self, event):
+		ret = QtGui.QLineEdit.event(self, event)
+
 		if event.type() == QtCore.QEvent.KeyPress:
 			k = event.key()
+			if self._validateKey(event):
+				self.setFocus()
+				# Keypress does defaut action.
+				# No custom signals are sent.
 
-			if k == QtCore.Qt.Key_Left:
+			elif k == QtCore.Qt.Key_Left:
 				self.left_pressed.emit()
-				return True
+				ret = True
 
 			elif k == QtCore.Qt.Key_Right:
 				self.right_pressed.emit()
-				return True
+				ret = True
 
 			elif k == QtCore.Qt.Key_Up:
 				self.up_pressed.emit()
-				return True
+				ret = True
 
 			elif k == QtCore.Qt.Key_Down:
 				self.down_pressed.emit()
-				return True
+				ret = True
 
 			elif k in (QtCore.Qt.Key_Return, QtCore.Qt.Key_Enter):
 				self.return_pressed.emit()
-				return True
+				ret = True
 
 			elif k == QtCore.Qt.Key_Escape:
 				self.escape_pressed.emit()
-				return True
-			else:
-				self.setFocus()
+				ret = True
+		return ret
 
-		return QtGui.QLineEdit.event(self, event)
+
+
+class AmountLine(SearchLine):
+
+	def _validateKey(self, key_event):
+		return unicode(key_event.text()).isnumeric()
+
+
+	def addToAmount(self, amount):
+		try:
+			i = int(self.text()) + amount
+		except ValueError:
+			i = amount
+
+		if i < 0:
+			i = 0
+
+		self.setText(unicode(i))
 
 
 
@@ -159,7 +187,7 @@ class BalancePage(QtGui.QWidget):
 		grid.addWidget(self.label2, 2, 0)
 		self.setLayout(grid)
 
-		# Signals:
+		# Connect signals:
 		self.timer.timeout.connect(self.timeoutEvent)
 
 

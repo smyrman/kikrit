@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
 
-from django_kikrit.merchandise.models import Merchandise, buy_merchandise
 from django_kikrit.accounts.models import Account, RFIDCard
-
+from django_kikrit.merchandise.models import Merchandise, buy_merchandise,\
+		deposit_money
 from qt_client.main.models import MerchandiseListModel
-from qt_client.main.gui_components import SearchLine, OrderPage, BalancePage
+from qt_client.main.gui_components import SearchLine, AmountLine, OrderPage,\
+		BalancePage
 
 
 class MainWidget(QtGui.QWidget):
@@ -36,7 +37,6 @@ class MainWidget(QtGui.QWidget):
 		self.merchandise_list.setModel(MerchandiseListModel(self._getItems(),
 			self))
 		self.merchandise_list.setSelectionMode(QtGui.QListView.SingleSelection)
-		#self.merchandise_list.setSelectionMode(QtGui.QListView.ExtendedSelection)
 
 		self.stack = QtGui.QStackedWidget()
 		self.order_page = OrderPage(self.stack)
@@ -51,23 +51,6 @@ class MainWidget(QtGui.QWidget):
 		self.status = QtGui.QLabel(self)
 		self.status.setAlignment(QtCore.Qt.AlignRight)
 
-		# Signals:
-		if parent != None:
-			self.parentWidget().currentChanged.connect(self.tabChanged)
-
-		self.search_line.textChanged.connect(self.searchLineChanged)
-		self.add_button.clicked.connect(self.addClicked)
-		self.remove_button.clicked.connect(self.removeClicked)
-
-		self.search_line.right_pressed.connect(self.rightPressed)
-		self.search_line.left_pressed.connect(self.leftPressed)
-		self.search_line.up_pressed.connect(self.upPressed)
-		self.search_line.down_pressed.connect(self.downPressed)
-		self.search_line.return_pressed.connect(self.returnPressed)
-		self.search_line.escape_pressed.connect(self.escapePressed)
-
-		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
-
 		# Layout:
 		grid = QtGui.QGridLayout(self)
 		grid.addWidget(self.search_line, 0, 0)
@@ -78,6 +61,23 @@ class MainWidget(QtGui.QWidget):
 		grid.addWidget(self.status, 3, 1)
 
 		self.setLayout(grid)
+
+		# Connect signals:
+		if parent != None:
+			self.parentWidget().currentChanged.connect(self.tabChanged)
+
+		self.search_line.textChanged.connect(self.searchLineChanged)
+		self.search_line.right_pressed.connect(self.rightPressed)
+		self.search_line.left_pressed.connect(self.leftPressed)
+		self.search_line.up_pressed.connect(self.upPressed)
+		self.search_line.down_pressed.connect(self.downPressed)
+		self.search_line.return_pressed.connect(self.returnPressed)
+		self.search_line.escape_pressed.connect(self.escapePressed)
+
+		self.add_button.clicked.connect(self.addClicked)
+		self.remove_button.clicked.connect(self.removeClicked)
+		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
+
 
 	def _reset(self):
 		self.stack.setCurrentWidget(self.order_page)
@@ -133,7 +133,7 @@ class MainWidget(QtGui.QWidget):
 
 
 	def tabChanged(self, index):
-		if self.parentWidget().indexOf(self) == index:
+		if self.parentWidget().widget(index) == self:
 			self.search_line.grabKeyboard()
 		else:
 			self.search_line.releaseKeyboard()
@@ -233,5 +233,136 @@ class MainWidget(QtGui.QWidget):
 				self.status.setText("Transaction was disallowed mr. "+ color)
 
 
+
+class DepositWidget(QtGui.QWidget):
+	label = None
+	amount_line = None
+	msg = None
+
+	stack = None
+	balance_page = None
+	empty_page = None
+
+	def __init__(self, rfid_thread, parent=None):
+		QtGui.QWidget.__init__(self, parent)
+		self.rfid_thread = rfid_thread
+
+		# Views:
+		self.label = QtGui.QLabel("Amount to deposit:")
+		self.label.setAlignment(QtCore.Qt.AlignRight)
+
+		self.amount_line = AmountLine()
+		self.amount_line.grabKeyboard()
+
+		self.stack = QtGui.QStackedWidget()
+		self.empty_page = QtGui.QWidget(self.stack)
+		self.balance_page = BalancePage(self.stack)
+		self.stack.addWidget(self.empty_page)
+		self.stack.addWidget(self.balance_page)
+
+		# Layout:
+		grid = QtGui.QGridLayout()
+		grid.addWidget(self.label, 0, 0)
+		grid.addWidget(self.amount_line, 0, 1)
+		grid.addWidget(self.stack, 1, 0, 1, 2)
+		self.setLayout(grid)
+
+		# Connect signals:
+		if parent != None:
+			self.parentWidget().currentChanged.connect(self.tabChanged)
+		self.rfid_thread.rfid_signal.connect(self.rfidEvent)
+
+		self.amount_line.right_pressed.connect(self.rightPressed)
+		self.amount_line.left_pressed.connect(self.leftPressed)
+		self.amount_line.up_pressed.connect(self.upPressed)
+		self.amount_line.down_pressed.connect(self.downPressed)
+		self.amount_line.escape_pressed.connect(self.escapePressed)
+
+
+	def _reset(self):
+		self.amount_line.setText("")
+		self.stack.setCurrentIndex(0)
+
+
+	def _tabHasFocus(self):
+		"""Returns True if self is the parrents current widget, or if there is
+		no parent. Otherwise return False.
+
+		"""
+		parent = self.parentWidget()
+		if parent == None or parent.currentWidget() == self:
+			return True
+		return False
+
+
+	def tabChanged(self, index):
+		if self.parentWidget().widget(index) == self:
+			self.amount_line.grabKeyboard()
+		else:
+			self.amount_line.releaseKeyboard()
+
+
+	def leftPressed(self):
+		self.amount_line.addToAmount(-1)
+		self.amount_line.selectAll()
+
+
+	def rightPressed(self):
+		self.amount_line.addToAmount(1)
+		self.amount_line.selectAll()
+
+
+	def upPressed(self):
+		self.amount_line.addToAmount(10)
+		self.amount_line.selectAll()
+
+
+	def downPressed(self):
+		self.amount_line.addToAmount(-10)
+		self.amount_line.selectAll()
+
+	def escapePressed(self):
+		self._reset()
+
+
+	def rfidEvent(self, rfid_str):
+		# Guard: This widget has focus?
+		if not self._tabHasFocus():
+			return
+
+		# Get amount:
+		try:
+			txt = self.amount_line.text()
+			if txt == "": txt = "0"
+			amount = int(txt)
+			if float(amount) != float(txt):
+				amount = None
+				#self.msg.post("Deposit amount must be an integer",
+				#		self.msg.STYLE_ERROR)
+		except ValueError:
+			amount = None
+			#self.msg.post("Deposit amount must be an integer",
+			#		self.msg.STYLE_ERROR)
+
+
+		# Get card:
+		try:
+			card = RFIDCard.objects.get(rfid_string=unicode(rfid_str))
+		except RFIDCard.DoesNotExist:
+			#self.msg.post("Deposit amount must be integer",
+			#		self.msg.STYLE_ERROR)
+			card = None
+
+		# Execute deposit:
+		if card != None and amount != None:
+			if amount > 0:
+				deposit_money(card.account, amount)
+				self._reset()
+				#self.msg.post(u"An amount of %d,- was deposited" % amount,
+				#		self.msg.STYLE_SUCCESS)
+				self.balance_page.showPage(card.account)
+			else:
+				self._reset()
+				self.balance_page.showPage(card.account)
 
 
