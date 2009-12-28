@@ -88,7 +88,7 @@ def deposit_money(account, amount):
 
 	ret = False
 	if account.deposit(amount):
-		transaction = Transaction(account=account, amount=amonut)
+		transaction = Transaction(account=account, amount=amount)
 		transaction.save()
 		ret = True
 
