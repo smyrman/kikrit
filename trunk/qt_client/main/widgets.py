@@ -5,8 +5,8 @@ from django_kikrit.accounts.models import Account, RFIDCard
 from django_kikrit.merchandise.models import Merchandise, buy_merchandise,\
 		deposit_money
 from qt_client.main.models import MerchandiseListModel
-from qt_client.main.gui_components import SearchLine, AmountLine, OrderPage,\
-		BalancePage
+from qt_client.main.gui_components import SearchLine, AmountLine, MessageLine,\
+		OrderPage, BalancePage
 
 
 class MainWidget(QtGui.QWidget):
@@ -23,7 +23,7 @@ class MainWidget(QtGui.QWidget):
 	add_button = None
 	remove_button = None
 
-	status = None
+	msg = None
 
 	def __init__(self, rfid_thread, parent=None):
 		QtGui.QWidget.__init__(self, parent)
@@ -47,9 +47,7 @@ class MainWidget(QtGui.QWidget):
 		self.add_button = QtGui.QPushButton("Add", self)
 		self.remove_button = QtGui.QPushButton("Remove", self)
 
-		# TODO: Replace self.status with an instance of a custom class.
-		self.status = QtGui.QLabel(self)
-		self.status.setAlignment(QtCore.Qt.AlignRight)
+		self.msg = MessageLine()
 
 		# Layout:
 		grid = QtGui.QGridLayout(self)
@@ -58,7 +56,7 @@ class MainWidget(QtGui.QWidget):
 		grid.addWidget(self.add_button, 2, 0)
 		grid.addWidget(self.stack, 1, 1)
 		grid.addWidget(self.remove_button, 2, 1)
-		grid.addWidget(self.status, 3, 1)
+		grid.addWidget(self.msg, 3, 1)
 
 		self.setLayout(grid)
 
@@ -203,7 +201,7 @@ class MainWidget(QtGui.QWidget):
 
 	def escapePressed(self):
 		self._reset()
-		self.status.setText("Order Canceled")
+		self.msg.post("Order Canceled", self.msg.STYLE_CANCEL)
 
 
 	def rfidEvent(self, rfid_str):
@@ -215,7 +213,7 @@ class MainWidget(QtGui.QWidget):
 		try:
 			card = RFIDCard.objects.get(rfid_string=unicode(rfid_str))
 		except RFIDCard.DoesNotExist:
-			self.status.setText("RFID card not found!")
+			self.msg.post(u"RFID card not found", self.msg.STYLE_ERROR)
 			card = None
 
 		# Execute purchase:
@@ -224,13 +222,15 @@ class MainWidget(QtGui.QWidget):
 			if len(items) == 0:
 				self.balance_page.showPage(card.account)
 			elif buy_merchandise(card.account, items):
-				color = Account.COLOR_CHOICES[card.account.color][1]
 				self._reset()
-				self.status.setText("A sucsessfull purchace mr. "+ color)
+				color = card.account.COLOR_CHOICES[card.account.color][1]
+				self.msg.post(u"A successfull purchase mr. %s" % color,
+						self.msg.STYLE_SUCCESS2)
 				self.balance_page.showPage(card.account)
 			else:
-				color = Account.COLOR_CHOICES[card.account.color][1]
-				self.status.setText("Transaction was disallowed mr. "+ color)
+				color = card.account.COLOR_CHOICES[card.account.color][1]
+				self.msg.post(u"Transaction was dissalowed mr. %s" % color,
+						self.msg.STYLE_ERROR)
 
 
 
@@ -254,6 +254,8 @@ class DepositWidget(QtGui.QWidget):
 		self.amount_line = AmountLine()
 		self.amount_line.grabKeyboard()
 
+		self.msg = MessageLine()
+
 		self.stack = QtGui.QStackedWidget()
 		self.empty_page = QtGui.QWidget(self.stack)
 		self.balance_page = BalancePage(self.stack)
@@ -265,6 +267,7 @@ class DepositWidget(QtGui.QWidget):
 		grid.addWidget(self.label, 0, 0)
 		grid.addWidget(self.amount_line, 0, 1)
 		grid.addWidget(self.stack, 1, 0, 1, 2)
+		grid.addWidget(self.msg, 2, 1)
 		self.setLayout(grid)
 
 		# Connect signals:
@@ -337,20 +340,20 @@ class DepositWidget(QtGui.QWidget):
 			amount = int(txt)
 			if float(amount) != float(txt):
 				amount = None
-				#self.msg.post("Deposit amount must be an integer",
-				#		self.msg.STYLE_ERROR)
+				self.msg.post("Deposit amount must be an integer",
+						self.msg.STYLE_ERROR)
 		except ValueError:
 			amount = None
-			#self.msg.post("Deposit amount must be an integer",
-			#		self.msg.STYLE_ERROR)
+			self.msg.post("Deposit amount must be an integer",
+					self.msg.STYLE_ERROR)
 
 
 		# Get card:
 		try:
 			card = RFIDCard.objects.get(rfid_string=unicode(rfid_str))
 		except RFIDCard.DoesNotExist:
-			#self.msg.post("Deposit amount must be integer",
-			#		self.msg.STYLE_ERROR)
+			self.msg.post("RFID card not found",
+					self.msg.STYLE_ERROR)
 			card = None
 
 		# Execute deposit:
@@ -358,8 +361,8 @@ class DepositWidget(QtGui.QWidget):
 			if amount > 0:
 				deposit_money(card.account, amount)
 				self._reset()
-				#self.msg.post(u"An amount of %d,- was deposited" % amount,
-				#		self.msg.STYLE_SUCCESS)
+				self.msg.post(u"An amount of %d,- was deposited" % amount,
+						self.msg.STYLE_SUCCESS3)
 				self.balance_page.showPage(card.account)
 			else:
 				self._reset()

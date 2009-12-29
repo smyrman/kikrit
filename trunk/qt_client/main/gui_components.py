@@ -3,10 +3,13 @@ from PyQt4 import QtCore, QtGui
 
 from django_kikrit.accounts.models import BalanceImage
 from qt_client.main.models import MerchandiseListModel
+from qt_client.main.styles import STYLE_INFO, STYLE_ERROR, STYLE_CANCEL, \
+		STYLE_SUCCESS1, STYLE_SUCCESS2, STYLE_SUCCESS3, STYLE_NONE
 
 # FIXME: Get page_time from settings:
 #from settings import BALANE_PAGE_TIME_SEC
 BALANCE_PAGE_TIME_SEC = 5
+MESSAGE_TIME_SEC = 5
 
 class SearchLine(QtGui.QLineEdit):
 	"""LineEdid that grabs the keyboard, and send events upon some of the
@@ -35,12 +38,7 @@ class SearchLine(QtGui.QLineEdit):
 
 		if event.type() == QtCore.QEvent.KeyPress:
 			k = event.key()
-			if self._validateKey(event):
-				self.setFocus()
-				# Keypress does defaut action.
-				# No custom signals are sent.
-
-			elif k == QtCore.Qt.Key_Left:
+			if k == QtCore.Qt.Key_Left:
 				self.left_pressed.emit()
 				ret = True
 
@@ -63,6 +61,12 @@ class SearchLine(QtGui.QLineEdit):
 			elif k == QtCore.Qt.Key_Escape:
 				self.escape_pressed.emit()
 				ret = True
+
+			elif self._validateKey(event):
+				self.setFocus()
+				# Keypress does defaut action.
+				# No custom signals are sent.
+
 		return ret
 
 
@@ -83,6 +87,37 @@ class AmountLine(SearchLine):
 			i = 0
 
 		self.setText(unicode(i))
+
+
+class MessageLine(QtGui.QPushButton):
+	STYLE_NONE = STYLE_NONE
+	STYLE_INFO = STYLE_INFO
+	STYLE_ERROR = STYLE_ERROR
+	STYLE_CANCEL = STYLE_CANCEL
+	STYLE_SUCCESS1 = STYLE_SUCCESS1 # v
+	STYLE_SUCCESS2 = STYLE_SUCCESS2 # open wallet
+	STYLE_SUCCESS3 = STYLE_SUCCESS3 # closed wallet
+
+	timer = None
+
+	def __init__(self, *args):
+		QtGui.QPushButton.__init__(self, *args)
+
+		self.timer = QtCore.QTimer()
+		self.timer.timeout.connect(self.timeoutEvent)
+		self.setFlat(True)
+		self.setAutoFillBackground(True)
+
+	def post(self, txt, style):
+		self.setText(txt)
+		self.setPalette(style[0])
+		self.setIcon(QtGui.QIcon(style[1]))
+		self.timer.start(MESSAGE_TIME_SEC*1000)
+
+	def timeoutEvent(self):
+		self.timer.stop()
+		self.post("", self.STYLE_NONE)
+
 
 
 
