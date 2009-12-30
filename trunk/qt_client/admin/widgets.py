@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui, QtWebKit
 
-from django_kikrit.settings import RUNSERVER_PORT
+from settings import RUNSERVER_PORT
 from qt_client.utils.key_emu import KeyEmulator
 
 

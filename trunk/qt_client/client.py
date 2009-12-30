@@ -5,26 +5,29 @@ import os
 
 from PyQt4 import QtGui
 
-BASEDIR = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
-sys.path.insert(0, BASEDIR)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'django_kikrit.settings'
+PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
+sys.path.insert(0, PROJECT_ROOT)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from qt_client.main.widgets import MainWidget, DepositWidget
 from qt_client.admin.widgets import AdminWidget
 from qt_client.utils.widgets import DebugWidget
 from qt_client.utils.threads import RFIDThread
 
-# FIXME: Get DEVICE from settings
-#from settings import DEVICE
-DEVICE = None
+from settings import RFID_DEVICE
 
 def main():
 	app = QtGui.QApplication(sys.argv)
 
 	tabs = QtGui.QTabWidget()
-	rfid_thread = RFIDThread(device=None)
+	rfid_thread = RFIDThread(device=RFID_DEVICE)
 	main_widget = MainWidget(rfid_thread, parent=tabs)
 	deposit_widget = DepositWidget(rfid_thread, parent=tabs)
 	admin_widget = AdminWidget(rfid_thread, parent=tabs)
+
+	if "--debug" in sys.argv[1:]:
+		debug_panel = DebugWidget(tabs.window(), rfid_thread)
+		debug_panel.show()
+		rfid_thread.setDevice(None)
 
 	tabs.addTab(main_widget, "Main")
 	tabs.addTab(deposit_widget, "Deposit")
@@ -38,10 +41,6 @@ def main():
 
 	rfid_thread.start()
 	tabs.show()
-
-	if "--debug" in sys.argv[1:]:
-		debug_panel = DebugWidget(tabs.window(), rfid_thread)
-		debug_panel.show()
 
 	return app.exec_()
 

@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 import sys
-from os.path import dirname, abspath, join as join_path
+import os
 
+PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
+sys.path.insert(0, PROJECT_ROOT)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from django.core.management import execute_manager
 
-sys.path.insert(0, join_path(dirname(abspath(__file__)), ".."))
 
 try:
     import settings # Assumed to be in the same directory.

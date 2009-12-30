@@ -1,15 +1,12 @@
 # -*- coding: utf-8 -*-
 from PyQt4 import QtCore, QtGui
 
+from settings import BALANCE_PAGE_TIME_SEC, MESSAGE_TIME_SEC
 from django_kikrit.accounts.models import BalanceImage
 from qt_client.main.models import MerchandiseListModel
 from qt_client.main.styles import STYLE_INFO, STYLE_ERROR, STYLE_CANCEL, \
 		STYLE_SUCCESS1, STYLE_SUCCESS2, STYLE_SUCCESS3, STYLE_NONE
 
-# FIXME: Get page_time from settings:
-#from settings import BALANE_PAGE_TIME_SEC
-BALANCE_PAGE_TIME_SEC = 5
-MESSAGE_TIME_SEC = 5
 
 class SearchLine(QtGui.QLineEdit):
 	"""LineEdid that grabs the keyboard, and send events upon some of the

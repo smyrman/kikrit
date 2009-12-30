@@ -2,7 +2,7 @@ import os
 
 from PyQt4 import QtCore, QtGui
 
-from django_kikrit.settings import PROJECT_ROOT
+from settings import PROJECT_ROOT
 
 
 # Colors:
