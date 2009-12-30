@@ -226,7 +226,7 @@ class MainWidget(QtGui.QWidget):
 				self._reset()
 				color = card.account.COLOR_CHOICES[card.account.color][1]
 				self.msg.post(u"A successfull purchase mr. %s" % color,
-						self.msg.STYLE_SUCCESS2)
+						self.msg.STYLE_PURCHASE)
 				self.balance_page.showPage(card.account)
 			else:
 				color = card.account.COLOR_CHOICES[card.account.color][1]
@@ -363,7 +363,7 @@ class DepositWidget(QtGui.QWidget):
 				deposit_money(card.account, amount)
 				self._reset()
 				self.msg.post(u"An amount of %d,- was deposited" % amount,
-						self.msg.STYLE_SUCCESS3)
+						self.msg.STYLE_DEPOSIT)
 				self.balance_page.showPage(card.account)
 			else:
 				self._reset()

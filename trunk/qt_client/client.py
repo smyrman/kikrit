@@ -3,7 +3,7 @@
 import sys
 import os
 
-from PyQt4 import QtGui
+from PyQt4 import QtGui, QtCore
 
 PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
 sys.path.insert(0, PROJECT_ROOT)
@@ -13,10 +13,14 @@ from qt_client.admin.widgets import AdminWidget
 from qt_client.utils.widgets import DebugWidget
 from qt_client.utils.threads import RFIDThread
 
-from settings import RFID_DEVICE
+from settings import RFID_DEVICE, STYLE_SHEET
+STYLE_SHEET = STYLE_SHEET.replace("/", os.path.sep)
+
 
 def main():
 	app = QtGui.QApplication(sys.argv)
+
+	app.setStyleSheet(open(STYLE_SHEET).read())
 
 	tabs = QtGui.QTabWidget()
 	rfid_thread = RFIDThread(device=RFID_DEVICE)

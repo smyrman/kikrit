@@ -3,9 +3,8 @@ from PyQt4 import QtCore, QtGui
 
 from settings import BALANCE_PAGE_TIME_SEC, MESSAGE_TIME_SEC
 from django_kikrit.accounts.models import BalanceImage
+from qt_client.utils.get_icons import getIcon
 from qt_client.main.models import MerchandiseListModel
-from qt_client.main.styles import STYLE_INFO, STYLE_ERROR, STYLE_CANCEL, \
-		STYLE_SUCCESS1, STYLE_SUCCESS2, STYLE_SUCCESS3, STYLE_NONE
 
 
 class SearchLine(QtGui.QLineEdit):
@@ -87,13 +86,13 @@ class AmountLine(SearchLine):
 
 
 class MessageLine(QtGui.QPushButton):
-	STYLE_NONE = STYLE_NONE
-	STYLE_INFO = STYLE_INFO
-	STYLE_ERROR = STYLE_ERROR
-	STYLE_CANCEL = STYLE_CANCEL
-	STYLE_SUCCESS1 = STYLE_SUCCESS1 # v
-	STYLE_SUCCESS2 = STYLE_SUCCESS2 # open wallet
-	STYLE_SUCCESS3 = STYLE_SUCCESS3 # closed wallet
+	STYLE_NONE = ("msgNone", "") # obj_name, icon_name
+	STYLE_INFO = ("msgInfo", "info")
+	STYLE_ERROR = ("msgError", "error")
+	STYLE_CANCEL = ("msgCancel", "cancel")
+	STYLE_SUCCESS = ("msgSuccess", "success")
+	STYLE_PURCHASE = ("msgPurchase", "purchase")
+	STYLE_DEPOSIT = ("msgDeposit", "deposit")
 
 	timer = None
 
@@ -104,16 +103,24 @@ class MessageLine(QtGui.QPushButton):
 		self.timer.timeout.connect(self.timeoutEvent)
 		self.setFlat(True)
 		self.setAutoFillBackground(True)
+		self._setStyle(self.STYLE_NONE)
+
+	def _setStyle(self, style):
+		self.setObjectName(style[0])
+		self.setIcon(getIcon(style[1]))
+		# Force style update:
+		st = self.style()
+		self.setStyle(st)
 
 	def post(self, txt, style):
+		self._setStyle(style)
 		self.setText(txt)
-		self.setPalette(style[0])
-		self.setIcon(QtGui.QIcon(style[1]))
 		self.timer.start(MESSAGE_TIME_SEC*1000)
 
 	def timeoutEvent(self):
 		self.timer.stop()
-		self.post("", self.STYLE_NONE)
+		self.setText("")
+		self._setStyle(self.STYLE_NONE)
 
 
 
