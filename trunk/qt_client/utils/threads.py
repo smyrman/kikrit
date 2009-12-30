@@ -14,7 +14,7 @@ class RFIDThread(QtCore.QThread):
 
 	def __init__(self, parent=None, device=None, timeout=0.1):
 		QtCore.QThread.__init__(self, parent)
-			self.setDevice(device)
+		self.setDevice(device)
 
 
 	def setDevice(self, device, timeout=0.1):
