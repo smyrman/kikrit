@@ -1,0 +1,18 @@
+/* -- coding: utf-8 -- */
+/* -- filetype: css -- */
+/*The icon part below does not work:*/
+MessageLine {
+	border-width: 1px;
+	border-color: black;
+	border-style: outset;
+	border-radius: 3px;
+	padding: 3px;
+}
+MessageLine#msgNone {border-style: none;}
+MessageLine#msgError {background: rgb(170, 0, 0); color: white;}
+MessageLine#msgCancel {background: rgb(142, 142, 142); color: black;}
+MessageLine#msgInfo {background: rgb(0, 170, 255); color: black;}
+MessageLine#msgSuccess {background: rgb(0, 170, 255); color: black;}
+MessageLine#msgPurchase {background: rgb(0, 170, 255); color: black;}
+MessageLine#msgDeposit {background: rgb(0, 170, 255); color: black;}
+
