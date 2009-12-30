@@ -12,14 +12,16 @@ class RFIDThread(QtCore.QThread):
 	rfid_serial = None
 	rfid_signal = QtCore.pyqtSignal(str, name="rfidSignal")
 
-	def __init__(self, parent=None, device="/dev/ttyS0", timeout=0.1):
+	def __init__(self, parent=None, device=None, timeout=0.1):
 		QtCore.QThread.__init__(self, parent)
-		if device != None:
 			self.setDevice(device)
 
 
 	def setDevice(self, device, timeout=0.1):
-		self.rfid_serial = serial.Serial(device, 9600, timeout=timeout)
+		if device != None:
+			self.rfid_serial = serial.Serial(device, 9600, timeout=timeout)
+		else:
+			self.rfid_serial = None
 
 
 	def readRfid(self):

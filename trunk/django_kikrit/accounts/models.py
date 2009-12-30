@@ -6,9 +6,9 @@ from os.path import sep as path_sep
 from django.db import models
 from django.contrib.auth.models import User
 
-import django_kikrit.accounts.signals
+from settings import UPLOAD_PATH
 from django_kikrit.accounts.fields import NegativeIntegerField
-from django_kikrit.settings import UPLOAD_PATH
+import django_kikrit.accounts.signals
 
 class LimitGroup(models.Model):
 	"""A user might be a member of ONE LimitGroup. This determin how negative

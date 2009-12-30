@@ -1,20 +1,14 @@
 # Django settings for django_kikrit project.
-from os.path import dirname, abspath, join as join_path
+import os
+PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
 
-PROJECT_ROOT = join_path(dirname(abspath(__file__)), "..", "..")
-
+# DJANGO_KIKRIT SETTINGS:
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
-)
-
-MANAGERS = ADMINS
-
 # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_ENGINE = 'sqlite3'
-# Or path to database file if using sqlite3.
+# Name or path to database file if using sqlite3.
 DATABASE_NAME = PROJECT_ROOT+'/kikrittest.db'
 # Not used with sqlite3.
 DATABASE_USER = ''
@@ -26,4 +20,9 @@ DATABASE_HOST = ''
 DATABASE_PORT = ''
 
 SECRET_KEY = 's#(&@jcdlqc*#m&^yx16-u2i++_!-3+g@_f=!jdu3nq)#y#!%@'
+
+# QT_CLINET SETTINGS:
+RFID_DEVICE = None
+BALANCE_PAGE_TIME_SEC = 5
+MESSAGE_TIME_SEC = 5
 

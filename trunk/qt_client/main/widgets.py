@@ -54,9 +54,9 @@ class MainWidget(QtGui.QWidget):
 		grid.addWidget(self.search_line, 0, 0)
 		grid.addWidget(self.merchandise_list, 1, 0)
 		grid.addWidget(self.add_button, 2, 0)
-		grid.addWidget(self.stack, 1, 1)
+		grid.addWidget(self.stack, 1, 1, 1, 1)
 		grid.addWidget(self.remove_button, 2, 1)
-		grid.addWidget(self.msg, 3, 1)
+		grid.addWidget(self.msg, 0, 1)
 
 		self.setLayout(grid)
 
@@ -140,7 +140,8 @@ class MainWidget(QtGui.QWidget):
 	def addClicked(self):
 		"""Called when the user presses the add-button"""
 		# Set stack index:
-		self.stack.setCurrentWidget(self.order_page)
+		if self.stack.currentIndex() != 0:
+			self.stack.setCurrentIndex(0)
 
 		indexes = self.merchandise_list.selectedIndexes()
 
