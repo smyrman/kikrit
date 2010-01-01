@@ -2,14 +2,14 @@
 import sys
 import os
 
-PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
-sys.path.insert(0, PROJECT_ROOT)
+BASEPATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
+sys.path.append(BASEPATH)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from django.core.management import execute_manager
 
 
 try:
-    import settings # Assumed to be in the same directory.
+	import settings # Assumed to be in the same directory.
 except ImportError:
 	sys.stderr.write("Error: Can't find the file 'settings.py' in the "
 			"directory containing %r. It appears you've customized "
@@ -20,4 +20,5 @@ except ImportError:
 
 
 if __name__ == "__main__":
-    execute_manager(settings)
+	execute_manager(settings)
+

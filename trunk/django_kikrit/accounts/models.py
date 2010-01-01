@@ -49,7 +49,7 @@ class Account(models.Model):
 	user = models.OneToOneField(User, null=True, blank=True,
 			help_text="Needed to enable login and, to send emails to user.")
 	name = models.CharField(max_length=50, help_text="Account name", unique=True)
-	balance = models.IntegerField(default=0)
+	balance = models.IntegerField(default=0, editable=False)
 	limit_group = models.ForeignKey(LimitGroup, null=True, blank=True)
 	color = models.SmallIntegerField(choices=COLOR_CHOICES, editable=False)
 	# Timestamp for when the user last whent grey:
@@ -148,6 +148,8 @@ class Account(models.Model):
 			self.balance -= amount
 			self.save()
 			ret = True
+		elif self.get_color() != self.color:
+			self.save()
 
 		return ret
 
