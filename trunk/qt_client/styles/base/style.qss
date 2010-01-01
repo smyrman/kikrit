@@ -1,9 +1,10 @@
 /* -- coding: utf-8 -- */
 /* -- vim: set filetype=css -- */
+
 MessageLine {
 	border-width: 1px;
-	border-color: black;
-	border-style: outset;
+	border-color: palette(shadow);
+	border-style: solid;
 	border-radius: 3px;
 	padding: 3px;
 }
@@ -14,4 +15,19 @@ MessageLine#msgInfo {background: rgb(0, 170, 255); color: black;}
 MessageLine#msgSuccess {background: rgb(0, 170, 255); color: black;}
 MessageLine#msgPurchase {background: rgb(0, 170, 255); color: black;}
 MessageLine#msgDeposit {background: rgb(0, 170, 255); color: black;}
+
+QLabel#balancePage {
+	border-width: 1px;
+	border-color: palette(shadow);
+	border-style: solid;
+	border-radius: 3px;
+	padding: 3px;
+	background: palette(base);
+	font-size: 32px;
+}
+
+
+* {
+	font-size: 20px;
+}
 

@@ -184,6 +184,7 @@ class MainWidget(QtGui.QWidget):
 		if self.order_page.list_view.hasFocus():
 			self._setSelected(self.order_page.list_view, next=False)
 		else:
+			self.merchandise_list.setFocus()
 			self._setSelected(self.merchandise_list, next=False)
 
 
@@ -191,6 +192,7 @@ class MainWidget(QtGui.QWidget):
 		if self.order_page.list_view.hasFocus():
 			self._setSelected(self.order_page.list_view, next=True)
 		else:
+			self.merchandise_list.setFocus()
 			self._setSelected(self.merchandise_list, next=True)
 
 
@@ -200,9 +202,11 @@ class MainWidget(QtGui.QWidget):
 		else:
 			self.addClicked()
 
+
 	def escapePressed(self):
+		if len(self.order_page.items()) > 0:
+			self.msg.post("Order canceled", self.msg.STYLE_CANCEL)
 		self._reset()
-		self.msg.post("Order Canceled", self.msg.STYLE_CANCEL)
 
 
 	def rfidEvent(self, rfid_str):
@@ -210,26 +214,27 @@ class MainWidget(QtGui.QWidget):
 		if not self._tabHasFocus():
 			return
 
-		# Get card:
+		# Get account:
 		try:
 			card = RFIDCard.objects.get(rfid_string=unicode(rfid_str))
+			account = card.account
 		except RFIDCard.DoesNotExist:
 			self.msg.post(u"RFID card not found", self.msg.STYLE_ERROR)
-			card = None
+			account = None
 
 		# Execute purchase:
-		if card != None:
+		if account != None:
 			items = self.order_page.items()
+			self.balance_page.showPage(account)
 			if len(items) == 0:
-				self.balance_page.showPage(card.account)
-			elif buy_merchandise(card.account, items):
+				pass
+			elif buy_merchandise(account, items):
 				self._reset()
-				color = card.account.COLOR_CHOICES[card.account.color][1]
+				color = account.COLOR_CHOICES[account.get_color()][1]
 				self.msg.post(u"A successfull purchase mr. %s" % color,
 						self.msg.STYLE_PURCHASE)
-				self.balance_page.showPage(card.account)
 			else:
-				color = card.account.COLOR_CHOICES[card.account.color][1]
+				color = account.COLOR_CHOICES[account.get_color()][1]
 				self.msg.post(u"Transaction was dissalowed mr. %s" % color,
 						self.msg.STYLE_ERROR)
 

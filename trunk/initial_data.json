@@ -1,0 +1,29 @@
+[{"pk": 1, "model": "accounts.balanceimage", "fields": {
+    "maximum_balance": null,
+    "image": "django_kikrit/media/upload/white.png",
+    "grey": false,
+    "black": false,
+    "white": true,
+    "minimum_balance": null
+  }
+},
+
+{"pk": 2, "model": "accounts.balanceimage", "fields": {
+    "maximum_balance": null,
+    "image": "django_kikrit/media/upload/grey.png",
+    "grey": true,
+    "black": false,
+    "white": false,
+    "minimum_balance": null
+  }
+},
+
+{"pk": 3, "model": "accounts.balanceimage", "fields": {
+    "maximum_balance": null,
+    "image": "django_kikrit/media/upload/black.png",
+    "grey": false,
+    "black": true,
+    "white": false,
+    "minimum_balance": null
+  }
+}]

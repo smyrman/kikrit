@@ -2,8 +2,8 @@
 import sys
 import os
 
-BASEPATH = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
-sys.path.append(BASEPATH)
+PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
+sys.path.append(PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from django.core.management import execute_manager
 

@@ -176,6 +176,10 @@ class Account(models.Model):
 		BalanceImage.DoesNotExist exception is thrown.
 
 		"""
+		# Update color before we look for an image:
+		if self.get_color() != self.color:
+			self.save()
+
 		# Filter based on balance:
 		q1 = BalanceImage.objects.filter(minimum_balance__lte=self.balance,
 				maximum_balance__gte=self.balance)
