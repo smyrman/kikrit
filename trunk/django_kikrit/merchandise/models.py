@@ -49,13 +49,31 @@ class Transaction(models.Model):
 	"""Class for logging transactions.
 
 	"""
+	TYPE_PURCHASE = 0
+	TYPE_DEPOSIT = 1
+	TYPE_CHOICES = (
+			(TYPE_PURCHASE, "purchase"),
+			(TYPE_DEPOSIT, "deposit"),
+	)
 	timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 	account = models.ForeignKey(Account)
-	merchandise = models.ManyToManyField(Merchandise, null=True, blank=True)
+	merchandise = models.ManyToManyField(Merchandise, null=True, blank=True,
+			through="Transaction_Merchandise")
 	amount = models.IntegerField()
+	type = models.BooleanField(choices=TYPE_CHOICES, blank=True)
 
 	def __unicode__(self):
 		return unicode(self.timestamp)
+
+
+
+class Transaction_Merchandise(models.Model):
+	"""Associtation table to connect Merchandise to a Transaction
+
+	"""
+	transaction = models.ForeignKey(Transaction)
+	merchandise = models.ForeignKey(Merchandise)
+	number = models.PositiveIntegerField()
 
 
 
@@ -73,11 +91,24 @@ def buy_merchandise(account, merchandise_list):
 
 	ret = False
 	if price == 0 or account.withdraw(price):
-		transaction = Transaction(account=account, amount=-price)
+		transaction = Transaction(account=account, amount=-price,
+				type=Transaction.TYPE_PURCHASE)
 		transaction.save()
 
 		# ManyToManyFields must be set after save:
-		transaction.merchandise = merchandise_list
+		merchandise_list.sort()
+		last_m = merchandise_list[0]
+		n = 0
+		for m in merchandise_list + [Merchandise()]:
+			n += 1
+			if m.pk != last_m.pk:
+				tm = Transaction_Merchandise()
+				tm.transaction = transaction
+				tm.merchandise = last_m
+				tm.number = n
+				tm.save()
+				n = 0
+			last_m = m
 		ret = True
 
 	return ret
@@ -88,9 +119,9 @@ def deposit_money(account, amount):
 
 	ret = False
 	if account.deposit(amount):
-		transaction = Transaction(account=account, amount=amount)
+		transaction = Transaction(account=account, amount=amount,
+				type=Transaction.TYPE_DEPOSIT)
 		transaction.save()
 		ret = True
-
 	return ret
 

@@ -6,6 +6,10 @@ PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+ADMINS = ()
+MANAGERS = ADMINS
+
+
 # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_ENGINE = 'sqlite3'
 # Name or path to database file if using sqlite3.

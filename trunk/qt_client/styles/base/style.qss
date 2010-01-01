@@ -1,6 +1,5 @@
 /* -- coding: utf-8 -- */
-/* -- filetype: css -- */
-/*The icon part below does not work:*/
+/* -- vim: set filetype=css -- */
 MessageLine {
 	border-width: 1px;
 	border-color: black;
