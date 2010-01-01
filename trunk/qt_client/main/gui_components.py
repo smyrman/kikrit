@@ -85,6 +85,7 @@ class AmountLine(SearchLine):
 		self.setText(unicode(i))
 
 
+
 class MessageLine(QtGui.QPushButton):
 	STYLE_NONE = ("msgNone", "") # obj_name, icon_name
 	STYLE_INFO = ("msgInfo", "info")
@@ -162,6 +163,13 @@ class OrderPage(QtGui.QWidget):
 		grid.addWidget(self.sum_label, 1, 1)
 		self.setLayout(grid)
 
+		# Style:
+		self.setObjectName("orderPage")
+		self.list_view.setObjectName("orderPage")
+		self.total_label.setObjectName("orderPage")
+		self.sum_label.setObjectName("orderPage")
+
+
 	def items(self, indexes=None):
 		if indexes != None:
 			return [self.list_view.model().items[i.row()] for i in indexes]
@@ -228,6 +236,12 @@ class BalancePage(QtGui.QWidget):
 
 		# Connect signals:
 		self.timer.timeout.connect(self.timeoutEvent)
+
+		# Style:
+		self.setObjectName("balancePage")
+		self.label1.setObjectName("balancePage")
+		self.label2.setObjectName("balancePage")
+		self.image.setObjectName("balancePage")
 
 
 	def showPage(self, account):

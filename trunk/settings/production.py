@@ -1,6 +1,7 @@
 # Django settings for django_kikrit project.
 import os
-PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
+
+PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
 
 # DJANGO_KIKRIT SETTINGS:
 DEBUG = True

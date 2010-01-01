@@ -5,7 +5,7 @@ import os
 
 from PyQt4 import QtGui, QtCore
 
-PROJECT_ROOT = os.path.join(os.path.abspath(os.path.dirname(__file__)), "..")
+PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
 sys.path.insert(0, PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from qt_client.main.widgets import MainWidget, DepositWidget
