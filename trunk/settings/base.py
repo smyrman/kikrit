@@ -3,6 +3,7 @@ import os
 
 PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
 
+# WEB SERVER SETTINGS:
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -54,3 +55,6 @@ INSTALLED_APPS = (
 AUTH_PROFILE_MODULE = 'auth.Account'
 
 RUNSERVER_PORT = '8081'
+
+# CLIENT SETTINGS:
+SPLASH_SCREEN = PROJECT_ROOT + "/graphics/kikrit_logo.png"

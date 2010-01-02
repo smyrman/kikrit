@@ -13,25 +13,30 @@ from qt_client.admin.widgets import AdminWidget
 from qt_client.utils.widgets import DebugWidget
 from qt_client.utils.threads import RFIDThread
 
-from settings import RFID_DEVICE, STYLE_SHEET
+from settings import RFID_DEVICE, STYLE_SHEET, SPLASH_SCREEN
 STYLE_SHEET = STYLE_SHEET.replace("/", os.path.sep)
+SPLASH_SCREEN = SPLASH_SCREEN.replace("/", os.path.sep)
 
 
 def main():
 	app = QtGui.QApplication(sys.argv)
 
+	# Splash:
+	splash = QtGui.QSplashScreen(QtGui.QPixmap(SPLASH_SCREEN))
+	splash.show()
+	app.processEvents()
+
+	# Stylesheet:
 	app.setStyleSheet(open(STYLE_SHEET).read())
 
-	tabs = QtGui.QTabWidget()
+	# Threads:
 	rfid_thread = RFIDThread(device=RFID_DEVICE)
+
+	# Main window (tabs):
+	tabs = QtGui.QTabWidget()
 	main_widget = MainWidget(rfid_thread, parent=tabs)
 	deposit_widget = DepositWidget(rfid_thread, parent=tabs)
 	admin_widget = AdminWidget(rfid_thread, parent=tabs)
-
-	if "--debug" in sys.argv[1:]:
-		debug_panel = DebugWidget(tabs.window(), rfid_thread)
-		debug_panel.show()
-		rfid_thread.setDevice(None)
 
 	tabs.addTab(main_widget, "Main")
 	tabs.addTab(deposit_widget, "Deposit")
@@ -39,11 +44,19 @@ def main():
 
 	tabs.setWindowTitle('KiKrit')
 	#tabs.showFullScreen() # Should be used in final release
-	tabs.resize(600, 400)
+	tabs.resize(1000, 600)
 	tabs.setMinimumSize(600, 400)
-	tabs.move(200, 200)
+	tabs.move(10, 200)
 
+	# Debug panel:
+	if "--debug" in sys.argv[1:]:
+		debug_panel = DebugWidget(tabs.window(), rfid_thread)
+		debug_panel.show()
+		rfid_thread.setDevice(None)
+
+	# Show main window / start threads:
 	rfid_thread.start()
+	splash.finish(tabs)
 	tabs.show()
 
 	return app.exec_()
