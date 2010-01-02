@@ -10,12 +10,15 @@ import datetime
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(PROJECT_ROOT)
 
-if sys.argv[1] == "help":
+if len(sys.argv) < 2:
+	print "You must supply a command argument.. Try to add 'help'"
+
+elif sys.argv[1] == "help":
 	print "Commands:\n"\
 		"help - show this text\n"\
-		"install - install database according to settings and load initial",\
+		"install - install database (according to settings) and load initial",\
 		"data\n"\
-		"backup - bacup all data from a to file."
+		"backup - bacup all data from the database to a file."
 
 elif sys.argv[1] == "install":
 	# Create super-user, populate db with initial data:
