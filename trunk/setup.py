@@ -1,8 +1,29 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# This file supplies an easy wrapper for django_kikrit/manage.py, and contains
-# only a few essential commands.
 
+# Copyright (C) 2010: Sindre Røkenes Myren, Andreas Hopland Sperre
+#
+# This file is part of KiKrit wich is distrebuted under GPLv3. See the file
+# COPYING.txt for more details.
+#
+#    KiKrit is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    KiKrit is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with KiKrit.  If not, see <http://www.gnu.org/licenses/>.
+
+
+"""This file supplies an easy wrapper for django_kikrit/manage.py, and contains
+only a few essential commands.
+
+"""
 import os
 import sys
 import datetime

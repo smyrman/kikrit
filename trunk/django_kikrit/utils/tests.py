@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+
+# Copyright (C) 2010: Sindre Røkenes Myren, Andreas Hopland Sperre
+
+# This file is part of KiKrit wich is distrebuted under GPLv3. See the file
+# COPYING.txt for more details.
+
 """
 This file demonstrates two different styles of tests (one doctest and one
 unittest). These will both pass when you run "manage.py test".

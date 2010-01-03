@@ -1,0 +1,5 @@
+# -*- coding: utf-8 -*-
+Main developers:
+Sindre Røkenes Myren | smyrman -a- gmail com
+Andreas Hopland Sperre | sperre -a- stud ntnu no
+
