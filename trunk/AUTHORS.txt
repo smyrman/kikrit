@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
-Main developers:
-Sindre Røkenes Myren | smyrman -a- gmail com
-Andreas Hopland Sperre | sperre -a- stud ntnu no
+KiKrit:
+	Sindre Røkenes Myren | smyrman -a- gmail com
+	Andreas Hopland Sperre | sperre -a- stud ntnu no
 
+The Oxygen Icon Theme (Icons used in qt_client/styles/base):
+	David Vignoni <david@icon-king.com>
+	Ollivier Lapeyre <johann@oxygen-icons.org>
+	Kenneth Wimer <kwwii@bootsplash.org>
+	Nuno Pinheiro <nuno@oxygen-icons.org>
+	Iaconelli <riccardo@oxygen-icons.org>
+	Miller <miller@oxygen-icons.org>
