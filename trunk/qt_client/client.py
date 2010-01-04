@@ -48,7 +48,8 @@ def main():
 	tabs.addTab(deposit_widget, "Deposit")
 	tabs.addTab(admin_widget, "Admin")
 
-	tabs.setWindowTitle('KiKrit')
+	tabs.setWindowTitle("KiKrit")
+	tabs.setWindowIcon(QtGui.QIcon("graphics/favicon.png"))
 	#tabs.showFullScreen() # Should be used in final release
 	tabs.resize(1000, 600)
 	tabs.setMinimumSize(600, 400)
