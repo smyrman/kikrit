@@ -58,6 +58,8 @@ class Account(models.Model):
 	balance = models.IntegerField(default=0, editable=False)
 	limit_group = models.ForeignKey(LimitGroup, null=True, blank=True)
 	color = models.SmallIntegerField(choices=COLOR_CHOICES, editable=False)
+	email = models.EmailField(blank=True, null=True)
+	phone_number = models.IntegerField(blank=True, null=True)
 	# Timestamp for when the user last whent grey:
 	timestamp_grey = models.DateTimeField(editable=False, null=True, blank=True)
 

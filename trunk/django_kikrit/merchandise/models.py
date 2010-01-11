@@ -24,7 +24,7 @@ class Merchandise(models.Model):
 	name = models.CharField(max_length=50, unique=True)
 	ordinary_price = models.PositiveIntegerField()
 	internal_price = models.PositiveIntegerField()
-	ean = models.CharField(max_length=20, unique=True)
+	ean = models.CharField(max_length=20, blank=True, null=True)
 	tags = models.ManyToManyField(MerchandiseTag, null=True, blank=True)
 
 	def __unicode__(self):
