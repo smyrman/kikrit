@@ -30,13 +30,15 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 os.chdir(PROJECT_ROOT)
 from settings import RUNSERVER_PORT
 
-# Start webserver:
-os.system("screen -d -m django_kikrit/manage.py runserver localhost:%s"\
-		% RUNSERVER_PORT)
+# If webserver is not running, start webserver:
+SCREEN_NAME = "kikrit_webserver"
+if os.system("screen -ls | grep %s" % SCREEN_NAME) != 0:
+	os.system("screen -d -m -S %s django_kikrit/manage.py runserver"\
+			" localhost:%s" % (SCREEN_NAME, RUNSERVER_PORT))
 
 # Start client:
 from qt_client import client
 client.main()
 
-# Resume webserver screen:
-os.system("screen -r")
+# Reatatch webserver screen:
+os.system("screen -r %s" % SCREEN_NAME)
