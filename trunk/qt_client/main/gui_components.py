@@ -24,6 +24,7 @@ class SearchLine(QtGui.QLineEdit):
 	down_pressed = QtCore.pyqtSignal(name="downPressed")
 	return_pressed = QtCore.pyqtSignal(name="returnPressed")
 	escape_pressed = QtCore.pyqtSignal(name="escapePressed")
+	f5_pressed = QtCore.pyqtSignal(name="f5Pressed")
 
 	def __init__(self, *args):
 		QtGui.QLineEdit.__init__(self, *args)
@@ -63,6 +64,9 @@ class SearchLine(QtGui.QLineEdit):
 			elif k == QtCore.Qt.Key_Escape:
 				self.escape_pressed.emit()
 				ret = True
+
+			elif k == QtCore.Qt.Key_F5:
+				self.f5_pressed.emit()
 
 			elif self._validateKey(event):
 				self.setFocus()

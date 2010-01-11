@@ -77,6 +77,7 @@ class MainWidget(QtGui.QWidget):
 		self.search_line.down_pressed.connect(self.downPressed)
 		self.search_line.return_pressed.connect(self.returnPressed)
 		self.search_line.escape_pressed.connect(self.escapePressed)
+		self.search_line.f5_pressed.connect(self.f5Pressed)
 
 		self.add_button.clicked.connect(self.addClicked)
 		self.remove_button.clicked.connect(self.removeClicked)
@@ -213,6 +214,17 @@ class MainWidget(QtGui.QWidget):
 		if len(self.order_page.items()) > 0:
 			self.msg.post("Order canceled", self.msg.STYLE_CANCEL)
 		self._reset()
+
+	def f5Pressed(self):
+		indexes = self.merchandise_list.selectedIndexes()
+		self.merchandise_list.model().setAllData(self._getItems())
+		self.merchandise_list.model().filter(u"")
+		filter_str = self.search_line.text()
+		self.merchandise_list.model().filter(filter_str)
+
+		# Reset selection:
+		self.merchandise_list.selectionModel().select(indexes[0],
+				QtGui.QItemSelectionModel.ClearAndSelect)
 
 
 	def rfidEvent(self, rfid_str):

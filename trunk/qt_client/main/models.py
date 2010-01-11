@@ -66,6 +66,12 @@ class MerchandiseListModel(QtCore.QAbstractListModel):
 		self.reset()
 
 
+	def setAllData(self, new_list):
+		self.all_items = new_list
+		self.items = new_list
+		self.reset()
+
+
 	def setData(self, new_list):
 		"""replace old list with new list
 
