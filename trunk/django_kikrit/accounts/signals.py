@@ -18,6 +18,7 @@ def create_user_account(signal, instance, **kwargs):
 	account, new = Account.objects.get_or_create(user=instance)
 	if new:
 		account.name = instance.username
+		account.email = instance.email
 		account.save()
 
 
