@@ -50,23 +50,30 @@ def main():
 
 	tabs.setWindowTitle("KiKrit")
 	tabs.setWindowIcon(QtGui.QIcon("graphics/favicon.png"))
-	#tabs.showFullScreen() # Should be used in final release
-	tabs.resize(1000, 600)
 	tabs.setMinimumSize(600, 400)
-	tabs.move(10, 200)
+	maximize = True
 
 	# Debug panel:
 	if "--debug" in sys.argv[1:]:
 		debug_panel = DebugWidget(tabs.window(), rfid_thread)
 		debug_panel.show()
+
 		rfid_thread.setDevice(None)
+		maximize = False
+		tabs.resize(1000, 600)
+		tabs.move(10, 200)
 
 	# Show main window / start threads:
 	rfid_thread.start()
 	splash.finish(tabs)
-	tabs.show()
+	if maximize:
+		tabs.showMaximized()
+	else:
+		tabs.show()
 
-	return app.exec_()
+	ret = app.exec_()
+	rfid_thread.terminate()
+	return ret
 
 
 if __name__ == "__main__":
