@@ -140,7 +140,6 @@ class Account(models.Model):
 		self.COLOR_WHITE or self.COLOR_GREY.(Also saves the object, and updates
 		the color field!)
 
-
 		"""
 		# Input check:
 		if amount.__class__ != int or amount <= 0:
