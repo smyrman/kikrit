@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Django settings for django_kikrit project.
 import os
 
@@ -10,7 +11,7 @@ TEMPLATE_DEBUG = DEBUG
 # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle':
 DATABASE_ENGINE = 'sqlite3'
 # Name or path to database file if using sqlite3:
-DATABASE_NAME = os.path.join(PROJECT_ROOT, '/kikrit_prod.db')
+DATABASE_NAME = os.path.join(PROJECT_ROOT, 'kikrit_prod.db')
 # Not used with sqlite3:
 DATABASE_USER = ''
 # Not used with sqlite3:
