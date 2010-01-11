@@ -59,7 +59,7 @@ class RFIDThread(QtCore.QThread):
 	def run(self):
 		# GUARD: Device not set?
 		if self.device == None:
-			print "WARNING: RFID device not set",
+			print "WARNING: RFID device not set, or debug mode is active!",\
 			"\n -> Check the RFID_DEVICE parameter in your settings!"
 			while 1:
 				self.sleep(30)
