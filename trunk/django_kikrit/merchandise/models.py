@@ -80,6 +80,7 @@ class Transaction_Merchandise(models.Model):
 	transaction = models.ForeignKey(Transaction)
 	merchandise = models.ForeignKey(Merchandise)
 	number = models.PositiveIntegerField()
+	amount = models.IntegerField()
 
 
 
@@ -92,11 +93,13 @@ def buy_merchandise(account, merchandise_list):
 
 	if account.has_internal_price():
 		price = sum((m.internal_price for m in merchandise_list))
+		internal = True
 	else:
 		price = sum((m.ordinary_price for m in merchandise_list))
+		internal = False
 
 	ret = False
-	if price == 0 or account.withdraw(price):
+	if price == 0 or account.get_color(-price) != account.COLOR_BLACK:
 		transaction = Transaction(account=account, amount=-price,
 				type=Transaction.TYPE_PURCHASE)
 		transaction.save()
@@ -105,17 +108,28 @@ def buy_merchandise(account, merchandise_list):
 		merchandise_list.sort()
 		last_m = merchandise_list[0]
 		n = 0
+		a = 0
 		for m in merchandise_list + [Merchandise()]:
-			n += 1
+			# Save tm:
 			if m.pk != last_m.pk:
 				tm = Transaction_Merchandise()
 				tm.transaction = transaction
 				tm.merchandise = last_m
 				tm.number = n
+				tm.amount = a
 				tm.save()
 				n = 0
+				a = 0
 			last_m = m
-		ret = True
+
+			# Append num:
+			n += 1
+			if internal and m.internal_price != None:
+					a -= m.internal_price
+			elif m.ordinary_price != None:
+				a -= m.ordinary_price
+
+		ret = account.withdraw(price)
 
 	return ret
 
