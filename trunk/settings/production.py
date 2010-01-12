@@ -29,4 +29,4 @@ BALANCE_PAGE_TIME_SEC = 5
 MESSAGE_TIME_SEC = 5
 
 STYLE_SHEET = PROJECT_ROOT + "/qt_client/styles/base/style.qss"
-ICONS = PROJECT_ROOT + "/qt_client/style/base/icons.cfg"
+ICONS = PROJECT_ROOT + "/qt_client/styles/base/icons.cfg"

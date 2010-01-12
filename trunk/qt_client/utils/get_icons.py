@@ -6,7 +6,7 @@
 # COPYING.txt for more details.
 
 import os
-from ConfigParser import ConfigParser
+from ConfigParser import ConfigParser, NoOptionError
 
 from PyQt4 import QtGui
 
@@ -23,17 +23,20 @@ def getIcon(icon_name, size=16):
 
 	# Find section based on size:
 	sections = [int(s) for s in CFG.sections() if s.isdigit() and int(s) >= size]
-	if len(sections) != 0:
-		section = unicode(min(sections))
+	sections.sort()
+	if CFG.has_section("svg"):
+		section = "svg"
+	elif len(sections) != 0:
+		section = unicode(sections[0])
 	else:
-		section = CFG.DEFAULT
-
+		section = "DEFAULT"
 	# Get icon path:
 	try:
 		icon = CFG.get(section, icon_name).replace('/', os.path.sep)
 		path = os.path.join(os.path.abspath(os.path.dirname(ICONS)), icon)
-	except CFG.NoOptionError:
-		print "DEBUG: icon %s not found in %s" % (icon_name, ICONS)
+	except NoOptionError:
+		print "DEBUG: option '%s' not found in '%s'" % (icon_name, ICONS)
+		print "DEBUG: using section '%s'" % section
 		path = ""
 
 	return QtGui.QIcon(path)

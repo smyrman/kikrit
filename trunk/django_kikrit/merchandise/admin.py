@@ -8,7 +8,7 @@
 from django.contrib import admin
 
 from django_kikrit.merchandise.models import Merchandise, MerchandiseTag,\
-		Transaction
+		Transaction, Transaction_Merchandise
 
 
 class MerchandiseAdmin(admin.ModelAdmin):
@@ -23,12 +23,16 @@ class MerchandiseAdmin(admin.ModelAdmin):
 		return u",".join((tag.__unicode__() for tag in obj.tags.all()))
 	get_tags.short_description = 'tags'
 
+class Transaction_MerchandiseInline(admin.TabularInline):
+	model = Transaction_Merchandise
+	extra = 2
 
 class TransactionAdmin(admin.ModelAdmin):
 	date_hierarchy = 'timestamp'
 	list_display = ('timestamp', 'account', 'amount')
 	search_fields = ('timestamp', 'account__name', 'amount')
 	list_filter = ('type',)
+	inlines = (Transaction_MerchandiseInline,)
 
 
 admin.site.register(Merchandise, MerchandiseAdmin)
