@@ -243,7 +243,7 @@ class MainWidget(QtGui.QWidget):
 		# Execute purchase:
 		if account != None:
 			items = self.order_page.items()
-			self.balance_page.showPage(account)
+
 			if len(items) == 0:
 				pass
 			elif buy_merchandise(account, items):
@@ -255,6 +255,8 @@ class MainWidget(QtGui.QWidget):
 				color = account.COLOR_CHOICES[account.get_color()][1]
 				self.msg.post(u"Transaction was dissalowed mr. %s" % color,
 						self.msg.STYLE_ERROR)
+
+			self.balance_page.showPage(account)
 
 
 
