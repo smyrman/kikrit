@@ -79,7 +79,6 @@ class Transaction_Merchandise(models.Model):
 	"""
 	transaction = models.ForeignKey(Transaction)
 	merchandise = models.ForeignKey(Merchandise)
-	number = models.PositiveIntegerField()
 	amount = models.IntegerField()
 
 
@@ -105,32 +104,17 @@ def buy_merchandise(account, merchandise_list):
 		transaction.save()
 
 		# ManyToManyFields must be set after save:
-		merchandise_list.sort()
-		last_m = merchandise_list[0]
-		n = 0
-		a = 0
-		for m in merchandise_list + [Merchandise()]:
-			# Save tm:
-			if m.pk != last_m.pk:
-				tm = Transaction_Merchandise()
-				tm.transaction = transaction
-				tm.merchandise = last_m
-				tm.number = n
-				tm.amount = a
-				tm.save()
-				n = 0
-				a = 0
-			last_m = m
-
-			# Append num:
-			n += 1
-			if internal and m.internal_price != None:
-					a -= m.internal_price
-			elif m.ordinary_price != None:
-				a -= m.ordinary_price
+		for m in merchandise_list:
+			tm = Transaction_Merchandise()
+			tm.transaction = transaction
+			tm.merchandise = m
+			if internal:
+				tm.amount = -m.internal_price
+			else:
+				tm.amount = -m.ordinary_price
+			tm.save()
 
 		ret = account.withdraw(price)
-
 	return ret
 
 
