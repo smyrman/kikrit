@@ -135,6 +135,7 @@ class MainWidget(QtGui.QWidget):
 		mdl_index = list_view.model().index(new_index, 0)
 		list_view.selectionModel().select(mdl_index,
 				QtGui.QItemSelectionModel.ClearAndSelect)
+		list_view.scrollTo(mdl_index)
 
 
 	def tabChanged(self, index):
