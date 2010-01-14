@@ -6,28 +6,6 @@
 # COPYING.txt for more details.
 
 from django.db import models
-from django.contrib.auth.models import User
 
-
-# Signals:
-def create_user_account(signal, instance, **kwargs):
-	"""Signal for automatically creating an Account upon user creation/save.
-
-	"""
-	from django_kikrit.accounts.models import Account
-	account, new = Account.objects.get_or_create(user=instance)
-	if new:
-		# new account created/ new user created:
-		# -> Set account.name to user's username
-		account.name = instance.username
-		account.email = instance.email
-		account.save()
-	elif instance.email not in (None, ""):
-		# User's email field is not empty:
-		# -> Set account.email to user's email
-		account.email = instance.email
-		account.save()
-
-models.signals.post_save.connect(create_user_account, sender=User)
-
+# No signals currently implemented.
 
