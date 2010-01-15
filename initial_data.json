@@ -1,29 +1,32 @@
 [{"pk": 1, "model": "accounts.balanceimage", "fields": {
     "maximum_balance": null,
+    "minimum_balance": null,
     "image": "django_kikrit/media/upload/white.png",
-    "grey": false,
-    "black": false,
     "white": true,
-    "minimum_balance": null
+    "grey": false,
+    "black": false
   }
 },
 
 {"pk": 2, "model": "accounts.balanceimage", "fields": {
     "maximum_balance": null,
+    "minimum_balance": null,
     "image": "django_kikrit/media/upload/grey.png",
-    "grey": true,
-    "black": false,
     "white": false,
-    "minimum_balance": null
+    "grey": true,
+    "black": false
   }
 },
 
 {"pk": 3, "model": "accounts.balanceimage", "fields": {
     "maximum_balance": null,
+    "minimum_balance": null,
     "image": "django_kikrit/media/upload/black.png",
-    "grey": false,
-    "black": true,
     "white": false,
-    "minimum_balance": null
+    "grey": false,
+    "black": true
   }
 }]
+
+ {"pk": 1, "model": "auth.group", "fields": {"name": "admin", "permissions": [28, 31, 25, 49, 34, 37, 29, 32, 26, 50, 35, 38, 30, 33, 27, 51, 36, 39, 4, 1, 7, 5, 2, 8, 6, 3, 9, 43, 40, 44, 41, 45, 42]}},
+ {"pk": 2, "model": "auth.group", "fields": {"name": "staff", "permissions": [28, 31, 25, 49, 34, 37, 29, 32, 26, 50, 35, 38, 30, 33, 27, 36, 43, 40, 44, 41, 45, 42]}},
