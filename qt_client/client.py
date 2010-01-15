@@ -41,11 +41,11 @@ def main():
 	# Main window (tabs):
 	tabs = QtGui.QTabWidget()
 	main_widget = MainWidget(rfid_thread, parent=tabs)
-	deposit_widget = DepositWidget(rfid_thread, parent=tabs)
+	#deposit_widget = DepositWidget(rfid_thread, parent=tabs)
 	admin_widget = AdminWidget(rfid_thread, parent=tabs)
 
 	tabs.addTab(main_widget, "Main")
-	tabs.addTab(deposit_widget, "Deposit")
+	#tabs.addTab(deposit_widget, "Deposit")
 	tabs.addTab(admin_widget, "Admin")
 
 	tabs.setWindowTitle("KiKrit")

@@ -233,6 +233,7 @@ class BalanceImage(models.Model):
 		return unicode(self.image).split(path_sep)[-1]
 
 
+
 class RFIDCard(models.Model):
 	account = models.ForeignKey(Account)
 	rfid_string = models.CharField(max_length=50, unique=True)
@@ -240,3 +241,71 @@ class RFIDCard(models.Model):
 	def __unicode__(self):
 		return unicode(self.rfid_string)
 
+
+
+class Transaction(models.Model):
+	"""Class for logging transactions.
+
+	"""
+	TYPE_DEPOSIT = 0
+	TYPE_WITHDRAWAL = 1
+	TYPE_PURCHASE = 2
+
+	TYPE_CHOICES = (
+			(TYPE_DEPOSIT, "deposit"),
+			(TYPE_WITHDRAWAL, "withdraw"),
+			(TYPE_PURCHASE, "purchase"),
+	)
+
+	timestamp = models.DateTimeField(auto_now_add=True, editable=False)
+	responsible = models.ForeignKey(User, blank=True, null=True, editable=False)
+	account = models.ForeignKey(Account)
+	amount = models.IntegerField()
+	type = models.IntegerField(choices=TYPE_CHOICES, editable=False)
+
+	def __unicode__(self):
+		print self.type
+		type = self.TYPE_CHOICES[self.type][1]
+		tf = 'from'
+		if self.type == self.TYPE_DEPOSIT:
+			tf = 'to'
+		return u"%s of %s %s %s" % (type, self.amount, tf, self.account)
+
+
+	def undo(self):
+		"""Call this method before delete, to udo the effect of a transaction
+		on an account.
+
+		"""
+		self.account.balance -= self.amount
+		self.account.save()
+
+
+
+## Helper Functions:
+
+def deposit_to_account(account, amount, responsible):
+	"""Returns transaction object upon success, or None on failure
+
+	"""
+	# Input cheks are done in the Account class.
+	ret = None
+	if account.deposit(amount):
+		transaction = Transaction(account=account, amount=amount,
+				responsible=responsible, type=Transaction.TYPE_DEPOSIT)
+		transaction.save()
+		ret = transaction
+	return ret
+
+def withdraw_from_account(account, amount, responsible):
+	"""Returns transaction object upon success, or None on failure
+
+	"""
+	# Input cheks are done in the Account class.
+	ret = None
+	if account.withdraw(amount):
+		transaction = Transaction(account=account, amount=-amount,
+				responsible=responsible, type=Transaction.TYPE_WITHDRAWAL)
+		transaction.save()
+		ret = transaction
+	return ret

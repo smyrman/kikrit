@@ -52,7 +52,6 @@ INSTALLED_APPS = (
 	'django_kikrit.merchandise',
 	'django_kikrit.utils',
 )
-AUTH_PROFILE_MODULE = 'auth.Account'
 
 RUNSERVER_PORT = '8081'
 
