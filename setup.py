@@ -29,28 +29,66 @@ import sys
 import datetime
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-os.chdir(PROJECT_ROOT)
 
-if len(sys.argv) < 2:
-	print "You must supply a command argument.. Try to add 'help'"
-
-elif sys.argv[1] == "help":
+# COMMANDS
+def help(*args):
 	print "Commands:\n"\
-		"help - show this text\n"\
-		"install - install database (according to settings) and load initial",\
-		"data\n"\
-		"backup - bacup all data from the database to a file."
+		"  help - show this text\n"\
+		"  install - install database (according to settings) and load"\
+		"initial data\n"\
+		"  backup [multiline] - bacup all data from the database to a file.\n"\
+		"  git-update [git-remote, git-branch] - Shorthand for 'backup', 'git"\
+		"pull', 'rm kikrit_prod.db' and 'django_kikrit/manage.py load_data'."
 
-elif sys.argv[1] == "install":
-	# Create super-user, populate db with initial data:
-	cmd = "django_kikrit/manage.py syncdb"
-	os.system(cmd.replace("/", os.path.sep))
+def install(*args):
+		# Create super-user, populate db with initial data:
+		cmd = "django_kikrit/manage.py syncdb"
+		os.system(cmd.replace("/", os.path.sep))
 
-elif sys.argv[1] == "backup":
-	# Create super-user, populate db with initial data:
-	filename = "backup_%s.json" % datetime.datetime.now().isoformat()[:19]
-	cmd = "django_kikrit/manage.py dumpdata --format json > %s" % filename
-	os.system(cmd.replace("/", os.path.sep))
+def backup(*args):
+		# Create super-user, populate db with initial data:
+		filename = "backup_%s.json" % datetime.datetime.now().isoformat()[:19]
+		cmd = "django_kikrit/manage.py dumpdata --format json > %s" % filename
+		os.system(cmd.replace("/", os.path.sep))
+		print "Backed up db content to '%s'" % filename
 
-else:
-	print "Command argument not found little man.. Try to add 'help'"
+		# Better formating of file:
+		if "multiline" in args:
+			f = open(filename)
+			line = f.readline()
+			f.close()
+			lines = line.replace("}},","}},\n")
+			f = open(filename, 'w')
+			f.write(lines)
+			f.close()
+		return filename
+
+def git_update(*args):
+	filename = backup()
+	os.system("git pull %s" % " ".join(args))
+	os.system("mv kikrit_prod.db kikrit_prod.db.1")
+	install()
+	cmd = "django_kikrit/manage.py loaddata %s" % filename
+	if os.system(cmd.replace("/", os.path.sep)) == 0:
+		os.system("rm kikrit_prod.db.1")
+
+	print "Migration complete"
+
+
+def main():
+	os.chdir(PROJECT_ROOT)
+	if len(sys.argv) < 2:
+		print "You must supply a command argument.. Try to add 'help'"
+	elif sys.argv[1] == "help":
+		help(*sys.argv[2:])
+	elif sys.argv[1] == "install":
+		install(*sys.argv[2:])
+	elif sys.argv[1] == "backup":
+		backup(*sys.argv[2:])
+	elif sys.argv[1] == "git-update":
+		git_update(*sys.argv[2:])
+	else:
+		print "Command argument not found little man.. Try to add 'help'"
+
+if __name__ == "__main__":
+	main()
