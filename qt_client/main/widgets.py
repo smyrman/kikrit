@@ -8,8 +8,9 @@
 from PyQt4 import QtCore, QtGui
 
 from django_kikrit.accounts.models import Account, RFIDCard
-from django_kikrit.merchandise.models import Merchandise, buy_merchandise,\
-		deposit_money
+from django_kikrit.merchandise.models import Merchandise, buy_merchandise
+#from django_kikrit.accounts.models import deposit_to_account,\
+#	withdraw_from_account
 from qt_client.main.models import MerchandiseListModel
 from qt_client.main.gui_components import SearchLine, AmountLine, MessageLine,\
 		OrderPage, BalancePage
@@ -261,6 +262,7 @@ class MainWidget(QtGui.QWidget):
 
 
 
+# WARNING: Widget out of date.
 class DepositWidget(QtGui.QWidget):
 	label = None
 	amount_line = None

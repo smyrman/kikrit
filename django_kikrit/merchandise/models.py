@@ -7,7 +7,7 @@
 
 from django.db import models
 
-from django_kikrit.accounts.models import Account
+from django_kikrit.accounts.models import Account, Transaction
 
 
 class MerchandiseTag(models.Model):
@@ -51,81 +51,83 @@ class Merchandise(models.Model):
 
 
 
-class Transaction(models.Model):
-	"""Class for logging transactions.
+class TransactionTypeManager(models.Manager):
+    """Custom manager for showing certain kinds of transactions"""
+    type = None
 
-	"""
-	TYPE_PURCHASE = 0
-	TYPE_DEPOSIT = 1
-	TYPE_CHOICES = (
-			(TYPE_PURCHASE, "purchase"),
-			(TYPE_DEPOSIT, "deposit"),
-	)
-	timestamp = models.DateTimeField(auto_now_add=True, editable=False)
-	account = models.ForeignKey(Account)
-	merchandise = models.ManyToManyField(Merchandise, null=True, blank=True,
-			through="Transaction_Merchandise")
-	amount = models.IntegerField()
-	type = models.BooleanField(choices=TYPE_CHOICES, blank=True)
+    def __init__(self, type, *args, **kwargs):
+        self.type = type
+        super(self.__class__,self).__init__(*args, **kwargs)
 
-	def __unicode__(self):
-		return unicode(self.timestamp)
+    def get_query_set(self):
+        return super(self.__class__,
+                self).get_query_set().filter(type=self.type)
 
 
 
-class Transaction_Merchandise(models.Model):
-	"""Associtation table to connect Merchandise to a Transaction
+class PurchasedItem(models.Model):
+	"""Associtation table to connect Merchandise to a Transaction.
 
 	"""
 	transaction = models.ForeignKey(Transaction)
 	merchandise = models.ForeignKey(Merchandise)
-	amount = models.IntegerField()
+	price = models.PositiveIntegerField()
+
+	def __unicode__(self):
+		return u"%s %s,-" % (self.merchandise.name, self.price)
 
 
+
+
+class Purchase(Transaction):
+	default_manager = TransactionTypeManager(type=Transaction.TYPE_PURCHASE)
+
+	class Meta:
+		proxy = True
+
+	def undo(self):
+		"""Call this function before delete to undo the effect this purchase
+		has had on the system.
+		"""
+		self.account.balance -= self.amount
+		self.account.save()
+		q = PurchasedItems.objects.filter(transaction__id=self.id)
+		q.delete()
+
+
+## Helper Functions:
 
 def buy_merchandise(account, merchandise_list):
-	"""Try ro buy merchandice_list with credit from account. Return True upon
-	sucsess, or False upon failure.
+	"""Try ro buy merchandice_list with credit from account. Returns
+	transaction object upon success, or None on failure.
 
 	"""
+	internal = account.has_internal_price()
+
 	# Input cheks are done in the Account class.
-
-	if account.has_internal_price():
-		price = sum((m.internal_price for m in merchandise_list))
-		internal = True
+	if internal:
+		total_price = sum((m.internal_price for m in merchandise_list))
 	else:
-		price = sum((m.ordinary_price for m in merchandise_list))
-		internal = False
+		total_price = sum((m.ordinary_price for m in merchandise_list))
 
-	ret = False
-	if price == 0 or account.get_color(-price) != account.COLOR_BLACK:
-		transaction = Transaction(account=account, amount=-price,
+	ret = None
+	if total_price == 0 or account.withdraw(total_price):
+		transaction = Transaction(account=account, amount=-total_price,
 				type=Transaction.TYPE_PURCHASE)
 		transaction.save()
+		ret = transaction
 
-		# ManyToManyFields must be set after save:
+		# Purchased items must be created after save:
 		for m in merchandise_list:
-			tm = Transaction_Merchandise()
-			tm.transaction = transaction
-			tm.merchandise = m
+			pm = PurchasedItem()
+			pm.transaction = transaction
+			pm.merchandise = m
 			if internal:
-				tm.amount = -m.internal_price
+				pm.price = m.internal_price
 			else:
-				tm.amount = -m.ordinary_price
-			tm.save()
+				pm.price = m.ordinary_price
+			pm.save()
 
-		ret = account.withdraw(price)
 	return ret
 
-
-def deposit_money(account, amount):
-	# Input cheks are done in the Account class.
-
-	ret = False
-	if account.deposit(amount):
-		transaction = Transaction(account=account, amount=amount,
-				type=Transaction.TYPE_DEPOSIT)
-		transaction.save()
-		ret = True
-	return ret
 

@@ -6,9 +6,11 @@
 # COPYING.txt for more details.
 
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 
+from django_kikrit.accounts.admin import TransactionAdmin
 from django_kikrit.merchandise.models import Merchandise, MerchandiseTag,\
-		Transaction, Transaction_Merchandise
+		Purchase, PurchasedItem
 
 
 class MerchandiseAdmin(admin.ModelAdmin):
@@ -24,17 +26,23 @@ class MerchandiseAdmin(admin.ModelAdmin):
 		return u",".join((tag.__unicode__() for tag in obj.tags.all()))
 	get_tags.short_description = 'tags'
 
-class Transaction_MerchandiseInline(admin.TabularInline):
-	model = Transaction_Merchandise
+class PurchasedItemInline(admin.TabularInline):
+	model = PurchasedItem
+	fk_name = 'transaction'
 	extra = 2
 
-class TransactionAdmin(admin.ModelAdmin):
-	date_hierarchy = 'timestamp'
+
+class PurchaseAdmin(admin.ModelAdmin):
+	exclude = ('amount',)
 	list_display = ('timestamp', 'account', 'amount')
 	search_fields = ('timestamp', 'account__name', 'amount')
-	list_filter = ('type',)
-	inlines = (Transaction_MerchandiseInline,)
+	list_filter = ()
+	inlines = (PurchasedItemInline,)
+
+	def save_form(self, request, form, change):
+		raise PermissionDenied
+
 
 admin.site.register(Merchandise, MerchandiseAdmin)
 admin.site.register(MerchandiseTag)
-admin.site.register(Transaction, TransactionAdmin)
+#admin.site.register(PurchasedItem)
