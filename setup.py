@@ -69,10 +69,13 @@ def git_update(*args):
 	os.system("mv kikrit_prod.db kikrit_prod.db.1")
 	install()
 	cmd = "django_kikrit/manage.py loaddata %s" % filename
+
 	if os.system(cmd.replace("/", os.path.sep)) == 0:
 		os.system("rm kikrit_prod.db.1")
-
-	print "Migration complete"
+		print "Migration complete"
+	else:
+		print "Migration failed! Original db available in 'kikrit_prod.db.1'"\
+			" and backup file '%s'" % filename
 
 
 def main():
