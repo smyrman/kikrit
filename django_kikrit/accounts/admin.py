@@ -56,11 +56,19 @@ class TransactionAdmin(ExtendedModelAdmin):
 	def save_form(self, request, form, change):
 		if change:
 			raise PermissionDenied
+
 		obj = form.save(commit=False)
+		ret = None
+
 		if obj.amount > 0:
-			return deposit_to_account(obj.account, obj.amount, request.user)
+			ret = deposit_to_account(obj.account, obj.amount, request.user)
 		elif obj.amount < 0:
-			return withdraw_from_account(obj.account, -obj.amount, request.user)
+			ret = withdraw_from_account(obj.account, -obj.amount, request.user)
+
+		if ret == None:
+			raise PermissionDenied
+
+		return ret
 
 
 	def undo(self, request, queryset):
