@@ -16,7 +16,6 @@ import settings
 urlpatterns = patterns('',
 	(r'^media/(?P<path>.*)$', static.serve,
 		{'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-	(r'^ajax/', include('django_kikrit.ajax_select.urls')),
 	(r'^(.*)', admin.site.root),
 )
 
