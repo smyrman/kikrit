@@ -6,20 +6,17 @@
 # COPYING.txt for more details.
 
 from django.conf.urls.defaults import *
-
-# Uncomment the next two lines to enable the admin:
+from django.views import static
 from django.contrib import admin
 admin.autodiscover()
 
+import settings
+
+
 urlpatterns = patterns('',
-	# Example:
-	# (r'^django_kikrit/', include('django_kikrit.foo.urls')),
-
-	# Uncomment the admin/doc line below and add 'django.contrib.admindocs'
-	# to INSTALLED_APPS to enable admin documentation:
-	# (r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-	# Uncomment the next line to enable the admin:
-	#(r'^admin/(.*)', admin.site.root),
+	(r'^media/(?P<path>.*)$', static.serve,
+		{'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+	(r'^ajax/', include('django_kikrit.ajax_select.urls')),
 	(r'^(.*)', admin.site.root),
 )
+

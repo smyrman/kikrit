@@ -6,7 +6,7 @@
  b) Edit settings/production.py to your liking. That includes in particular;
  the database. The other settings can wait.
 
- c) Initialize the database  and configure a super user by issuing the command:
+ c) Initialize the database and configure a super user by issuing the command:
  'python setup.py install'.
 
 

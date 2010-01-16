@@ -3,7 +3,7 @@ import os
 
 PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
 
-# WEB SERVER SETTINGS:
+# DJANGO_KIKRIT SETTINGS:
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
@@ -19,8 +19,8 @@ SITE_ID = 1
 USE_I18N = False
 
 MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'django_kikrit', 'media')
-MEDIA_URL = '/media'
-ADMIN_MEDIA_PREFIX = '/media/'
+MEDIA_URL = '/media/'
+ADMIN_MEDIA_PREFIX = '/media/admin/'
 UPLOAD_PATH = os.path.join(MEDIA_ROOT, 'upload') # Here goes BalanceImages
 
 # List of callables that know how to import templates from various sources.
