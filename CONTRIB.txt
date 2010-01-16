@@ -1,0 +1,17 @@
+Distrebuted components that are not originally written by KiKrit developers include:
+
+A small extraction of The Oxygen Icon Theme (http://www.oxygen-icons.org/):
+	qt_client/styles/base/icons/*
+
+Django snippets (Sequences of code):
+	django_kikrit/utils/widgets.py
+	django_kikrit/utils/admin.py
+
+Javascripts:
+	django_kikirit/media/js/jquery.min.js
+	django_kikirit/media/js/jquery.autocomplete.min.js
+
+CSS files:
+	django_kikrit/media/css/jquery.autocomplete.css
+
+

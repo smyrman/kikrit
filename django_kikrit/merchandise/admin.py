@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2010: Sindre Røkenes Myren, Andreas Hopland Sperre
+# Copyright (C) 2010: Sindre Røkenes Myren
 
 # This file is part of KiKrit wich is distrebuted under GPLv3. See the file
 # COPYING.txt for more details.
@@ -14,7 +14,6 @@ from django_kikrit.merchandise.models import Merchandise, MerchandiseTag,\
 
 
 class MerchandiseAdmin(admin.ModelAdmin):
-	#select_related = True
 	list_display = ('name', 'ordinary_price', 'internal_price', 'ean',
 			'get_tags')
 	search_fields = ('name', 'ordinary_price', 'internal_price', 'ean',
@@ -26,13 +25,16 @@ class MerchandiseAdmin(admin.ModelAdmin):
 		return u",".join((tag.__unicode__() for tag in obj.tags.all()))
 	get_tags.short_description = 'tags'
 
+
+
 class PurchasedItemInline(admin.TabularInline):
 	model = PurchasedItem
 	fk_name = 'transaction'
 	extra = 2
 
 
-class PurchaseAdmin(admin.ModelAdmin):
+
+class PurchaseAdmin(TransactionAdmin):
 	exclude = ('amount',)
 	list_display = ('timestamp', 'account', 'amount')
 	search_fields = ('timestamp', 'account__name', 'amount')
@@ -43,6 +45,8 @@ class PurchaseAdmin(admin.ModelAdmin):
 		raise PermissionDenied
 
 
+
 admin.site.register(Merchandise, MerchandiseAdmin)
 admin.site.register(MerchandiseTag)
+#admin.site.register(Purchase, PurchaseAdmin)
 #admin.site.register(PurchasedItem)

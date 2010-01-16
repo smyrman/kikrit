@@ -1,15 +1,17 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (C) 2010: Sindre Røkenes Myren, Andreas Hopland Sperre
+# Copyright (C) 2010: Sindre Røkenes Myren
 
 # This file is part of KiKrit wich is distrebuted under GPLv3. See the file
 # COPYING.txt for more details.
 
+from django.db import models
 from django.contrib import admin
 from django.contrib.auth.admin import User, UserAdmin, Group, GroupAdmin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response
 
+from django_kikrit.utils.admin import ExtendedModelAdmin
 from django_kikrit.accounts.models import Account, RFIDCard, LimitGroup,\
 		BalanceImage, Transaction, deposit_to_account, withdraw_from_account
 
@@ -20,8 +22,10 @@ class RFIDCardInline(admin.TabularInline):
 
 
 
-class AccountAdmin(admin.ModelAdmin):
-	#select_related = True
+class AccountAdmin(ExtendedModelAdmin):
+	#form = make_ajax_form(Account, dict(user='user'))
+	related_search_fields = {'user': ('username', 'email'),}
+
 	list_display = ('name', 'user', 'limit_group', 'balance', 'color', 'email',
 			'phone_number')
 	search_fields = ('name', 'user__username', 'limit_group__name', 'balance')
@@ -39,7 +43,8 @@ class BalanceImageAdmin(admin.ModelAdmin):
 
 
 
-class TransactionAdmin(admin.ModelAdmin):
+class TransactionAdmin(ExtendedModelAdmin):
+	related_search_fields = {'account': ('name', 'email'),}
 	date_hierarchy = 'timestamp'
 	actions = ['undo']
 	list_display = ('timestamp', 'account', 'amount', 'type', 'responsible')
