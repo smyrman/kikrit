@@ -96,7 +96,8 @@ class TransactionAdmin(ExtendedModelAdmin):
 class UserAdmin2(UserAdmin):
 	select_related = True
 	actions = UserAdmin.actions + ['create_accounts', 'update_accounts']
-	list_display = tuple(UserAdmin.list_display) + ('has_account',)
+	list_display = UserAdmin.list_display + ('has_account',)
+	list_filter = UserAdmin.list_filter + ('groups',)
 
 	def has_account(self, obj):
 		queryset = Account.objects.filter(user=obj)
