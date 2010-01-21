@@ -14,18 +14,25 @@ class MerchandiseTag(models.Model):
 	name = models.CharField(max_length=20)
 	description = models.TextField(null=True, blank=True)
 
+	class Meta:
+		ordering = ('name',)
+
 	def __unicode__(self):
 		return self.name
 
 
 
 class Merchandise(models.Model):
-	search_fields = ('name', 'ordinary_price', 'internal_price', 'ean')
+	SEARCH_FIELDS = ('name', 'ordinary_price', 'internal_price', 'ean')
+
 	name = models.CharField(max_length=50, unique=True)
 	ordinary_price = models.PositiveIntegerField()
 	internal_price = models.PositiveIntegerField()
 	ean = models.CharField(max_length=20, blank=True, null=True)
 	tags = models.ManyToManyField(MerchandiseTag, null=True, blank=True)
+
+	class Meta:
+		ordering = ('name',)
 
 	def __unicode__(self):
 		return u"%s -  %d,- (%d,-)" % (self.name, self.ordinary_price,
@@ -38,7 +45,7 @@ class Merchandise(models.Model):
 		"""
 		filter_str = unicode(filter_str).lower()
 		# Search attributes:
-		for attr in self.search_fields:
+		for attr in self.SEARCH_FIELDS:
 			if filter_str in unicode(getattr(self, attr)).lower():
 				return True
 
