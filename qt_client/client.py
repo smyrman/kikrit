@@ -19,7 +19,7 @@ from qt_client.admin.widgets import AdminWidget
 from qt_client.utils.widgets import DebugWidget
 from qt_client.utils.threads import RFIDThread
 
-from settings import RFID_DEVICE, STYLE_SHEET, SPLASH_SCREEN
+from settings import RFID_DEVICE, STYLE_SHEET, SPLASH_SCREEN, RUNSERVER_PORT
 STYLE_SHEET = STYLE_SHEET.replace("/", os.path.sep)
 SPLASH_SCREEN = SPLASH_SCREEN.replace("/", os.path.sep)
 
@@ -42,7 +42,8 @@ def main():
 	tabs = QtGui.QTabWidget()
 	main_widget = MainWidget(rfid_thread, parent=tabs)
 	#deposit_widget = DepositWidget(rfid_thread, parent=tabs)
-	admin_widget = AdminWidget(rfid_thread, parent=tabs)
+	url = u"http://localhost:%s" % RUNSERVER_PORT
+	admin_widget = AdminWidget(rfid_thread, url, parent=tabs)
 
 	tabs.addTab(main_widget, "Main")
 	#tabs.addTab(deposit_widget, "Deposit")

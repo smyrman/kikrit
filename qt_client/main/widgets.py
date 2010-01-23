@@ -227,8 +227,11 @@ class MainWidget(QtGui.QWidget):
 		self.merchandise_list.model().filter(filter_str)
 
 		# Reset selection:
-		self.merchandise_list.selectionModel().select(indexes[0],
-				QtGui.QItemSelectionModel.ClearAndSelect)
+		try:
+			self.merchandise_list.selectionModel().select(indexes[0],
+					QtGui.QItemSelectionModel.ClearAndSelect)
+		except IndexError:
+			pass
 
 
 	def rfidEvent(self, rfid_str):
