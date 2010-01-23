@@ -15,6 +15,7 @@ from django_kikrit.utils.admin import ExtendedModelAdmin
 from django_kikrit.accounts.models import Account, RFIDCard, LimitGroup,\
 		BalanceImage, Transaction, deposit_to_account, withdraw_from_account,\
 		purchase_from_account
+from django_kikrit.merchandise.models import PurchasedItem
 
 
 class RFIDCardInline(admin.TabularInline):
@@ -48,7 +49,8 @@ class TransactionAdmin(ExtendedModelAdmin):
 	related_search_fields = {'account': ('name', 'email'),}
 	date_hierarchy = 'timestamp'
 	actions = ['undo']
-	list_display = ('timestamp', 'account', 'amount', 'type', 'responsible')
+	list_display = ('timestamp', 'account', 'amount', 'type', 'responsible',
+			'get_merchandise')
 	search_fields = ('timestamp', 'account__name', 'amount',
 			'responsible__username', 'responsible__first_name',
 			'responsible__last_name')
@@ -60,20 +62,19 @@ class TransactionAdmin(ExtendedModelAdmin):
 			raise PermissionDenied
 
 		obj = form.save(commit=False)
-		ret = None
+		trans = None
 
 		if obj.type == Transaction.TYPE_DEPOSIT:
-			ret = deposit_to_account(obj.account, obj.amount, request.user)
+			trans = deposit_to_account(obj.account, obj.amount, request.user)
 		elif obj.type == Transaction.TYPE_WITHDRAWAL:
-			ret = withdraw_from_account(obj.account, obj.amount, request.user)
+			trans = withdraw_from_account(obj.account, obj.amount, request.user)
 		elif obj.type == Transaction.TYPE_PURCHASE:
-			ret = purchase_from_account(obj.account, obj.amount, request.user)
+			trans = purchase_from_account(obj.account, obj.amount, request.user)
 
-		if ret == None:
-			# There is no reason for this to happen anymore..
+		if trans == None:
 			raise PermissionDenied
 
-		return ret
+		return trans
 
 
 	def undo(self, request, queryset):
@@ -95,6 +96,21 @@ class TransactionAdmin(ExtendedModelAdmin):
 
 		return None
 	undo.short_description = "Revert selected transactions"
+
+
+	def get_merchandise(self, obj):
+		objs = PurchasedItem.objects.filter(transaction=obj)
+		ret = u" ".join((unicode(o) for o in objs))
+		if len(ret) >= 40:
+			ret = ret[:37] + u"..."
+		return ret
+	get_merchandise.short_description = "purchased items"
+
+
+	def get_actions(self, request):
+		actions = super(TransactionAdmin, self).get_actions(request)
+		del actions['delete_selected']
+		return actions
 
 
 
