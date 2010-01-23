@@ -81,6 +81,11 @@ class AdminWidget(QtGui.QWidget):
 	def logout(self):
 		"""Logs out the user"""
 		self.web.load(self.logout_url)
+
+	def keyPressEvent(self, event):
+		if event.key() == QtCore.Qt.Key_F5:
+			self.web.reload()
+
 	
 	def urlChanged(self, new_url):
 		"""Updates fade/unfade back/next buttons"""
