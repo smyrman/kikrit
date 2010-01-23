@@ -13,7 +13,8 @@ from django.shortcuts import render_to_response
 
 from django_kikrit.utils.admin import ExtendedModelAdmin
 from django_kikrit.accounts.models import Account, RFIDCard, LimitGroup,\
-		BalanceImage, Transaction, deposit_to_account, withdraw_from_account
+		BalanceImage, Transaction, deposit_to_account, withdraw_from_account,\
+		purchase_from_account
 
 
 class RFIDCardInline(admin.TabularInline):
@@ -52,6 +53,7 @@ class TransactionAdmin(ExtendedModelAdmin):
 			'responsible__username', 'responsible__first_name',
 			'responsible__last_name')
 	list_filter = ('type',)
+	formfield_overrides = {models.IntegerField: {'min_value': 1}}
 
 	def save_form(self, request, form, change):
 		if change:
@@ -60,12 +62,15 @@ class TransactionAdmin(ExtendedModelAdmin):
 		obj = form.save(commit=False)
 		ret = None
 
-		if obj.amount > 0:
+		if obj.type == Transaction.TYPE_DEPOSIT:
 			ret = deposit_to_account(obj.account, obj.amount, request.user)
-		elif obj.amount < 0:
-			ret = withdraw_from_account(obj.account, -obj.amount, request.user)
+		elif obj.type == Transaction.TYPE_WITHDRAWAL:
+			ret = withdraw_from_account(obj.account, obj.amount, request.user)
+		elif obj.type == Transaction.TYPE_PURCHASE:
+			ret = purchase_from_account(obj.account, obj.amount, request.user)
 
 		if ret == None:
+			# There is no reason for this to happen anymore..
 			raise PermissionDenied
 
 		return ret

@@ -262,7 +262,7 @@ class Transaction(models.Model):
 	responsible = models.ForeignKey(User, blank=True, null=True, editable=False)
 	account = models.ForeignKey(Account)
 	amount = models.IntegerField()
-	type = models.IntegerField(choices=TYPE_CHOICES, editable=False)
+	type = models.IntegerField(choices=TYPE_CHOICES)
 
 	def __unicode__(self):
 		print self.type
@@ -286,7 +286,7 @@ class Transaction(models.Model):
 ## Helper Functions:
 
 def deposit_to_account(account, amount, responsible):
-	"""Returns transaction object upon success, or None on failure
+	"""Returns transaction object upon success, or None on failure.
 
 	"""
 	# Input cheks are done in the Account class.
@@ -299,7 +299,7 @@ def deposit_to_account(account, amount, responsible):
 	return ret
 
 def withdraw_from_account(account, amount, responsible):
-	"""Returns transaction object upon success, or None on failure
+	"""Returns transaction object upon success, or None on failure.
 
 	"""
 	# Input cheks are done in the Account class.
@@ -307,6 +307,19 @@ def withdraw_from_account(account, amount, responsible):
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
 				responsible=responsible, type=Transaction.TYPE_WITHDRAWAL)
+		transaction.save()
+		ret = transaction
+	return ret
+
+def purchase_from_account(account, amount, responsible):
+	"""Returns transaction object upon success, or None on failure.
+
+	"""
+	# Input cheks are done in the Account class.
+	ret = None
+	if account.withdraw(amount):
+		transaction = Transaction(account=account, amount=-amount,
+				responsible=responsible, type=Transaction.TYPE_PURCHASE)
 		transaction.save()
 		ret = transaction
 	return ret
