@@ -86,7 +86,8 @@ class MainWidget(QtGui.QWidget):
 
 
 	def _reset(self):
-		self.stack.setCurrentWidget(self.order_page)
+		if self.stack.currentWidget() != self.order_page:
+			self.stack.setCurrentWidget(self.order_page)
 		self.order_page.emptyList()
 		self.search_line.setText("")
 		self.merchandise_list.setFocus()
@@ -142,6 +143,7 @@ class MainWidget(QtGui.QWidget):
 	def tabChanged(self, index):
 		if self.parentWidget().widget(index) == self:
 			self.search_line.grabKeyboard()
+			self.f5Pressed() # Re-read merchandise from db.
 		else:
 			self.search_line.releaseKeyboard()
 
