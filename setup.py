@@ -28,6 +28,8 @@ import os
 import sys
 import datetime
 
+from settings import BACKUP_DIR
+
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 # COMMANDS
@@ -48,6 +50,7 @@ def install(*args):
 def backup(*args):
 		# Create super-user, populate db with initial data:
 		filename = "backup_%s.json" % datetime.datetime.now().isoformat()[:19]
+		filename = os.path.join(BACKUP_DIR, filename)
 		cmd = "django_kikrit/manage.py dumpdata --format json > %s" % filename
 		os.system(cmd.replace("/", os.path.sep))
 		print "Backed up db content to '%s'" % filename
