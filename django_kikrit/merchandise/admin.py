@@ -5,6 +5,7 @@
 # This file is part of KiKrit wich is distrebuted under GPLv3. See the file
 # COPYING.txt for more details.
 
+from django.db import models
 from django.contrib import admin
 from django.core.exceptions import PermissionDenied
 
@@ -20,6 +21,8 @@ class MerchandiseAdmin(admin.ModelAdmin):
 			'tags__name')
 	list_filter = ('tags',)
 	oredring = ('name',)
+	formfield_overrides = {models.ManyToManyField: {'widget':
+		admin.widgets.FilteredSelectMultiple('tags', False)}}
 
 	def get_tags(self, obj):
 		return u",".join((tag.__unicode__() for tag in obj.tags.all()))
