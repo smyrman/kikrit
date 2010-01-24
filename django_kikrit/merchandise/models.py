@@ -35,7 +35,7 @@ class Merchandise(models.Model):
 		ordering = ('name',)
 
 	def __unicode__(self):
-		return u"%s -  %d,- (%d,-)" % (self.name, self.ordinary_price,
+		return u"%s: %d,- (%d,-)" % (self.name, self.ordinary_price,
 				self.internal_price)
 
 
