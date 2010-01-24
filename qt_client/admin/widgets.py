@@ -36,7 +36,8 @@ class AdminWidget(QtGui.QWidget):
 		self.home_button = QtGui.QPushButton(getIcon("home", 32), "", self)
 		self.back_button = QtGui.QPushButton(getIcon("back", 32), "", self)
 		self.next_button = QtGui.QPushButton(getIcon("next", 32), "", self)
-		self.lock_button = QtGui.QPushButton(getIcon("lock", 32), "Logout", self)
+		self.lock_button = QtGui.QPushButton(getIcon("lock", 32), "Log out",
+				self)
 		self.web = QtWebKit.QWebView()
 
 		self.home_button.clicked.connect(self.home)
