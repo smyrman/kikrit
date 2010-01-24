@@ -28,7 +28,7 @@ QLabel#balancePage {
 
 
 /* Comment out to use system font-size */
-QAbstractButton, QLineEdit, QLabel, QListView {
+MainWidget QAbstractButton, QLineEdit, QLabel, QListView {
 	font-size: 20px;
 }
 
