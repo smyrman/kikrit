@@ -17,7 +17,7 @@ import settings
 urlpatterns = patterns('',
 	(r'^media/(?P<path>.*)$', static.serve,
 		{'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-	(r'^logout/', logout_view),
+	#(r'^logout/', logout_view),
 	(r'^(.*)', admin.site.root),
 )
 

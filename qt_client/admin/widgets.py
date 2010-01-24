@@ -21,13 +21,15 @@ class AdminWidget(QtGui.QWidget):
 	next_button = None
 	lock_button = None
 
+	clear_on_next = False
+
 	def __init__(self, rfid_thread, parent=None):
 		QtGui.QWidget.__init__(self, parent)
 		self.rfid_thread = rfid_thread
 
 		# Define url's
 		self.home_url = QtCore.QUrl("http://localhost:%s/" % RUNSERVER_PORT)
-		self.logout_url = QtCore.QUrl("http://localhost:%s/logout" %
+		self.logout_url = QtCore.QUrl("http://localhost:%s/logout/" %
 				RUNSERVER_PORT)
 
 		# Views:
@@ -103,12 +105,19 @@ class AdminWidget(QtGui.QWidget):
 		#history = self.web.page().history()
 		history = self.web.history()
 
+		# Hack to delete history on logout:
+		if self.clear_on_next == True:
+			history.clear()
+			self.clear_on_next = False
+
 		# Clear history on logout, and rigth after login:
-		if new_url == self.home_url:
+		if new_url == self.logout_url:
 			# FIXME: have away to determin if the user is loged in or not. It
 			# would also enable us to use the loged in user in other aspects of
 			# the program.
-			history.clear()
+			self.clear_on_next = True
+			self.home()
+			return
 
 		# Update buttons:
 		if history.canGoBack():
