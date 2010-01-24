@@ -93,15 +93,21 @@ class AdminWidget(QtGui.QWidget):
 		self.web.load(self.logout_url)
 
 
+	def keyPressEvent(self, event):
+		if event.key() == QtCore.Qt.Key_F5:
+			self.web.reload()
+
+
 	def urlChanged(self, new_url):
 		"""Updates fade/unfade back/next buttons"""
 		#history = self.web.page().history()
 		history = self.web.history()
 
 		# Clear history on logout, and rigth after login:
-		print new_url
-		print self.home_url
 		if new_url == self.home_url:
+			# FIXME: have away to determin if the user is loged in or not. It
+			# would also enable us to use the loged in user in other aspects of
+			# the program.
 			history.clear()
 
 		# Update buttons:
