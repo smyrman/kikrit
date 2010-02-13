@@ -271,14 +271,21 @@ class Transaction(models.Model):
 			tf = 'to'
 		return u"%s of %s %s %s" % (type, self.amount, tf, self.account)
 
+
+	# The commit_on_succsess decorator will start a db transaction. This
+	# transaction will lock the Account table until the transaction is
+	# complete.
 	@transaction.commit_on_success
 	def undo(self):
 		"""Call this method before delete, to undo the effect of a transaction
 		on an account.
 
 		"""
-		self.account.balance -= self.amount
-		self.account.save()
+		# Make a 100% sure that the account is up to date:
+		account = Account.objects.get(pk=self.account.pk)
+
+		account.balance -= self.amount
+		account.save()
 
 
 
@@ -289,6 +296,9 @@ def deposit_to_account(account, amount, responsible):
 	"""Returns transaction object upon success, or None on failure.
 
 	"""
+	# Make a 100% sure that the account is up to date:
+	account = account.objects.get(pk=account.pk)
+
 	# Input cheks are done in the Account class.
 	ret = None
 	if account.deposit(amount):
@@ -298,11 +308,15 @@ def deposit_to_account(account, amount, responsible):
 		ret = transaction
 	return ret
 
+
 @transaction.commit_on_success
 def withdraw_from_account(account, amount, responsible):
 	"""Returns transaction object upon success, or None on failure.
 
 	"""
+	# Make a 100% sure that the account is up to date:
+	account = account.objects.get(pk=account.pk)
+
 	# Input cheks are done in the Account class.
 	ret = None
 	if account.withdraw(amount):
@@ -312,11 +326,15 @@ def withdraw_from_account(account, amount, responsible):
 		ret = transaction
 	return ret
 
+
 @transaction.commit_on_success
 def purchase_from_account(account, amount, responsible):
 	"""Returns transaction object upon success, or None on failure.
 
 	"""
+	# Make a 100% sure that the account is up to date:
+	account = account.objects.get(pk=account.pk)
+
 	# Input cheks are done in the Account class.
 	ret = None
 	if account.withdraw(amount):
@@ -325,3 +343,5 @@ def purchase_from_account(account, amount, responsible):
 		transaction.save()
 		ret = transaction
 	return ret
+
+
