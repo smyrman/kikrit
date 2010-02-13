@@ -10,11 +10,11 @@ from random import random
 from os.path import sep as path_sep
 
 from django.db import models
+from django.db import transaction
 from django.contrib.auth.models import User
 
 from settings import UPLOAD_PATH
 from django_kikrit.accounts.fields import NegativeIntegerField
-import django_kikrit.accounts.signals
 
 class LimitGroup(models.Model):
 	"""A user might be a member of ONE LimitGroup. This determin how negative
@@ -135,7 +135,6 @@ class Account(models.Model):
 
 	def __unicode__(self):
 		return unicode(self.name)
-
 
 	def withdraw(self, amount):
 		"""Try to withdraw an amount. Returns True on sucsess, and False on
@@ -272,9 +271,9 @@ class Transaction(models.Model):
 			tf = 'to'
 		return u"%s of %s %s %s" % (type, self.amount, tf, self.account)
 
-
+	@transaction.commit_on_success
 	def undo(self):
-		"""Call this method before delete, to udo the effect of a transaction
+		"""Call this method before delete, to undo the effect of a transaction
 		on an account.
 
 		"""
@@ -285,6 +284,7 @@ class Transaction(models.Model):
 
 ## Helper Functions:
 
+@transaction.commit_on_success
 def deposit_to_account(account, amount, responsible):
 	"""Returns transaction object upon success, or None on failure.
 
@@ -298,6 +298,7 @@ def deposit_to_account(account, amount, responsible):
 		ret = transaction
 	return ret
 
+@transaction.commit_on_success
 def withdraw_from_account(account, amount, responsible):
 	"""Returns transaction object upon success, or None on failure.
 
@@ -311,6 +312,7 @@ def withdraw_from_account(account, amount, responsible):
 		ret = transaction
 	return ret
 
+@transaction.commit_on_success
 def purchase_from_account(account, amount, responsible):
 	"""Returns transaction object upon success, or None on failure.
 
