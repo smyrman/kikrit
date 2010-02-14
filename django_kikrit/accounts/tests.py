@@ -30,11 +30,11 @@ class SimpleTest(TestCase):
 		account = Account(id=1,name="Test Account", balance=0, limit_group=None)
 		account.save()
 		trans1 = deposit_to_account(account, 200, user1)
-		#account = Account.objects.get(pk=1)
+		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, 200)
 
 		trans2 = withdraw_from_account(account, 200, user1)
-		#account = Account.objects.get(pk=1)
+		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, 0)
 
 		transX = withdraw_from_account(account, 200, user1)
@@ -45,18 +45,18 @@ class SimpleTest(TestCase):
 		account.limit_group = lg
 		account.save()
 		trans3 = withdraw_from_account(account, 199, user1)
-		#account = Account.objects.get(pk=1)
+		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -199)
 
 		trans4 = withdraw_from_account(account, 1, user1)
-		#account = Account.objects.get(pk=1)
+		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -200)
 
 		transX= withdraw_from_account(account, 1, user1)
 		self.failUnlessEqual(transX, None)
 
 		trans3.undo()
-		#account = Account.objects.get(pk=1)
+		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -1)
 		trans3.delete()
 
