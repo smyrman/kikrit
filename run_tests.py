@@ -17,5 +17,5 @@ def main():
 	return os.system("django_kikrit/manage.py test merchandise accounts utils")
 
 if __name__ == "__main__":
-	main()
+	exit(main())
 
