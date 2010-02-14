@@ -297,7 +297,7 @@ def deposit_to_account(account, amount, responsible):
 
 	"""
 	# Make a 100% sure that the account is up to date:
-	account = account.objects.get(pk=account.pk)
+	account = Account.objects.get(pk=account.pk)
 
 	# Input cheks are done in the Account class.
 	ret = None
@@ -315,7 +315,7 @@ def withdraw_from_account(account, amount, responsible):
 
 	"""
 	# Make a 100% sure that the account is up to date:
-	account = account.objects.get(pk=account.pk)
+	account = Account.objects.get(pk=account.pk)
 
 	# Input cheks are done in the Account class.
 	ret = None
@@ -333,7 +333,7 @@ def purchase_from_account(account, amount, responsible):
 
 	"""
 	# Make a 100% sure that the account is up to date:
-	account = account.objects.get(pk=account.pk)
+	account = Account.objects.get(pk=account.pk)
 
 	# Input cheks are done in the Account class.
 	ret = None
