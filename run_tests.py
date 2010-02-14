@@ -13,8 +13,11 @@ This file should always be run before commit!
 
 import os
 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
 def main():
-	return os.system("django_kikrit/manage.py test merchandise accounts utils")
+	apps = "accounts merchandise utils"
+	return os.system("%s/django_kikrit/manage.py test %s" % (PROJECT_ROOT, apps))
 
 if __name__ == "__main__":
 	exit(main())
