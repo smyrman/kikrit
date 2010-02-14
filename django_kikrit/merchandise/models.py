@@ -6,6 +6,7 @@
 # COPYING.txt for more details.
 
 from django.db import models
+from django.db import transaction
 
 from django_kikrit.accounts.models import Account, Transaction
 
@@ -104,11 +105,15 @@ class Purchase(Transaction):
 
 ## Helper Functions:
 
+@transaction.commit_on_success
 def buy_merchandise(account, merchandise_list):
 	"""Try ro buy merchandice_list with credit from account. Returns
 	transaction object upon success, or None on failure.
 
 	"""
+	# Make a 100% sure that the account is up to date:
+	account = Account.objects.get(pk=account.pk)
+
 	internal = account.has_internal_price()
 
 	# Input cheks are done in the Account class.
