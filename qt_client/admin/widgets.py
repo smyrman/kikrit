@@ -111,9 +111,9 @@ class AdminWidget(QtGui.QWidget):
 			history.clear()
 			self.clear_on_next = False
 
-		# Clear history on logout, and rigth after login:
+		# Clear history on logout:
 		if new_url == self.logout_url:
-			# FIXME: have away to determin if the user is loged in or not. It
+			# FIXME: have a way to determin if the user is loged in or not. It
 			# would also enable us to use the loged in user in other aspects of
 			# the program.
 			self.clear_on_next = True
