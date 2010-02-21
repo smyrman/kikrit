@@ -16,6 +16,7 @@ sys.path.insert(0, PROJECT_ROOT)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 from qt_client.main.widgets import MainWidget, DepositWidget
 from qt_client.admin.widgets import AdminWidget
+from qt_client.first_run.widgets import FirstRunWidget
 from qt_client.utils.widgets import DebugWidget
 from qt_client.utils.threads import RFIDThread
 
@@ -26,6 +27,14 @@ SPLASH_SCREEN = SPLASH_SCREEN.replace("/", os.path.sep)
 
 def main():
 	app = QtGui.QApplication(sys.argv)
+
+	# First run:
+	if "--firstrun" in sys.argv[1:]:
+		first_run = FirstRunWidget()
+		first_run.show()
+		ret = app.exec_()
+		if ret != 0:
+			return ret
 
 	# Splash:
 	splash = QtGui.QSplashScreen(QtGui.QPixmap(SPLASH_SCREEN))
