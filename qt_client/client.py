@@ -6,6 +6,19 @@
 # This file is part of KiKrit wich is distrebuted under GPLv3. See the file
 # COPYING.txt for more details.
 
+"""KiKrit client is the front-end application of KiKrit. It enables purchase of
+merchendaise and the performance of administrative tasks (as long as the
+Django web server is running).
+
+If you don't want to run KiKrit in the usual way, KiKrit has a number of
+command line arguments:
+	--help		Prints this tekst
+	--version	Outout KiKrit version and database revision information
+	--firstrun	Issue the first-run dialog, even when the database is corectly
+				installed
+	--debug		Enables the debug panel - useful for developers.
+"""
+
 import sys
 import os
 
@@ -26,9 +39,23 @@ SPLASH_SCREEN = SPLASH_SCREEN.replace("/", os.path.sep)
 
 
 def main():
+
+	# Handle all parameters exept --debug. The first two parameters don't need
+	# the qt app to be created.
+
+	if "--help" in sys.argv[1:]:
+		print __doc__
+		exit(0)
+
+	if "--version" in sys.argv[1:]:
+		import version
+		print "KiKrit", version.KIKRIT_VERSION
+		print "Database revision", version.DATABASE_REVISION
+		exit(0)
+
+	# --firstrun needs the qt. app to be created.
 	app = QtGui.QApplication(sys.argv)
 
-	# First run:
 	if "--firstrun" in sys.argv[1:]:
 		first_run = FirstRunWidget()
 		first_run.show()
