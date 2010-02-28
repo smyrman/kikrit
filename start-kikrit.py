@@ -20,25 +20,35 @@
 #    along with KiKrit.  If not, see <http://www.gnu.org/licenses/>.
 
 """This is a shortcut for starting the webserver and the client in one
-click/command. It requires screen, and is therefore not Windows compatible.
+click/command. It requires that screen and bash is installed, and is therefore
+not Windows compatible.
 
 """
 
 import os
+import sys
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-os.chdir(PROJECT_ROOT)
+sys.path.append(PROJECT_ROOT)
+
 from settings import RUNSERVER_PORT
-
-# If webserver is not running, start webserver:
-SCREEN_NAME = "kikrit_webserver"
-if os.system("screen -ls | grep %s" % SCREEN_NAME) != 0:
-	os.system("screen -d -m -S %s django_kikrit/manage.py runserver"\
-			" localhost:%s" % (SCREEN_NAME, RUNSERVER_PORT))
-
-# Start client:
 from qt_client import client
-client.main()
 
-# Reatatch webserver screen:
-os.system("screen -r %s" % SCREEN_NAME)
+def main():
+	os.chdir(PROJECT_ROOT)
+	# If webserver is not running, start webserver in a new 'screen':
+	SCREEN_NAME = "kikrit_webserver"
+
+	if os.system("screen -ls | grep %s" % SCREEN_NAME) != 0:
+		os.system("screen -d -m -S %s django_kikrit/manage.py runserver "\
+				"localhost:%s" % (SCREEN_NAME, RUNSERVER_PORT))
+
+	# Start client:
+	client.main()
+
+	# Reatatch webserver screen:
+	os.system("screen -r %s" % SCREEN_NAME)
+
+
+if __name__ == "__main__":
+	main()
