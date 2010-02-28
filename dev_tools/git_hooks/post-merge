@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# This hook automatically runs the install_hooks.py after any sucsessfull
+# merge.
+
+echo -e "++ Updating git hooks ++";
+$GIT_DIR/dev_tools/install_hooks.py
