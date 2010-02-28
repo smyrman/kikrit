@@ -83,3 +83,17 @@ class ImportOrNotPage(QtGui.QWizardPage):
 
 	def fileDialogDirSelected(self, path):
 		self.le_old_kkdir.setText(unicode(path))
+
+
+class EditSetingsPage(QtGui.QWizardPage):
+	le_rand_str = None
+	pb_manual_edit = None
+
+	def __init__(self, parent):
+		QtGui.QWizardPage.__init__(self, parent)
+
+		# Create widgets:
+
+		# Layout:
+
+		# Connect signals:
