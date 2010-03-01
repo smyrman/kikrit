@@ -7,20 +7,25 @@
 
 from PyQt4 import QtCore, QtGui
 
-from qt_client.first_run.gui_components import ImportOrNotPage
+from qt_client.first_run.gui_components import InfoPage, ImportPage,\
+	ConfirmPage, SummaryPage
 
 
 class FirstRunWidget(QtGui.QWizard):
-	page_import_or_not = None
-	page_import_db = None
-	page_edit_settings = None
-	page_add_superuser = None
+	page_info = None
+	page_importdb = None
+	page_confirm = None
+	page_sumary = None
 
 
 	def __init__(self, parent=None):
 		QtGui.QWizard.__init__(self, parent)
 
-		self.page_import_or_not = ImportOrNotPage(self)
-		self.addPage(self.page_import_or_not)
-		self.addPage(QtGui.QWizardPage())
-		self.addPage(QtGui.QWizardPage())
+		self.page_info = InfoPage(self)
+		self.addPage(self.page_info)
+		self.page_importdb = ImportPage(self)
+		self.addPage(self.page_importdb)
+		self.page_confirm = ConfirmPage(self)
+		self.addPage(self.page_confirm)
+		self.page_summary = SummaryPage(self)
+		self.addPage(self.page_summary)

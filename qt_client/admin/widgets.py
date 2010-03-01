@@ -17,7 +17,7 @@ class AdminWidget(QtGui.QWidget):
 	home_url = None
 	logout_url = None
 	home_button = None
-	back_button= None
+	back_button = None
 	next_button = None
 	lock_button = None
 
