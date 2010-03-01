@@ -45,23 +45,23 @@ def main():
 
 	if "--help" in sys.argv[1:]:
 		print __doc__
-		exit(0)
+		return 0
 
 	if "--version" in sys.argv[1:]:
 		import version
 		print "KiKrit", version.KIKRIT_VERSION
 		print "Database revision", version.DATABASE_REVISION
-		exit(0)
+		return 0
 
 	# --firstrun needs the qt. app to be created.
 	app = QtGui.QApplication(sys.argv)
 
 	if "--firstrun" in sys.argv[1:]:
 		first_run = FirstRunWidget()
+		first_run.setWindowTitle("KiKrit FirstRun Wizard")
+		first_run.setWindowIcon(QtGui.QIcon("graphics/favicon.png"))
 		first_run.show()
-		ret = app.exec_()
-		if ret != 0:
-			return ret
+		return app.exec_()
 
 	# Splash:
 	splash = QtGui.QSplashScreen(QtGui.QPixmap(SPLASH_SCREEN))
