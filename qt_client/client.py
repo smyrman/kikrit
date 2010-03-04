@@ -12,11 +12,11 @@ Django web server is running).
 
 If you don't want to run KiKrit in the usual way, KiKrit has a number of
 command line arguments:
-	--help		Prints this tekst
-	--version	Outout KiKrit version and database revision information
-	--firstrun	Issue the first-run dialog, even when the database is corectly
-				installed
-	--debug		Enables the debug panel - useful for developers.
+    --help      Prints this tekst
+    --version   Outout KiKrit version and database revision information
+    --firstrun  Issue the first-run dialog, even when the database is corectly
+                installed
+    --debug     Enables the debug panel - useful for developers.
 """
 
 import sys
@@ -33,9 +33,7 @@ from qt_client.first_run.widgets import FirstRunWidget
 from qt_client.utils.widgets import DebugWidget
 from qt_client.utils.threads import RFIDThread
 
-from settings import RFID_DEVICE, STYLE_SHEET, SPLASH_SCREEN
-STYLE_SHEET = STYLE_SHEET.replace("/", os.path.sep)
-SPLASH_SCREEN = SPLASH_SCREEN.replace("/", os.path.sep)
+import settings
 
 
 def main():
@@ -56,7 +54,11 @@ def main():
 	# --firstrun needs the qt. app to be created.
 	app = QtGui.QApplication(sys.argv)
 
-	if "--firstrun" in sys.argv[1:]:
+	db_exist = True
+	if settings.DATABASE_ENGINE == "sqlite3":
+		db_exist = os.path.isfile(settings.DATABASE_NAME)
+
+	if "--firstrun" in sys.argv[1:] or db_exist == False:
 		first_run = FirstRunWidget()
 		first_run.setWindowTitle("KiKrit FirstRun Wizard")
 		first_run.setWindowIcon(QtGui.QIcon("graphics/favicon.png"))
@@ -64,15 +66,15 @@ def main():
 		return app.exec_()
 
 	# Splash:
-	splash = QtGui.QSplashScreen(QtGui.QPixmap(SPLASH_SCREEN))
+	splash = QtGui.QSplashScreen(QtGui.QPixmap(settings.SPLASH_SCREEN))
 	splash.show()
 	app.processEvents()
 
 	# Stylesheet:
-	app.setStyleSheet(open(STYLE_SHEET).read())
+	app.setStyleSheet(open(settings.STYLE_SHEET).read())
 
 	# Threads:
-	rfid_thread = RFIDThread(device=RFID_DEVICE)
+	rfid_thread = RFIDThread(device=settings.RFID_DEVICE)
 
 	# Main window (tabs):
 	tabs = QtGui.QTabWidget()
