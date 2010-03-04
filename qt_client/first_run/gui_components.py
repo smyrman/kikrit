@@ -45,8 +45,6 @@ class InfoPage(QtGui.QWizardPage):
 		grid.addWidget(self.txt_info, 0, 0, 1, 1)
 		grid.addWidget(self.cb_iunderstand, 1, 0, 1, 1)
 
-		# Connect signals:FIXME
-
 
 
 class ImportPage(QtGui.QWizardPage):
@@ -226,7 +224,7 @@ class SummaryPage(QtGui.QWizardPage):
 			self.log(u"Installing database...")
 
 			# Preform system cmd:
-			ret = os.system("python kikrit-admin.py install --no-input")
+			ret = os.system("python kikrit-admin.py install --noinput")
 
 			if ret == 0:
 				self.log(u" OK<br>")
@@ -261,7 +259,7 @@ class SummaryPage(QtGui.QWizardPage):
 
 			# Migrate DB
 			self.log(u"Migrating the database...")
-			ret = os.system("./kikrit-admin.py migrate")
+			ret = os.system("./kikrit-admin.py migrate --no-input")
 			if ret == 0:
 				self.log(u" OK<br>")
 			else:

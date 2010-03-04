@@ -49,7 +49,14 @@ PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 COMMANDS =	{"help":"help", "install":"install", "backup":"backup",
 		"migrate":"migrate", "git-update":"git_update"}
 
-# COMMANDS
+
+# Helper functions:
+def eprint(str):
+	print "%s: error: %s" % (sys.argv[0], str)
+
+
+# Commands:
+
 def help(*args):
 	"""Crying for help is nice, but I don't think this is the way you would
 	rather use this command. Try 'help install' or whatever, but screaming for
@@ -72,11 +79,11 @@ def install(*args):
 
 	"""
 	# Create super-user, populate db with initial data:
-	cmd = "django_kikrit/manage.py syncdb"
+	cmd = "django_kikrit/manage.py syncdb %s" % " ".join(args)
 	ret = os.system(cmd.replace("/", os.path.sep))
 	if ret != 0:
-		print "ERROR: Syncdb failed!"
-		exit(ret)
+		eprint("Syncdb failed!")
+		exit(1)
 
 
 def backup(*args):
@@ -91,7 +98,10 @@ def backup(*args):
 	filename = "backup_%s.json" % datetime.datetime.now().isoformat()[:19]
 	filename = os.path.join(BACKUP_DIR, filename)
 	cmd = "django_kikrit/manage.py dumpdata --format json > %s" % filename
-	os.system(cmd.replace("/", os.path.sep))
+	ret = os.system(cmd.replace("/", os.path.sep))
+	if ret != 0:
+		eprint("Backup failed!")
+		exit(1)
 	print "Backed up db content to '%s'" % filename
 
 	# Better formating of file:
@@ -124,7 +134,7 @@ def git_update(*args):
 	else:
 		print "Migration failed! Original db available in 'kikrit_prod.db.1'"\
 		      " and backup file '%s'" % filename
-		exit(ret)
+		exit(1)
 
 
 def migrate(*args):
@@ -139,15 +149,15 @@ def migrate(*args):
 def main():
 	os.chdir(PROJECT_ROOT)
 	if len(sys.argv) < 2:
-		print "You must supply a command argument.. Try to add 'help'"
+		eprint("You must supply a command argument.. Try to add 'help'")
 		exit(1)
 	elif sys.argv[1] in COMMANDS:
 		# Call the command with argumets:
 		eval(COMMANDS[sys.argv[1]])(*sys.argv[2:])
 		exit(0)
 	else:
-		print "The command argument '%s' was not found. Try to add 'help'" %\
-				sys.argv[1]
+		eprint("The command argument '%s' was not found. Try to add 'help'" %\
+				sys.argv[1])
 		exit(1)
 
 if __name__ == "__main__":
