@@ -27,7 +27,8 @@ makes the most common administrative tasks easy.
 Available command argumets are:
     help    Show this text, or print help about a specifc command
     install Install database (according to settings) and load initial data
-    backup  Backup your database to a 'json fixture' in your bacup directory.
+    backup  Backup your database to a 'json fixture' in your bacup directory
+    migrate Doens nothing (Will be implemented when needed)
 
 Deprecated commands that still work are:
     backup multiline  Issuing only 'backup' now does what this did (file
@@ -46,7 +47,7 @@ from settings import BACKUP_DIR
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 COMMANDS =	{"help":"help", "install":"install", "backup":"backup",
-		"git-update":"git_update"}
+		"migrate":"migrate", "git-update":"git_update"}
 
 # COMMANDS
 def help(*args):
@@ -72,7 +73,10 @@ def install(*args):
 	"""
 	# Create super-user, populate db with initial data:
 	cmd = "django_kikrit/manage.py syncdb"
-	os.system(cmd.replace("/", os.path.sep))
+	ret = os.system(cmd.replace("/", os.path.sep))
+	if ret != 0:
+		print "ERROR: Syncdb failed!"
+		exit(ret)
 
 
 def backup(*args):
@@ -110,14 +114,27 @@ def git_update(*args):
 	os.system("git pull %s" % " ".join(args))
 	os.system("mv kikrit_prod.db kikrit_prod.db.1")
 	install()
-	cmd = "django_kikrit/manage.py loaddata %s" % filename
 
-	if os.system(cmd.replace("/", os.path.sep)) == 0:
+	cmd = "django_kikrit/manage.py loaddata %s" % filename
+	ret = os.system(cmd.replace("/", os.path.sep))
+
+	if ret == 0:
 		os.system("rm kikrit_prod.db.1")
 		print "Migration complete"
 	else:
 		print "Migration failed! Original db available in 'kikrit_prod.db.1'"\
 		      " and backup file '%s'" % filename
+		exit(ret)
+
+
+def migrate(*args):
+	"""This function does nothing at the moment. When migrations become needed,
+	it will make sure the database structure is up to data, (e.g. that the
+	database revision is at the right number).
+
+	"""
+	pass
+	return 0
 
 
 def main():

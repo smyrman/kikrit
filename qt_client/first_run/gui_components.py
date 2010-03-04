@@ -125,7 +125,7 @@ class ImportPage(QtGui.QWizardPage):
 
 
 	def browsePushButtonPressed(self):
-		start = os.path.dirname(unicode(self.le_old_kkdir.text()))
+		start = unicode(self.le_old_kkdir.text())
 		self.fd_browse.setDirectory(start)
 		self.fd_browse.show()
 
@@ -162,11 +162,14 @@ class ConfirmPage(QtGui.QWizardPage):
 	def initializePage(self):
 		txt = u""
 		if self.field("create_new_db").toBool():
-			txt += u"* Create new db named '%s'<br>" % "FIXME.sb"
+			txt += u"* Create new database named '%s'.<br>" %\
+					settings.DATABASE_NAME
 
 		elif self.field("import_db").toBool():
 			kkdir = self.field("old_kkdir").toString()
-			txt += u"* Import and migrate db from '%s'<br>" % kkdir
+			txt += u"* Copy database file '%s/kikrit_prod.sb' to '%s'.<br>" %\
+					(kkdir, settings.DATABASE_NAME)
+			txt += u"* Migrate the database.<br>"
 
 		self.txt_summary.setText(txt)
 		#QtGui.QWizardPage.initializePage(self)
@@ -190,37 +193,81 @@ class SummaryPage(QtGui.QWizardPage):
 		grid = QtGui.QGridLayout(self)
 		grid.addWidget(self.txt_summary, 0, 0)
 
+		# Disable finish button:
+		self.completeChanged.emit()
+
 
 	def isComplete(self):
 		return self.is_complete
 
 
+	def log(self, txt):
+		self.txt_summary.insertHtml(txt)
+
+
+	def logComplete(self, success):
+		if success:
+			self.log("<br> All operations completed sucessfully!<br>")
+			self.setSubTitle("OK")
+			self.is_complete = True
+		else:
+			self.log("<br> Something went wrong! Please try to delete your "
+			         "database and try again!")
+			self.setSubTitle("ERROR")
+			self.is_complete = False
+		self.completeChanged.emit()
+
+
 	def initializePage(self):
-		txt = u""
 		if self.field("create_new_db").toBool():
+
 			# Create new db:
 			os.chdir(settings.PROJECT_ROOT)
-			txt += u"Installing database..."
-			self.txt_summary.setText(txt)
+			self.log(u"Installing database...")
 
+			# Preform system cmd:
 			ret = os.system("python kikrit-admin.py install --no-input")
+
 			if ret == 0:
-				txt += u" OK<br>"
-				txt += u"<br> All operations completed sucessfully!<br>"
-				self.setSubTitle("OK")
+				self.log(u" OK<br>")
 			else:
-				txt += u" FAILED!<br> "
-				txt += u"<br> Database creation failed!<br>"
-				self.setSubTitle("ERROR")
-			self.txt_summary.setText(txt)
-			self.is_complete = True
-			self.completeChanged.emit()
+				self.log(u" FAILED!<br>")
+				self.logComplete(False)
+				return
+
+			self.logComplete(True)
+			return
 
 
 		elif self.field("import_db").toBool():
-			kkdir = self.field("old_kkdir").toString()
-			# FIXME: Add copy and migrate db commands
-			pass
+			kkdir = unicode(self.field("old_kkdir").toString())
 
-		self.txt_summary.setText(txt)
-		#QtGui.QWizardPage.initializePage(self)
+			# Copy in existing db:
+			os.chdir(settings.PROJECT_ROOT)
+			self.log(u"Copying old database...")
+
+			# FIXME: Get db name of old_db from old settings
+			old_db = os.path.join(kkdir, "kikrit_prod.db")
+			new_db = settings.DATABASE_NAME
+
+			ret = os.system("cp %s %s" % (old_db, new_db))
+
+			if ret == 0:
+				self.log(u" OK<br>")
+			else:
+				self.log(u" FAILED!<br>")
+				self.logComplete(False)
+				return
+
+			# Migrate DB
+			self.log(u"Migrating the database...")
+			ret = os.system("./kikrit-admin.py migrate")
+			if ret == 0:
+				self.log(u" OK<br>")
+			else:
+				self.log(u" FAILED!<br>")
+				self.logComplete(False)
+				return
+
+			self.logComplete(True)
+			return
