@@ -134,19 +134,21 @@ def migrate(*args):
 
 	"""
 	pass
-	return 0
 
 
 def main():
 	os.chdir(PROJECT_ROOT)
 	if len(sys.argv) < 2:
 		print "You must supply a command argument.. Try to add 'help'"
+		exit(1)
 	elif sys.argv[1] in COMMANDS:
 		# Call the command with argumets:
 		eval(COMMANDS[sys.argv[1]])(*sys.argv[2:])
+		exit(0)
 	else:
 		print "The command argument '%s' was not found. Try to add 'help'" %\
-		      sys.argv[1]
+				sys.argv[1]
+		exit(1)
 
 if __name__ == "__main__":
 	main()
