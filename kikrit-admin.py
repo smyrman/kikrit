@@ -28,15 +28,10 @@ Available command argumets are:
     help    Show this text, or print help about a specifc command
     install Install database (according to settings) and load initial data
     backup  Backup your database to a 'json fixture' in your bacup directory
-    migrate Doens nothing (Will be implemented when needed)
-
-Deprecated commands that still work are:
-    backup multiline  Issuing only 'backup' now does what this did (file
-                      formating)
-    git-update        Shorthand for 'backup', 'git pull', 'rm kikrit_prod.db'
-                      and 'django_kikrit/manage.py load_data'.
+    migrate Does nothing (Will be implemented when needed)
 
 """
+
 import os
 import sys
 import datetime
@@ -116,31 +111,9 @@ def backup(*args):
 	return filename
 
 
-def git_update(*args):
-	"""Takes all the parameters that 'git pull' does.
-	WARNING: This command is deprecated and will soon be removed!
-	"""
-	filename = backup()
-	os.system("git pull %s" % " ".join(args))
-	os.system("mv kikrit_prod.db kikrit_prod.db.1")
-	install()
-
-	cmd = "django_kikrit/manage.py loaddata %s" % filename
-	ret = os.system(cmd.replace("/", os.path.sep))
-
-	if ret == 0:
-		os.system("rm kikrit_prod.db.1")
-		print "Migration complete"
-	else:
-		print "Migration failed! Original db available in 'kikrit_prod.db.1'"\
-		      " and backup file '%s'" % filename
-		exit(1)
-
-
 def migrate(*args):
-	"""This function does nothing at the moment. When migrations become needed,
-	it will make sure the database structure is up to data, (e.g. that the
-	database revision is at the right number).
+	"""This function does nothing at the moment. When migrations are first
+	needed, this function will make sure the database structure is up to data.
 
 	"""
 	pass
@@ -159,6 +132,7 @@ def main():
 		eprint("The command argument '%s' was not found. Try to add 'help'" %\
 				sys.argv[1])
 		exit(1)
+
 
 if __name__ == "__main__":
 	main()

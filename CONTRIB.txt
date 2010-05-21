@@ -1,4 +1,5 @@
-Distrebuted components that are not originally written by KiKrit developers include:
+Distrebuted components that are not originally written by KiKrit developers
+include:
 
 A small extraction of The Oxygen Icon Theme (http://www.oxygen-icons.org/):
 	qt_client/styles/base/icons/*
