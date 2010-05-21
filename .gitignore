@@ -1,4 +1,3 @@
 *.pyc
 *.svn/
 django_kikrit/media/upload
-test.sh
