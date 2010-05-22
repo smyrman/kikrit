@@ -27,8 +27,10 @@ not Windows compatible.
 
 import os
 import sys
+import time
+from subprocess import Popen, PIPE
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 1)[0]
 sys.path.append(PROJECT_ROOT)
 
 from settings import RUNSERVER_PORT
@@ -36,18 +38,26 @@ from qt_client import client
 
 def main():
 	os.chdir(PROJECT_ROOT)
-	# If webserver is not running, start webserver in a new 'screen':
-	SCREEN_NAME = "kikrit_webserver"
 
-	if os.system("screen -ls | grep %s" % SCREEN_NAME) != 0:
-		os.system("screen -d -m -S %s django_kikrit/manage.py runserver "\
-				"localhost:%s" % (SCREEN_NAME, RUNSERVER_PORT))
+	try:
+		# Start django web-server in the background
+		args = ("django_kikrit/manage.py", "runserver", "--noreload",
+				"localhost:%s" % RUNSERVER_PORT)
+		p1 = Popen(args, stdout=PIPE, stderr=PIPE)
 
-	# Start client:
-	client.main()
+		# Start the qt_client
+		args = ["qt_client/client.py",] + sys.argv[1:]
+		#p2 = Popen(args, stdout=PIPE, stderr=PIPE)
+		p2 = Popen(args)
+		p2.communicate()
+	except:
+		p1.kill()
+		p2.kill()
+		import traceback
+		traceback.print_exc()
+		exit(1)
 
-	# Reatatch webserver screen:
-	os.system("screen -r %s" % SCREEN_NAME)
+	p1.kill()
 
 
 if __name__ == "__main__":
