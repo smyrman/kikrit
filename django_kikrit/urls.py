@@ -10,14 +10,14 @@ from django.views import static
 from django.contrib import admin
 admin.autodiscover()
 
-from django_kikrit.utils.views import logout_view
-import settings
+#from django_kikrit.utils.views import logout_view
+from django.conf import settings
 
 
 urlpatterns = patterns('',
 	(r'^media/(?P<path>.*)$', static.serve,
 		{'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
 	#(r'^logout/', logout_view),
-	(r'^(.*)', admin.site.root),
+	(r'^admin/', include(admin.site.urls)),
 )
 

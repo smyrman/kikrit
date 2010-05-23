@@ -117,16 +117,9 @@ class TransactionAdmin(ExtendedModelAdmin):
 class UserAdmin2(UserAdmin):
 	select_related = True
 	actions = UserAdmin.actions + ['create_accounts', 'update_accounts']
-	list_display = UserAdmin.list_display + ('has_account',)
+	list_display = UserAdmin.list_display + ('account',)
+	list_display_links = UserAdmin.list_display_links + ('account',)
 	list_filter = UserAdmin.list_filter + ('groups',)
-
-	def has_account(self, obj):
-		queryset = Account.objects.filter(user=obj)
-		if queryset.count() == 0:
-			return False
-		return True
-	has_account.short_description = "Has account"
-
 
 	def create_accounts(self, request, queryset):
 		quryset = queryset.filter(account__isnull=True)

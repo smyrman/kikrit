@@ -7,7 +7,7 @@
 
 from PyQt4 import QtCore, QtGui, QtWebKit
 
-from settings import RUNSERVER_PORT
+import settings
 from qt_client.utils.key_emu import KeyEmulator
 from qt_client.utils.get_icons import getIcon
 
@@ -28,9 +28,8 @@ class AdminWidget(QtGui.QWidget):
 		self.rfid_thread = rfid_thread
 
 		# Define url's
-		self.home_url = QtCore.QUrl("http://localhost:%s/" % RUNSERVER_PORT)
-		self.logout_url = QtCore.QUrl("http://localhost:%s/logout/" %
-				RUNSERVER_PORT)
+		self.home_url = QtCore.QUrl(settings.ADMIN_TAB_URL)
+		self.logout_url = QtCore.QUrl(settings.ADMIN_TAB_URL + "logout/")
 
 		# Views:
 		self.home_button = QtGui.QPushButton(getIcon("home", 32), "", self)
@@ -155,5 +154,3 @@ class AdminWidget(QtGui.QWidget):
 
 		e = KeyEmulator()
 		e.sendInput(rfid_str)
-
-

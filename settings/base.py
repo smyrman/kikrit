@@ -55,8 +55,9 @@ INSTALLED_APPS = (
 
 RUNSERVER_PORT = '8081'
 
-
 # BACKUP_SETTINGS:
 BACKUP_DIR = PROJECT_ROOT + "/backup"
+
 # CLIENT SETTINGS:
+ADMIN_TAB_URL = "http://localhost:%s/admin/" % RUNSERVER_PORT
 SPLASH_SCREEN = PROJECT_ROOT + "/graphics/kikrit_logo.png"
