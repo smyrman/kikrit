@@ -37,6 +37,7 @@ class AdminWidget(QtGui.QWidget):
 		self.next_button = QtGui.QPushButton(getIcon("next", 32), "", self)
 		self.lock_button = QtGui.QPushButton(getIcon("lock", 32), "Log out",
 				self)
+		self.lock_button.setEnabled(False)
 		self.web = QtWebKit.QWebView()
 
 		self.home_button.clicked.connect(self.home)
@@ -109,6 +110,7 @@ class AdminWidget(QtGui.QWidget):
 		if self.clear_on_next == True:
 			history.clear()
 			self.clear_on_next = False
+			self.lock_button.setEnabled(False)
 
 		# Clear history on logout:
 		if new_url == self.logout_url:
@@ -121,6 +123,7 @@ class AdminWidget(QtGui.QWidget):
 
 		# Update buttons:
 		if history.canGoBack():
+			self.lock_button.setEnabled(True)
 			self.back_button.setEnabled(True)
 		else:
 			self.back_button.setEnabled(False)
