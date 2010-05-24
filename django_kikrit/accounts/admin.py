@@ -44,6 +44,7 @@ class BalanceImageAdmin(admin.ModelAdmin):
 	list_filter = ('black','grey','white')
 
 
+User.account.verbose_name = "Account"
 
 class TransactionAdmin(ExtendedModelAdmin):
 	related_search_fields = {'account': ('name', 'email'),}
@@ -117,9 +118,25 @@ class TransactionAdmin(ExtendedModelAdmin):
 class UserAdmin2(UserAdmin):
 	select_related = True
 	actions = UserAdmin.actions + ['create_accounts', 'update_accounts']
-	list_display = UserAdmin.list_display + ('account',)
-	list_display_links = UserAdmin.list_display_links + ('account',)
+	list_display = UserAdmin.list_display + ('get_account',)
 	list_filter = UserAdmin.list_filter + ('groups',)
+	filter_vertical = ('user_permissions',)
+	fieldsets = list(UserAdmin.fieldsets)
+	#fieldsets[1][1]["classes"] = ("collapse",)
+	fieldsets[2][1]["classes"] = ("collapse",)
+	fieldsets[3][1]["classes"] = ("collapse",)
+	fieldsets[4][1]["classes"] = ("collapse",)
+
+	def get_account(self, obj):
+		from django.core.urlresolvers import reverse
+		from django.utils.html import escape
+		if not obj.account:
+			return None
+		a_str = escape(unicode(obj.account))
+		a_href = reverse('admin:accounts_account_change', args=(obj.account.id,))
+		return u'<a href="%s">%s</a>' % (a_href, a_str)
+	get_account.short_desctiption = "Account"
+	get_account.allow_tags = True
 
 	def create_accounts(self, request, queryset):
 		quryset = queryset.filter(account__isnull=True)
@@ -171,6 +188,7 @@ class UserAdmin2(UserAdmin):
 
 class GroupAdmin2(GroupAdmin):
 	save_as = True
+	filter_vertical = ('permissions',)
 
 
 
