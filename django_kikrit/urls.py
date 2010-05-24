@@ -18,6 +18,17 @@ urlpatterns = patterns('',
 	(r'^media/(?P<path>.*)$', static.serve,
 		{'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
 	#(r'^logout/', logout_view),
+	# FIXME: For the auto complete to work in the admin view, the deprecated
+	# admin URL conf syntax is needed (^admin/(.*)$, ...). Before Django 1.3,
+	# a better solution MUST be found, as admin.ste.root will be erased from
+	# the source code then.
+	(r'^admin/(.*)$', admin.site.root),
 	(r'^admin/', include(admin.site.urls)),
 )
 
+
+if settings.DEBUG:
+	urlpatterns += patterns('',
+	(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':
+	settings.MEDIA_ROOT, 'show_indexes': True}),
+)
