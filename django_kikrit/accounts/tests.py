@@ -79,66 +79,67 @@ Test Group permissions
 
 >>> from django.contrib.auth.models import Group
 >>> g_admin = Group.objects.get(pk=1)
->>> p_admin = list(g_admin.permissions.all())
+>>> p_admin = [unicode(p) for p in g_admin.permissions.all()]
 >>> p_admin.sort()
 >>> for p in p_admin: print p
 accounts | account | Can add account
-accounts | balance image | Can add balance image
-accounts | limit group | Can add limit group
-accounts | transaction | Can add purchase
-accounts | rfid card | Can add rfid card
-accounts | transaction | Can add transaction
 accounts | account | Can change account
-accounts | balance image | Can change balance image
-accounts | limit group | Can change limit group
-accounts | transaction | Can change purchase
-accounts | rfid card | Can change rfid card
-accounts | transaction | Can change transaction
 accounts | account | Can delete account
+accounts | balance image | Can add balance image
+accounts | balance image | Can change balance image
 accounts | balance image | Can delete balance image
+accounts | limit group | Can add limit group
+accounts | limit group | Can change limit group
 accounts | limit group | Can delete limit group
-accounts | transaction | Can delete purchase
+accounts | rfid card | Can add rfid card
+accounts | rfid card | Can change rfid card
 accounts | rfid card | Can delete rfid card
+accounts | transaction | Can add purchase
+accounts | transaction | Can add transaction
+accounts | transaction | Can change purchase
+accounts | transaction | Can change transaction
+accounts | transaction | Can delete purchase
 accounts | transaction | Can delete transaction
 auth | group | Can add group
-auth | permission | Can add permission
-auth | user | Can add user
 auth | group | Can change group
-auth | permission | Can change permission
-auth | user | Can change user
 auth | group | Can delete group
+auth | permission | Can add permission
+auth | permission | Can change permission
 auth | permission | Can delete permission
+auth | user | Can add user
+auth | user | Can change user
 auth | user | Can delete user
-merchandise | merchandise | Can add merchandise
 merchandise | merchandise tag | Can add merchandise tag
-merchandise | merchandise | Can change merchandise
 merchandise | merchandise tag | Can change merchandise tag
-merchandise | merchandise | Can delete merchandise
 merchandise | merchandise tag | Can delete merchandise tag
+merchandise | merchandise | Can add merchandise
+merchandise | merchandise | Can change merchandise
+merchandise | merchandise | Can delete merchandise
+
 
 >>> g_staff = Group.objects.get(pk=2)
->>> p_staff = list(g_staff.permissions.all())
+>>> p_staff = [unicode(p) for p in g_staff.permissions.all()]
 >>> p_staff.sort()
 >>> for p in p_staff: print p
 accounts | account | Can add account
-accounts | balance image | Can add balance image
-accounts | transaction | Can add purchase
-accounts | rfid card | Can add rfid card
-accounts | transaction | Can add transaction
 accounts | account | Can change account
-accounts | balance image | Can change balance image
-accounts | transaction | Can change purchase
-accounts | rfid card | Can change rfid card
-accounts | transaction | Can change transaction
 accounts | account | Can delete account
+accounts | balance image | Can add balance image
+accounts | balance image | Can change balance image
 accounts | balance image | Can delete balance image
+accounts | rfid card | Can add rfid card
+accounts | rfid card | Can change rfid card
 accounts | rfid card | Can delete rfid card
-merchandise | merchandise | Can add merchandise
+accounts | transaction | Can add purchase
+accounts | transaction | Can add transaction
+accounts | transaction | Can change purchase
+accounts | transaction | Can change transaction
 merchandise | merchandise tag | Can add merchandise tag
-merchandise | merchandise | Can change merchandise
 merchandise | merchandise tag | Can change merchandise tag
-merchandise | merchandise | Can delete merchandise
 merchandise | merchandise tag | Can delete merchandise tag
+merchandise | merchandise | Can add merchandise
+merchandise | merchandise | Can change merchandise
+merchandise | merchandise | Can delete merchandise
 
 """}
 
