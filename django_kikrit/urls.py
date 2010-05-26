@@ -8,27 +8,22 @@
 from django.conf.urls.defaults import *
 from django.views import static
 from django.contrib import admin
-admin.autodiscover()
-
-#from django_kikrit.utils.views import logout_view
 from django.conf import settings
 
+#from django_kikrit.utils.views import logout_view
+#from jquery_widgets import namespaced_urls as jquery_widgets_urls
+
+admin.autodiscover()
 
 urlpatterns = patterns('',
-	(r'^media/(?P<path>.*)$', static.serve,
-		{'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
 	#(r'^logout/', logout_view),
-	# FIXME: For the auto complete to work in the admin view, the deprecated
-	# admin URL conf syntax is needed (^admin/(.*)$, ...). Before Django 1.3,
-	# a better solution MUST be found, as admin.ste.root will be erased from
-	# the source code then.
-	(r'^admin/(.*)$', admin.site.root),
-	(r'^admin/', include(admin.site.urls)),
+	url(r'^admin/', include(admin.site.urls)),
+	url(r'^jqw/', include('jquery_widgets.urls', app_name='jquery_widgets')),
 )
 
 
 if settings.DEBUG:
 	urlpatterns += patterns('',
-	(r'^media/(?P<path>.*)$', 'django.views.static.serve', {'document_root':
+	(r'^media/(?P<path>.*)$', static.serve, {'document_root':
 	settings.MEDIA_ROOT, 'show_indexes': True}),
 )

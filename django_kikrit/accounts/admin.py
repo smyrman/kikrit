@@ -11,7 +11,7 @@ from django.contrib.auth.admin import User, UserAdmin, Group, GroupAdmin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response
 
-from django_kikrit.utils.admin import ExtendedModelAdmin
+from jquery_widgets.admin import ExtendedModelAdmin
 from django_kikrit.accounts.models import Account, RFIDCard, LimitGroup,\
 		BalanceImage, Transaction, deposit_to_account, withdraw_from_account,\
 		purchase_from_account
@@ -25,7 +25,6 @@ class RFIDCardInline(admin.TabularInline):
 
 
 class AccountAdmin(ExtendedModelAdmin):
-	#form = make_ajax_form(Account, dict(user='user'))
 	related_search_fields = {'user': ('username', 'email'),}
 
 	list_display = ('name', 'user', 'limit_group', 'balance', 'color', 'email',
