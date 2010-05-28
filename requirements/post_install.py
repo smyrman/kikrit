@@ -2,6 +2,11 @@ import os
 import sys
 
 def main():
+	"""For virtual environments, symlink sip.so and PyQt4 into the
+	site-packeges directory. Note that python-pyqt4 and python-sip must be
+	installed to your system for this to work.
+
+	"""
 	pyenv = sys.argv[1]
 
 	# commands will be issued from the root of your python vitualenv.

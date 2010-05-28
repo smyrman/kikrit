@@ -18,9 +18,8 @@ admin.autodiscover()
 urlpatterns = patterns('',
 	#(r'^logout/', logout_view),
 	url(r'^admin/', include(admin.site.urls)),
-	url(r'^jqw/', include('jquery_widgets.urls', app_name='jquery_widgets')),
+	url(r'^jqw/', include('jquery_widgets.urls', namespace='jquery-widgets')),
 )
-
 
 if settings.DEBUG:
 	urlpatterns += patterns('',
