@@ -1,5 +1,7 @@
 1 INSTALLATION (Stand-alone client setup):
-  (New installation instructions expected for v0.3)
+  - New installation instructions expected for v0.3
+  - Please see http://wiki.github.com/smyrman/kikrit/getting-started for a more
+  complete installation guide.
 
  a) Download and unzip the latest version from the 'downloads tab'. Move the
     folder to somwhere on your harddrive, e.g to /home/user/kikrit.
