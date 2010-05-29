@@ -29,7 +29,7 @@ class Merchandise(models.Model):
 	name = models.CharField(max_length=50, unique=True)
 	ordinary_price = models.PositiveIntegerField()
 	internal_price = models.PositiveIntegerField()
-	ean = models.CharField(max_length=20, blank=True, null=True)
+	ean = models.CharField(max_length=20, blank=True, null=True, unique=True)
 	tags = models.ManyToManyField(MerchandiseTag, null=True, blank=True)
 
 	class Meta:
@@ -39,6 +39,13 @@ class Merchandise(models.Model):
 		return u"%s: %d,- (%d,-)" % (self.name, self.ordinary_price,
 				self.internal_price)
 
+	def save(self, *args, **kw):
+		# If strings are saved to the database as empty instead of NULL, this
+		# will violate the database fields 'unique' parameter the instance onr
+		# try to add the second Merchandise without an ean.
+		if self.ean == "":
+			self.ean = None
+		super(Merchandise, self).save(*args, **kw)
 
 	def filter(self, filter_str):
 		"""Return True if object matches filter_str, and False if not.

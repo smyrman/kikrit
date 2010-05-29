@@ -8,6 +8,7 @@
 from django.db import models
 from django import forms
 from django.template.defaultfilters import capfirst
+from south.modelsinspector import add_introspection_rules
 
 
 class NegativeIntegerField(models.PositiveIntegerField):
@@ -39,4 +40,12 @@ class NegativeIntegerField(models.PositiveIntegerField):
 		return models.PositiveIntegerField.get_db_prep_value(self, value)
 
 
-
+# Tell the Soth migrations system how this custom fields are different from the
+# standard django fields:
+add_introspection_rules([
+	(
+		[NegativeIntegerField], # Class(es) these apply to
+		[],			# Positional arguments (not used)
+		{},			# Keyword argument
+	),
+], ["^(django_kikrit\.)?accounts\.fields\.Negative.*"])

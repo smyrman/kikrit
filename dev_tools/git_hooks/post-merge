@@ -4,4 +4,4 @@
 # merge.
 
 echo -e "++ Updating git hooks ++";
-$GIT_DIR/dev_tools/install_hooks.py
+$GIT_DIR/../dev_tools/install_hooks.py

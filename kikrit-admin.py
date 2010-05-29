@@ -25,10 +25,10 @@ commands (and more). It is meant to be an easy to use commnad line tool that
 makes the most common administrative tasks easy.
 
 Available command argumets are:
-    help    Show this text, or print help about a specifc command
-    install Install database (according to settings) and load initial data
-    backup  Backup your database to a 'json fixture' in your bacup directory
-    migrate Does nothing (Will be implemented when needed)
+    help      Show this text, or print help about a specifc command
+    install   Install database (according to settings) and load initial data
+    backup    Backup your database to a 'json fixture' in your bacup directory
+    migrate   Migrate an outdated database to match the current KiKrit version
 
 """
 
@@ -37,13 +37,16 @@ import sys
 import datetime
 from inspect import cleandoc
 
-from settings import BACKUP_DIR
-
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(PROJECT_ROOT)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+from django.core import management
+from django.conf import settings
 
+
+# A mapping that mapps user input commands to python functions.
 COMMANDS =	{"help":"help", "install":"install", "backup":"backup",
-		"migrate":"migrate", "git-update":"git_update"}
-
+		"migrate":"migrate"}
 
 # Helper functions:
 def eprint(str):
@@ -61,6 +64,18 @@ def help(*args):
 	if len(args) > 0:
 		if args[0] in COMMANDS:
 			print cleandoc(eval(COMMANDS[args[0]]).__doc__)
+		elif args[0].lower() in ('sex', 'girls'):
+			print "You shuld try asking her out some time..."
+		elif args[0].lower() in ('boys', 'lads', 'men'):
+			print "Men, or 'male humans' are often thought of as much "\
+				"simpler then their female counterparts. Many women see men "\
+				"as giant, strong and half-brained ogers. Still, there is "\
+				"just something about those creatures that women tend to "\
+				"'fall for'."
+		elif args[0].lower() in ('robots',):
+			print "Robots are very sexy indeed. Their reproduction is "\
+				"however often controlled by the much more simple-minded "\
+				"humans."
 		else:
 			print "I realy can't help you with '%s'." % " ".join(args)
 	else:
@@ -68,17 +83,47 @@ def help(*args):
 
 
 def install(*args):
-	"""Currently just calls 'django_kikrit/manage.py syncdb'. This will create
-	the database tables that need to be created, and load the database with
-	the initial data that is found in 'initia_data.json'.
+	"""First calls:
+	  '$ django_kikrit/manage.py syncdb [--noinput]'.
+
+	This will install all database tables for all 'django apps' that do not use
+	'south migrations' (You might google 'django' and 'django south' to find out
+	more).
+
+	Then calls:
+	  '$ django_kikrit/manage.py safe_migrateion --autoskip-first [--noinput] [--no-initial-data]'
+
+	This will install or upgrade all apps that use 'south migrations'.
+
+	Finally, if not '--no-initial-data' is supplied, run:
+	  '$ django_kikrit/manage.py loaddata django_kikrit/accounts/fixtures/default_*'
+	This will load all default fixtures for the accounts app into the database.
+	The 'merchandise' and 'utils' app currently does not have any initial data.
+
+	Supported options:
+	  --noinput          Do not ask the user for input.
+	  --no-initial-data  Do not load initial data from fixtures.
+
 
 	"""
-	# Create super-user, populate db with initial data:
-	cmd = "django_kikrit/manage.py syncdb %s" % " ".join(args)
-	ret = os.system(cmd.replace("/", os.path.sep))
-	if ret != 0:
-		eprint("Syncdb failed!")
+	# deafaults:
+	interactive = True
+	no_initial_data = False
+
+	# A (very) simplistic way to get options:
+	if len(args) > 0:
+		if '--noinput' in args:
+			interactive = False
+		if '--no-initial-data' in args:
+			no_initial_data = True
+	elif len(args) > 2:
+		eprint("Unhandled arguments or options!")
 		exit(1)
+
+	management.call_command('syncdb', interactive=interactive,)
+	management.call_command('safe_migration', interactive=interactive,
+			autoskip=True, no_initial_data=no_initial_data)
+	# If not
 
 
 def backup(*args):
@@ -112,11 +157,16 @@ def backup(*args):
 
 
 def migrate(*args):
-	"""This function does nothing at the moment. When migrations are first
-	needed, this function will make sure the database structure is up to data.
+	"""This command preforms the exact same operations as the 'install'
+	command, except that it does not load any initial data.
+
+	Supported options:
+	  --noinput  Do NOT ask the user for input.
 
 	"""
-	pass
+	if not '--no-initial-data' in args:
+		args += ('--no-initial-data',)
+	install(*args)
 
 
 def main():
