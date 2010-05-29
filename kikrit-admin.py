@@ -145,13 +145,15 @@ def backup(*args):
 	print "Backed up db content to '%s'" % filename
 
 	# Better formating of file:
-	f = open(filename)
-	line = f.readline()
-	f.close()
-	lines = line.replace("}},","}},\n")
-	f = open(filename, 'w')
-	f.write(lines)
-	f.close()
+	# Note: Comented out this one - it is time consuming, and not necesary.
+	# Also, it is safer not to use it.
+	#f = open(filename)
+	#line = f.readline()
+	#f.close()
+	#lines = line.replace("}},","}},\n")
+	#f = open(filename, 'w')
+	#f.write(lines)
+	#f.close()
 
 	return filename
 
