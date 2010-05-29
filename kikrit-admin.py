@@ -136,7 +136,7 @@ def backup(*args):
 
 	# Preform manage.py dumpdata
 	filename = "backup_%s.json" % datetime.datetime.now().isoformat()[:19]
-	filename = os.path.join(BACKUP_DIR, filename)
+	filename = os.path.join(settings.BACKUP_DIR, filename)
 	cmd = "django_kikrit/manage.py dumpdata --format json > %s" % filename
 	ret = os.system(cmd.replace("/", os.path.sep))
 	if ret != 0:
