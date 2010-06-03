@@ -18,6 +18,7 @@ class MerchandiseTag(models.Model):
 	class Meta:
 		ordering = ('name',)
 
+
 	def __unicode__(self):
 		return self.name
 
@@ -35,9 +36,11 @@ class Merchandise(models.Model):
 	class Meta:
 		ordering = ('name',)
 
+
 	def __unicode__(self):
 		return u"%s: %d,- (%d,-)" % (self.name, self.ordinary_price,
 				self.internal_price)
+
 
 	def save(self, *args, **kw):
 		# If strings are saved to the database as empty instead of NULL, this
@@ -46,6 +49,17 @@ class Merchandise(models.Model):
 		if self.ean == "":
 			self.ean = None
 		super(Merchandise, self).save(*args, **kw)
+
+
+	def delete(self, preserve_transactions=True, **kwargs):
+		if preserve_transactions:
+			# Generate backup information for purchased item, and 'cut it
+			# loose':
+			PurchasedItem.objects.filter(merchandise=self).update(merchandise=None,
+					merchandise_name=self.name[:30], merchandise_tags="|".join(
+					(unicode(t) for t in self.tags.all()))[:30])
+		super(Merchandise, self).save(**kwargs)
+
 
 	def filter(self, filter_str):
 		"""Return True if object matches filter_str, and False if not.
@@ -74,6 +88,7 @@ class TransactionTypeManager(models.Manager):
         self.type = type
         super(self.__class__,self).__init__(*args, **kwargs)
 
+
     def get_query_set(self):
         return super(self.__class__,
                 self).get_query_set().filter(type=self.type)
@@ -88,9 +103,12 @@ class PurchasedItem(models.Model):
 	merchandise = models.ForeignKey(Merchandise)
 	price = models.PositiveIntegerField()
 
-	def __unicode__(self):
-		return u"%s %s,-" % (self.merchandise.name, self.price)
+	# Backup information if the realted merchandise object is deleted:
+	merchandise_name = models.CharField(max_length=30, null=True, blank=True)
+	merchandise_tags = models.CharField(max_length=30, null=True, blank=True)
 
+	def __unicode__(self):
+		return u"%s: %s,-" % (self.merchandise.name, self.price)
 
 
 
@@ -99,6 +117,7 @@ class Purchase(Transaction):
 
 	class Meta:
 		proxy = True
+
 
 	def undo(self):
 		"""Call this function before delete to undo the effect this purchase
@@ -110,10 +129,11 @@ class Purchase(Transaction):
 		q.delete()
 
 
+
 ## Helper Functions:
 
 @transaction.commit_on_success
-def buy_merchandise(account, merchandise_list):
+def buy_merchandise(account, merchandise_list, responsible=None):
 	"""Try ro buy merchandice_list with credit from account. Returns
 	transaction object upon success, or None on failure.
 
@@ -129,12 +149,11 @@ def buy_merchandise(account, merchandise_list):
 	else:
 		total_price = sum((m.ordinary_price for m in merchandise_list))
 
-	ret = None
+	transaction = None
 	if total_price == 0 or account.withdraw(total_price):
 		transaction = Transaction(account=account, amount=-total_price,
 				type=Transaction.TYPE_PURCHASE)
 		transaction.save()
-		ret = transaction
 
 		# Purchased items must be created after save:
 		for m in merchandise_list:
@@ -147,6 +166,4 @@ def buy_merchandise(account, merchandise_list):
 				pm.price = m.ordinary_price
 			pm.save()
 
-	return ret
-
-
+	return transaction

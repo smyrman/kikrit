@@ -77,17 +77,21 @@ class AccountTestCase(TestCase):
 		trans_withdraw6 = withdraw_from_account(account, 1, operator)
 		self.failUnlessEqual(trans_withdraw6, None)
 
-		# Test that transactions are not deleted when users are:
-		trans_id = trans_deposit.id
-		operator.delete()
-		trans_count = Transaction.objects.filter(id=trans_id).count()
-		self.failUnlessEqual(trans_count, 1)
-
-		# Test that transactions are not deleted when accounts are:
+		# Test that transactions are not deleted when users are, and that bacup
+		# information is stored to responsible_name:
 		trans_id = trans_withdraw.id
+		responsible_name = operator.username
+		operator.delete()
+		trans_withdraw = Transaction.objects.get(id=trans_id)
+		self.failUnlessEqual(trans_withdraw.responsible_name, responsible_name)
+
+		# Test that transactions are not deleted when accounts are, and that
+		# backup information is stored to account_name:
+		trans_id = trans_withdraw.id
+		account_name = account.name
 		account.delete()
-		trans_count = Transaction.objects.filter(id=trans_id).count()
-		self.failUnlessEqual(trans_count, 1)
+		trans_withdraw = Transaction.objects.get(id=trans_id)
+		self.failUnlessEqual(trans_withdraw.account_name, account_name)
 
 
 __test__ = {"fixtures":["default_groups.json"], "doctest": """

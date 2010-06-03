@@ -50,15 +50,19 @@ def user_delete(self, preserve_transactions=True, preserve_account=False,
 		account = None
 
 	if preserve_transactions:
-		Transaction.objects.filter(responsible=self).update(responsible=None)
-		if account and not preserve_account:
-			Transaction.objects.filter(account=account).update(account=None)
+		Transaction.objects.filter(responsible=self).update(responsible=None,
+				responsible_name=self.username)
 
 	if account and preserve_account:
 		self.account.user = None
 		self.account.save()
+		super(User, self).delete(**kwargs)
+	elif account:
+		# Make sure pre-delete hooks for self.ccount is called:
+		account.delete(preserve_transactions, False, **kwargs)
+	else:
+		super(User, self).delete(**kwargs)
 
-	super(User, self).delete(**kwargs)
 User.delete = user_delete
 
 
@@ -116,13 +120,18 @@ class Account(models.Model):
 
 		"""
 		if preserve_transactions:
-			Transaction.objects.filter(account=self).update(account=None)
+			Transaction.objects.filter(account=self).update(account=None,
+					account_name=self.name)
 
 		if self.user and preserve_user:
 			self.user.account = None
 			self.user.save()
-
-		super(Account, self).delete(**kwargs)
+			super(Account, self).delete(**kwargs)
+		elif self.user:
+			# Make sure the pre-delete hooks for self.user is called:
+			self.user.delete(preserve_transactions, False, **kwargs)
+		else:
+			super(Account, self).delete(**kwargs)
 
 
 	def has_internal_price(self):
@@ -303,6 +312,11 @@ class Transaction(models.Model):
 	account = models.ForeignKey(Account, blank=False, null=True)
 	amount = models.IntegerField()
 	type = models.IntegerField(choices=TYPE_CHOICES)
+
+	# Backup fields that can be used if the related account or user is
+	# deleted:
+	responsible_name = models.CharField(max_length=30, null=True, blank=True)
+	account_name = models.CharField(max_length=30, null=True, blank=True)
 
 	def __unicode__(self):
 		type_name = self.TYPE_CHOICES[self.type][1]
