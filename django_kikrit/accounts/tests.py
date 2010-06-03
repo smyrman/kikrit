@@ -15,21 +15,22 @@ Replace these with more appropriate tests for your application.
 
 from django.test import TestCase
 
+from django_kikrit.accounts.models import Account, LimitGroup, Transaction, \
+		withdraw_from_account, deposit_to_account
+from datetime import datetime, timedelta
+from django.contrib.auth.models import User
+
+
 class AccountTestCase(TestCase):
 
-	def test_transaction(self):
-		"""Test simple transactions """
-		from django_kikrit.accounts.models import Account, LimitGroup,\
-				 Transaction, withdraw_from_account, deposit_to_account
-		from datetime import datetime, timedelta
-		from django.contrib.auth.models import User
-
+	def test_basic_transactions(self):
+		"""Test basic deposit and withdraw for normal accounts"""
 		# Create an operator:
 		operator = User(username="tada", password="tada")
 		operator.save()
 
-		# Create a 'bank' account:
-		account = Account(id=1,name="Test Account", balance=0, limit_group=None)
+		# Create a bank account:
+		account = Account(id=1, name="Test Account")
 		account.save()
 
 		# Test to deposit 200:
@@ -42,56 +43,123 @@ class AccountTestCase(TestCase):
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, 0)
 
-		# Test to withdraw 200 from an empty account:
+		# Test that withdrawing 200 from an empty account fails:
 		trans_withdraw2 = withdraw_from_account(account, 200, operator)
 		self.failUnlessEqual(trans_withdraw2, None)
 
-		# Modify black_limit to -200 and test to withdraw 199:
+		# Return objects for reuse in other tests:
+		return account, operator, trans_deposit, trans_withdraw
+
+
+	def test_limitgroup_transactions(self):
+		"""Test credit withdraw for accounts with limitgroup memberships"""
+
+		# Create an operator:
+		operator = User(username="tada", password="tada")
+		operator.save()
+
+		# Create a bank account with black_limit == -200:
 		limit_group = LimitGroup(id=1, name="Tester1", black_limit=-200,
 				max_grey_hours=1)
 		limit_group.save()
-		account.limit_group = limit_group
+		account = Account(id=1, name="Test Account", limit_group=limit_group)
 		account.save()
-		trans_withdraw3 = withdraw_from_account(account, 199, operator)
+
+		# Test to withdraw 199:
+		trans_withdraw = withdraw_from_account(account, 199, operator)
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -199)
 
 		# Test to withdraw the last 1:
-		trans_withdraw4 = withdraw_from_account(account, 1, operator)
+		trans_withdraw2 = withdraw_from_account(account, 1, operator)
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -200)
 
-		# Test to withdraw another 1:
-		trans_withdraw5 = withdraw_from_account(account, 1, operator)
-		self.failUnlessEqual(trans_withdraw5, None)
+		# Test that withdrawing another 1 fails:
+		trans_withdraw3 = withdraw_from_account(account, 1, operator)
+		self.failUnlessEqual(trans_withdraw3, None)
 
-		# Test to undo a transaction:
-		trans_withdraw3.undo()
-		account = Account.objects.get(pk=1)
-		self.failUnlessEqual(account.balance, -1)
-		trans_withdraw3.delete()
-
-		# Test if user go black after grey_time hours:
-		account.timestamp_grey = datetime.now() - timedelta(hours=2, seconds=1)
+		# Test that the account go black after max_grey_hours == 1:
+		trans_deposit = deposit_to_account(account, 50, operator)
+		account.timestamp_grey = datetime.now() - timedelta(hours=1, seconds=1)
 		account.save()
-		trans_withdraw6 = withdraw_from_account(account, 1, operator)
-		self.failUnlessEqual(trans_withdraw6, None)
+		trans_withdraw4 = withdraw_from_account(account, 1, operator)
+		self.failUnlessEqual(trans_withdraw4, None)
+
+
+	def test_undo_transaction(self):
+		"""Test that the transaction's undo function completly reverse the
+		transaction
+
+		"""
+		# Cseate account, operator, and deposit/withdraw transactions:
+		bits = self.test_basic_transactions()
+		account, operator, trans_deposit, trans_withdraw = bits
+
+		# Test to undo the deposit transaction:
+		trans_deposit.undo()
+		account = Account.objects.get(pk=1)
+		self.failUnlessEqual(account.balance, -200)
+		trans_deposit.delete()
+
+		# Test to undo the withdraw transaction:
+		trans_withdraw.undo()
+		account = Account.objects.get(pk=1)
+		self.failUnlessEqual(account.balance, 0)
+		trans_withdraw.delete()
+
+
+	def test_against_cascade_deletion_of_tranasactions(self):
+		"""Test that transactions are not removed when related users or
+		accounts are deleted
+
+		"""
+		# Create account, operator, and deposit/withdraw transactions:
+		bits = self.test_basic_transactions()
+		account, operator, trans_deposit, trans_withdraw = bits
 
 		# Test that transactions are not deleted when users are, and that bacup
 		# information is stored to responsible_name:
-		trans_id = trans_withdraw.id
+		trans_id = trans_deposit.id
 		responsible_name = operator.username
 		operator.delete()
-		trans_withdraw = Transaction.objects.get(id=trans_id)
-		self.failUnlessEqual(trans_withdraw.responsible_name, responsible_name)
+		trans_deposit = Transaction.objects.get(id=trans_id)
+		self.failUnlessEqual(trans_deposit.responsible_name, responsible_name)
 
 		# Test that transactions are not deleted when accounts are, and that
 		# backup information is stored to account_name:
-		trans_id = trans_withdraw.id
+		trans_id = trans_deposit.id
 		account_name = account.name
 		account.delete()
-		trans_withdraw = Transaction.objects.get(id=trans_id)
-		self.failUnlessEqual(trans_withdraw.account_name, account_name)
+		trans_deposit = Transaction.objects.get(id=trans_id)
+		self.failUnlessEqual(trans_deposit.account_name, account_name)
+
+
+	def test_inactive_accounts(self):
+		"""Test that withdraw and deposit are not possible for inactive
+		accounts
+
+		"""
+		# Create account and operator:
+		operator = User(username="tada", password="tada")
+		operator.save()
+		account = Account(id=1, name="Test Account", is_active=False)
+		account.save()
+
+		account_balance = account.balance
+
+		# Test that withdraw fails:
+		trans_withdraw = withdraw_from_account(account, 200, operator)
+		self.failUnlessEqual(trans_withdraw, None)
+		account = Account.objects.get(pk=1)
+		self.failUnlessEqual(account.balance, account_balance)
+
+		# Test that deposit fails:
+		trans_deposit = deposit_to_account(account, 200, operator)
+		self.failUnlessEqual(trans_deposit, None)
+		account = Account.objects.get(pk=1)
+		self.failUnlessEqual(account.balance, account_balance)
+
 
 
 __test__ = {"fixtures":["default_groups.json"], "doctest": """

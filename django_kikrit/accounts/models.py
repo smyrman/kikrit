@@ -31,7 +31,8 @@ class LimitGroup(models.Model):
 			"'grey' (negative) balance before he goes black. (-1 implies no "
 			"limit)")
 	internal_price = models.BooleanField(default=False, blank=True,
-			help_text="Give members of this group a 'special price'.")
+			help_text="Members of this limit group will use internal price on "
+			"merchandise instead of the ordinary price")
 
 	def __unicode__(self):
 		return self.name
@@ -58,7 +59,7 @@ def user_delete(self, preserve_transactions=True, preserve_account=False,
 		self.account.save()
 		super(User, self).delete(**kwargs)
 	elif account:
-		# Make sure pre-delete hooks for self.ccount is called:
+		# Make sure pre-delete hooks for self.account is called:
 		account.delete(preserve_transactions, False, **kwargs)
 	else:
 		super(User, self).delete(**kwargs)
@@ -90,6 +91,8 @@ class Account(models.Model):
 	color = models.SmallIntegerField(choices=COLOR_CHOICES, editable=False)
 	email = models.EmailField(blank=True, null=True)
 	phone_number = models.IntegerField(blank=True, null=True)
+	is_active = models.BooleanField(default=True, blank=True,
+			help_text="If this box is not checked, the account can not be used")
 	# Timestamp for when the user last went grey:
 	timestamp_grey = models.DateTimeField(editable=False, null=True, blank=True)
 
@@ -197,18 +200,22 @@ class Account(models.Model):
 		if amount.__class__ != int or amount <= 0:
 			raise ValueError("'amount' must be an Integer greater then zero")
 
-		ret = False
+		# Inactive accounts can't be used:
+		if not self.is_active:
+			return False
+
+		success = False
 		new_color = self.get_color(-amount)
 
 		if new_color != self.COLOR_BLACK:
 			# Update balance and color:
 			self.balance -= amount
 			self.save()
-			ret = True
+			success = True
 		elif self.get_color() != self.color:
 			self.save()
 
-		return ret
+		return success
 
 
 	def deposit(self, amount):
@@ -219,6 +226,10 @@ class Account(models.Model):
 		# Input check:
 		if amount.__class__ != int or amount <= 0:
 			raise ValueError("'amount' must be an Integer greater then zero.")
+
+		# Inactive accounts can't be used:
+		if not self.is_active:
+			return False
 
 		# Update balance and color:
 		self.balance += amount
@@ -354,13 +365,12 @@ def deposit_to_account(account, amount, responsible):
 	account = Account.objects.get(pk=account.pk)
 
 	# Input checks are done in the Account class.
-	ret = None
+	transaction = None
 	if account.deposit(amount):
 		transaction = Transaction(account=account, amount=amount,
 				responsible=responsible, type=Transaction.TYPE_DEPOSIT)
 		transaction.save()
-		ret = transaction
-	return ret
+	return transaction
 
 
 @transaction.commit_on_success
@@ -372,13 +382,12 @@ def withdraw_from_account(account, amount, responsible):
 	account = Account.objects.get(pk=account.pk)
 
 	# Input checks are done in the Account class.
-	ret = None
+	transaction = None
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
 				responsible=responsible, type=Transaction.TYPE_WITHDRAWAL)
 		transaction.save()
-		ret = transaction
-	return ret
+	return transaction
 
 
 @transaction.commit_on_success
@@ -390,12 +399,11 @@ def purchase_from_account(account, amount, responsible):
 	account = Account.objects.get(pk=account.pk)
 
 	# Input checks are done in the Account class.
-	ret = None
+	transaction = None
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
 				responsible=responsible, type=Transaction.TYPE_PURCHASE)
 		transaction.save()
-		ret = transaction
-	return ret
+	return transaction
 
 
