@@ -31,8 +31,7 @@ class LimitGroup(models.Model):
 			"'grey' (negative) balance before he goes black. (-1 implies no "
 			"limit)")
 	internal_price = models.BooleanField(default=False, blank=True,
-			help_text="Members of this limit group will use internal price on "
-			"merchandise instead of the ordinary price")
+			help_text="Charge internal price for members of this limit group")
 
 	def __unicode__(self):
 		return self.name
