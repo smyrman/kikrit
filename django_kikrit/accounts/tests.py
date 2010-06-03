@@ -20,57 +20,78 @@ class AccountTestCase(TestCase):
 	def test_transaction(self):
 		"""Test simple transactions """
 		from django_kikrit.accounts.models import Account, LimitGroup,\
-				 withdraw_from_account, deposit_to_account
+				 Transaction, withdraw_from_account, deposit_to_account
 		from datetime import datetime, timedelta
 		from django.contrib.auth.models import User
 
-		user1 = User(username="tada", password="tada")
-		user1.save()
+		# Create an operator:
+		operator = User(username="tada", password="tada")
+		operator.save()
 
+		# Create a 'bank' account:
 		account = Account(id=1,name="Test Account", balance=0, limit_group=None)
 		account.save()
-		trans1 = deposit_to_account(account, 200, user1)
+
+		# Test to deposit 200:
+		trans_deposit = deposit_to_account(account, 200, operator)
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, 200)
 
-		trans2 = withdraw_from_account(account, 200, user1)
+		# Test to withdraw 200:
+		trans_withdraw = withdraw_from_account(account, 200, operator)
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, 0)
 
-		transX = withdraw_from_account(account, 200, user1)
-		self.failUnlessEqual(transX, None)
+		# Test to withdraw 200 from an empty account:
+		trans_withdraw2 = withdraw_from_account(account, 200, operator)
+		self.failUnlessEqual(trans_withdraw2, None)
 
-		lg = LimitGroup(id=1, name="Tester1", black_limit=-200, max_grey_hours=1)
-		lg.save()
-		account.limit_group = lg
+		# Modify black_limit to -200 and test to withdraw 199:
+		limit_group = LimitGroup(id=1, name="Tester1", black_limit=-200,
+				max_grey_hours=1)
+		limit_group.save()
+		account.limit_group = limit_group
 		account.save()
-		trans3 = withdraw_from_account(account, 199, user1)
+		trans_withdraw3 = withdraw_from_account(account, 199, operator)
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -199)
 
-		trans4 = withdraw_from_account(account, 1, user1)
+		# Test to withdraw the last 1:
+		trans_withdraw4 = withdraw_from_account(account, 1, operator)
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -200)
 
-		transX= withdraw_from_account(account, 1, user1)
-		self.failUnlessEqual(transX, None)
+		# Test to withdraw another 1:
+		trans_withdraw5 = withdraw_from_account(account, 1, operator)
+		self.failUnlessEqual(trans_withdraw5, None)
 
-		trans3.undo()
+		# Test to undo a transaction:
+		trans_withdraw3.undo()
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, -1)
-		trans3.delete()
+		trans_withdraw3.delete()
 
+		# Test if user go black after grey_time hours:
 		account.timestamp_grey = datetime.now() - timedelta(hours=2, seconds=1)
 		account.save()
+		trans_withdraw6 = withdraw_from_account(account, 1, operator)
+		self.failUnlessEqual(trans_withdraw6, None)
 
-		transX = withdraw_from_account(account, 1, user1)
-		self.failUnlessEqual(transX, None)
+		# Test that transactions are not deleted when users are:
+		trans_id = trans_deposit.id
+		operator.delete()
+		trans_count = Transaction.objects.filter(id=trans_id).count()
+		self.failUnlessEqual(trans_count, 1)
 
-		# TODO: Test that transactions is not deleted when a user is.
+		# Test that transactions are not deleted when accounts are:
+		trans_id = trans_withdraw.id
+		account.delete()
+		trans_count = Transaction.objects.filter(id=trans_id).count()
+		self.failUnlessEqual(trans_count, 1)
 
 
 __test__ = {"fixtures":["default_groups.json"], "doctest": """
-Test Group permissions
+Test default Group permissions
 
 >>> from django.contrib.auth.models import Group
 >>> g_staff = Group.objects.get(pk=1)

@@ -2,7 +2,7 @@
 
 # Copyright (C) 2010: Sindre Røkenes Myren
 
-# This file is part of KiKrit wich is distrebuted under GPLv3. See the file
+# This file is part of KiKrit which is distributed under GPLv3. See the file
 # COPYING.txt for more details.
 
 from datetime import datetime, timedelta
@@ -17,18 +17,18 @@ from settings import UPLOAD_PATH
 from django_kikrit.accounts.fields import NegativeIntegerField
 
 class LimitGroup(models.Model):
-	"""A user might be a member of ONE LimitGroup. This determin how negative
-	balance he can have (and for how long) without going black.
+	"""A group to that include withdraw limits, limits for minimum negative
+	balance, and time limits for how long after an account's balance has gone
+	negative, purchases and withdrawals are still allowed.
 
 	"""
-	grey_limit = 0 # Hard coded limit (for now).
-
 	name = models.CharField(max_length=50, unique=True)
+	grey_limit = 0 # Hard coded limit (for now).
 	black_limit = NegativeIntegerField(default=0,
 			help_text="Minimum balance where transactions are still allowed.")
 	max_grey_hours = models.SmallIntegerField(default=24,
-			help_text="The maximum number of hours a person migth have a "
-			"'grey' (negative) saldo before he goes black. (-1 implies no "
+			help_text="The maximum number of hours a person might have a "
+			"'grey' (negative) balance before he goes black. (-1 implies no "
 			"limit)")
 	internal_price = models.BooleanField(default=False, blank=True,
 			help_text="Give members of this group a 'special price'.")
@@ -38,8 +38,33 @@ class LimitGroup(models.Model):
 
 
 
+# Monkey patch the User not to do cascade delete accounts and transactions:
+def user_delete(self, preserve_transactions=True, preserve_account=False,
+		**kwargs):
+	"""Extended delete function where you can opt to preserve transactions and
+	account.
+	"""
+	try:
+		account = self.account
+	except Account.DoesNotExist:
+		account = None
+
+	if preserve_transactions:
+		Transaction.objects.filter(responsible=self).update(responsible=None)
+		if account and not preserve_account:
+			Transaction.objects.filter(account=account).update(account=None)
+
+	if account and preserve_account:
+		self.account.user = None
+		self.account.save()
+
+	super(User, self).delete(**kwargs)
+User.delete = user_delete
+
+
 class Account(models.Model):
-	"""A profile object, adding extra fields to a django User object.
+	"""A bank account that may or may not be associated to a user. Holds
+	balance information and limit group membership.
 
 	"""
 	COLOR_BLACK = 0
@@ -54,15 +79,19 @@ class Account(models.Model):
 
 	user = models.OneToOneField(User, null=True, blank=True,
 			help_text="Needed to enable login.")
-	name = models.CharField(max_length=50, help_text="Account name: Users's"
-			" full name is recomended", unique=True)
+	name = models.CharField(max_length=50, help_text="Account name: User's"
+			" full name is recommended", unique=True)
 	balance = models.IntegerField(default=0, editable=False)
 	limit_group = models.ForeignKey(LimitGroup, null=True, blank=True)
 	color = models.SmallIntegerField(choices=COLOR_CHOICES, editable=False)
 	email = models.EmailField(blank=True, null=True)
 	phone_number = models.IntegerField(blank=True, null=True)
-	# Timestamp for when the user last whent grey:
+	# Timestamp for when the user last went grey:
 	timestamp_grey = models.DateTimeField(editable=False, null=True, blank=True)
+
+	def __unicode__(self):
+		return unicode(self.name)
+
 
 	def save(self, *args, **kwargs):
 		"""Customized save function that updates color and grey_time_stamp.
@@ -79,6 +108,21 @@ class Account(models.Model):
 		# Update color and save:
 		self.color = new_color
 		super(self.__class__, self).save(*args, **kwargs)
+
+
+	def delete(self, preserve_transactions=True, preserve_user=False, **kwargs):
+		"""Extended delete function where you can opt to preserve transactions,
+		or users.
+
+		"""
+		if preserve_transactions:
+			Transaction.objects.filter(account=self).update(account=None)
+
+		if self.user and preserve_user:
+			self.user.account = None
+			self.user.save()
+
+		super(Account, self).delete(**kwargs)
 
 
 	def has_internal_price(self):
@@ -133,12 +177,9 @@ class Account(models.Model):
 		return color
 
 
-	def __unicode__(self):
-		return unicode(self.name)
-
 	def withdraw(self, amount):
 		"""Try to withdraw an amount. Returns True on sucsess, and False on
-		failure. Succsess is only possible if the new color equals
+		failure. Success is only possible if the new color equals
 		self.COLOR_WHITE or self.COLOR_GREY.(Also saves the object, and updates
 		the color field!)
 
@@ -170,7 +211,7 @@ class Account(models.Model):
 		if amount.__class__ != int or amount <= 0:
 			raise ValueError("'amount' must be an Integer greater then zero.")
 
-		# Update balance snd color:
+		# Update balance and color:
 		self.balance += amount
 		self.save()
 
@@ -259,17 +300,16 @@ class Transaction(models.Model):
 
 	timestamp = models.DateTimeField(auto_now_add=True, editable=False)
 	responsible = models.ForeignKey(User, blank=True, null=True, editable=False)
-	account = models.ForeignKey(Account)
+	account = models.ForeignKey(Account, blank=False, null=True)
 	amount = models.IntegerField()
 	type = models.IntegerField(choices=TYPE_CHOICES)
 
 	def __unicode__(self):
-		print self.type
-		type = self.TYPE_CHOICES[self.type][1]
-		tf = 'from'
+		type_name = self.TYPE_CHOICES[self.type][1]
+		ret_str = u'%s of %s from %s'
 		if self.type == self.TYPE_DEPOSIT:
-			tf = 'to'
-		return u"%s of %s %s %s" % (type, self.amount, tf, self.account)
+			ret_str = u'%s of %s to %s'
+		return ret_str % (type_name, self.amount, self.account)
 
 
 	# The commit_on_succsess decorator will start a db transaction. This
@@ -299,7 +339,7 @@ def deposit_to_account(account, amount, responsible):
 	# Make a 100% sure that the account is up to date:
 	account = Account.objects.get(pk=account.pk)
 
-	# Input cheks are done in the Account class.
+	# Input checks are done in the Account class.
 	ret = None
 	if account.deposit(amount):
 		transaction = Transaction(account=account, amount=amount,
@@ -317,7 +357,7 @@ def withdraw_from_account(account, amount, responsible):
 	# Make a 100% sure that the account is up to date:
 	account = Account.objects.get(pk=account.pk)
 
-	# Input cheks are done in the Account class.
+	# Input checks are done in the Account class.
 	ret = None
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
@@ -335,7 +375,7 @@ def purchase_from_account(account, amount, responsible):
 	# Make a 100% sure that the account is up to date:
 	account = Account.objects.get(pk=account.pk)
 
-	# Input cheks are done in the Account class.
+	# Input checks are done in the Account class.
 	ret = None
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
