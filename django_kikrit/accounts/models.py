@@ -83,7 +83,7 @@ class Account(models.Model):
 
 	user = models.OneToOneField(User, null=True, blank=True,
 			help_text="Needed to enable login.")
-	name = models.CharField(max_length=50, help_text="Account name: User's"
+	name = models.CharField(max_length=30, help_text="Account name: User's"
 			" full name is recommended", unique=True)
 	balance = models.IntegerField(default=0, editable=False)
 	limit_group = models.ForeignKey(LimitGroup, null=True, blank=True)
