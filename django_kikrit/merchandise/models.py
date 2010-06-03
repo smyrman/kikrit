@@ -23,7 +23,6 @@ class MerchandiseTag(models.Model):
 		return self.name
 
 
-
 class Merchandise(models.Model):
 	SEARCH_FIELDS = ('name', 'ordinary_price', 'internal_price', 'ean')
 

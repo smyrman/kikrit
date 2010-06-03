@@ -14,8 +14,8 @@ Replace these with more appropriate tests for your application.
 
 from django.test import TestCase
 from accounts.models import Account, LimitGroup
-from merchandise.models import MerchandiseTag, Merchandise, buy_merchandise
-
+from merchandise.models import MerchandiseTag, Merchandise, PurchasedItem,\
+		buy_merchandise
 
 
 class MerchandiseTest(TestCase):
@@ -63,6 +63,12 @@ class MerchandiseTest(TestCase):
 		self.failUnlessEqual(trans.amount, -total_price)
 		self.failUnlessEqual(account.balance, 500 - total_price)
 
+		# Test if the number of purchased items related to the transaction is
+		# correct:
+		pm_count = PurchasedItem.objects.filter(transaction=trans).count()
+		item_count = len(merchandise_list)
+		self.failUnlessEqual(pm_count, item_count)
+
 
 	def test_internal_purchase(self):
 		"""Test basic purchases (internal price)
@@ -105,6 +111,35 @@ class MerchandiseTest(TestCase):
 		account = Account.objects.get(id=account.id) # Force update
 		self.failUnlessEqual(trans, None)
 		self.failUnlessEqual(account.balance, 3)
+
+
+	def test_against_cascade_deletion_of_purchaseditem(self):
+		"""Test that purchased items are not removed when related merchandise
+		is
+
+		"""
+		account = Account(name="tset")
+		account.deposit(500) # Depost issues the save routine
+		operator = None
+
+		m1 = Merchandise(name="m1", internal_price=3, ordinary_price=4)
+		m1.save()
+		m2 = Merchandise(name="m2", internal_price=2, ordinary_price=4)
+		m2.save()
+
+		# Test a basic purchase:
+		trans = buy_merchandise(account, [m1], operator)
+
+		# Test that transactions are not deleted when related merchandise is,
+		# and that backup information is stored to merchandise_tags and
+		# merchandise_name:
+		pm1_id = PurchasedItem.objects.get(transaction=trans).id
+		merchandise_name = m1.name[:30]
+		merchandise_tags = "|".join((unicode(t) for t in m1.tags.all()))[:30]
+		m1.delete()
+		pm1 = PurchasedItem.objects.get(id=pm1_id)
+		self.failUnlessEqual(pm1.merchandise_name, merchandise_name)
+		self.failUnlessEqual(pm1.merchandise_tags, merchandise_tags)
 
 
 

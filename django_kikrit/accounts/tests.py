@@ -154,11 +154,10 @@ class AccountTestCase(TestCase):
 		account = Account.objects.get(pk=1)
 		self.failUnlessEqual(account.balance, account_balance)
 
-		# Test that deposit fails:
+		# Test that deposits are still allowed:
 		trans_deposit = deposit_to_account(account, 200, operator)
-		self.failUnlessEqual(trans_deposit, None)
 		account = Account.objects.get(pk=1)
-		self.failUnlessEqual(account.balance, account_balance)
+		self.failUnlessEqual(account.balance, account_balance+200)
 
 
 

@@ -228,8 +228,8 @@ class Account(models.Model):
 			raise ValueError("'amount' must be an Integer greater then zero.")
 
 		# Inactive accounts can't be used:
-		if not self.is_active:
-			return False
+		#if not self.is_active:
+		#	return False
 
 		# Update balance and color:
 		self.balance += amount
