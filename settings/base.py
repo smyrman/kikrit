@@ -51,8 +51,8 @@ INSTALLED_APPS = (
 	'django_kikrit.accounts',
 	'django_kikrit.merchandise',
 	'django_kikrit.utils',
+	'django_kikrit.jquery_widgets',
 	'south',
-	'jquery_widgets',
 )
 
 RUNSERVER_PORT = '8081'
