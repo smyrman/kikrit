@@ -1,8 +1,9 @@
 from optparse import make_option
 
-from django.db import models, connections, DEFAULT_DB_ALIAS
+from django import db
 from django.core import management
 from django.core.management.base import BaseCommand
+from django import VERSION as DJANGO_VERSION
 
 from south import migration
 from south.models import MigrationHistory
@@ -71,8 +72,12 @@ def autoskip_first_migration(apps, **options):
 
 	"""
 	autoskip_apps = []
-	db = options.get('database', DEFAULT_DB_ALIAS)
-	connection = connections[db]
+	# Added Django 1.1 compatibility code:
+	if DJANGO_VERSION[:3] >= (1, 2, 0):
+		database = options.get('database', db.DEFAULT_DB_ALIAS)
+		connection = connections[database]
+	else:
+		connection = db.connection
 
 	# Get a list of installed tables:
 	tables = connection.introspection.table_names()
@@ -88,7 +93,7 @@ def autoskip_first_migration(apps, **options):
 
 		# If one of the app's models have a table in the  database, assume that
 		# the first migration should be skipped for app:
-		for model in models.get_models(models.get_app(app_label)):
+		for model in db.models.get_models(db.models.get_app(app_label)):
 			if model._meta.db_table in tables:
 				# If integrated to south, you probably want to append app
 				# instead of app_label :)
