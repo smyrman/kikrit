@@ -1,7 +1,0 @@
-# -*- coding: utf-8 -*-
-Main developers on KiKrit:
-
-	Sindre Røkenes Myren | smyrman -a- gmail com
-	Andreas Hopland Sperre | sperre -a- stud ntnu no
-
-

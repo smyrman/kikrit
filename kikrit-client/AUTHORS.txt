@@ -1,0 +1,7 @@
+# -*- coding: utf-8 -*-
+Main developers on KiKrit client:
+  Andreas Hopland Sperre | sperre -a- stud ntnu no
+  Sindre Røkenes Myren | smyrman -a- gmail com
+
+Code taken from other projects (Names referenced in the source code):
+  None so far.
