@@ -8,8 +8,8 @@
 from PyQt4 import QtCore, QtGui, QtWebKit
 
 import settings
-from qt_client.utils.key_emu import KeyEmulator
-from qt_client.utils.get_icons import getIcon
+from utils.key_emu import KeyEmulator
+from utils.get_icons import getIcon
 
 
 class AdminWidget(QtGui.QWidget):

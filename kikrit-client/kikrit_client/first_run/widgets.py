@@ -7,8 +7,8 @@
 
 from PyQt4 import QtCore, QtGui
 
-from qt_client.first_run.gui_components import InfoPage, ImportPage,\
-	ConfirmPage, SummaryPage
+from first_run.gui_components import InfoPage, ImportPage, ConfirmPage,\
+                                     SummaryPage
 
 
 class FirstRunWidget(QtGui.QWizard):

@@ -9,7 +9,7 @@ from PyQt4 import QtCore, QtGui
 from django_kikrit.merchandise.models import Merchandise
 from django_kikrit.accounts.models import RFIDCard
 
-from qt_client.utils.key_emu import KeyEmulator
+from utils.key_emu import KeyEmulator
 
 
 class DebugWidget(QtGui.QWidget):

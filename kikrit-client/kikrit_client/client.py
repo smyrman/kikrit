@@ -24,16 +24,11 @@ import os
 
 from PyQt4 import QtGui, QtCore
 
-PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
-sys.path.insert(0, PROJECT_ROOT)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
-from qt_client.main.widgets import MainWidget, DepositWidget
-from qt_client.admin.widgets import AdminWidget
-from qt_client.first_run.widgets import FirstRunWidget
-from qt_client.utils.widgets import DebugWidget
-from qt_client.utils.threads import RFIDThread
-
-import settings
+from main.widgets import MainWidget, DepositWidget
+from admin.widgets import AdminWidget
+from utils.widgets import DebugWidget
+from utils.threads import RFIDThread
+from first_run.widgets import FirstRunWidget
 
 
 def main():
@@ -42,23 +37,25 @@ def main():
 	# the qt app to be created.
 
 	if "--help" in sys.argv[1:]:
-		print __doc__
+		print __doc__.expandtabs(4)
 		return 0
 
 	if "--version" in sys.argv[1:]:
-		import version
-		print "KiKrit", version.KIKRIT_VERSION
-		print "Database revision", version.DATABASE_REVISION
+		from kikrit_client import get_version
+		print "KiKrit Client", get_version(short=False)
 		return 0
 
 	# --firstrun needs the qt. app to be created.
 	app = QtGui.QApplication(sys.argv)
 
-	db_exist = True
-	if settings.DATABASE_ENGINE == "sqlite3":
-		db_exist = os.path.isfile(settings.DATABASE_NAME)
+	do_firstrun = False
+	try:
+		import setings
+		do_firstrun = not os.path.isfile(settings.DATABASE_NAME)
+	except ImportError:
+		do_firstrun = True
 
-	if "--firstrun" in sys.argv[1:] or db_exist == False:
+	if "--firstrun" in sys.argv[1:] or do_firstrun:
 		first_run = FirstRunWidget()
 		first_run.setWindowTitle("KiKrit FirstRun Wizard")
 		first_run.setWindowIcon(QtGui.QIcon("graphics/favicon.png"))

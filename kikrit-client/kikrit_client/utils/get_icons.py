@@ -10,11 +10,11 @@ from ConfigParser import ConfigParser, NoOptionError
 
 from PyQt4 import QtGui
 
-from settings import PROJECT_ROOT, ICONS
+from utils.os import path4os
+import settings
 
 CFG = ConfigParser()
-ICONS = ICONS.replace('/', os.path.sep) # Make path Windows compatible
-CFG.read(ICONS)
+CFG.read(path4os(settings.ICONS))
 
 def getIcon(icon_name, size=16):
 	# GUARD: Empty name:
@@ -40,6 +40,3 @@ def getIcon(icon_name, size=16):
 		path = ""
 
 	return QtGui.QIcon(path)
-
-
-

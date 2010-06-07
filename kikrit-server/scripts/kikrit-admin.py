@@ -29,6 +29,7 @@ Available command argumets are:
     install   Install database (according to settings) and load initial data
     backup    Backup your database to a 'json fixture' in your bacup directory
     migrate   Migrate an outdated database to match the current KiKrit version
+	createsettings 'FILE' Create a settingsfile from settings template.
 
 """
 
@@ -170,6 +171,10 @@ def migrate(*args):
 		args += ('--no-initial-data',)
 	install(*args)
 
+
+def createsettings(*args):
+	"""This command creates bla bla bla..
+	"""
 
 def main():
 	os.chdir(PROJECT_ROOT)

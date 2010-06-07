@@ -1,0 +1,31 @@
+[server_connection]
+# If you have installed KiKrit Server localy on this machine without any
+# apache/webserver configuration, set this option to true.
+standalone = %(stand_alone)s
+
+# An url to your kikrit_server installation. If standalone is set to true, this
+# url should typically be 'http://localhost:8081/', where the protnumber (8081)
+# can be changed to something else if needed. If you connect to a remote
+# server, this setting should point to the base url for your kikrit_server
+# installation, i.e 'https://example.com/kikrit/' or
+# 'https://kikrit.example.com/'.
+server_url = %(server_url)s
+
+# Get this information from your KiKrit server's admin view (administrative
+# permissions required). If you are runing kikrit in standalone mode, this
+# settings can be ignored.
+client_id = %(client_id)s
+client_key = %(client_key)s
+
+[gadgets]
+# The device id of your RFID-reader
+rfid_device = /dev/
+
+[theme]
+# Customize the apperance of your KiKrit client. To make your own theme, copy
+# the file located in kikrit_client/themes/base to
+# ~/.config/kikirit/themes/your_theme, and do your modifications. Update
+# theme_name to be equal to your_theme.
+# Default:
+# theme_name = 'base'
+

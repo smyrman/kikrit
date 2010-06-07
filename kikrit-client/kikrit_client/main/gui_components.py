@@ -7,10 +7,12 @@
 
 from PyQt4 import QtCore, QtGui
 
-from settings import BALANCE_PAGE_TIME_SEC, MESSAGE_TIME_SEC
-from django_kikrit.accounts.models import BalanceImage
-from qt_client.utils.get_icons import getIcon
-from qt_client.main.models import MerchandiseListModel
+# FIXME: Replace all django_kikrit classes/functions with custom kikrit_client
+# ones.
+#from django_kikrit.accounts.models import BalanceImage
+from main.models import MerchandiseListModel
+from utils.get_icons import getIcon
+import settings
 
 
 class SearchLine(QtGui.QLineEdit):
@@ -126,7 +128,7 @@ class MessageLine(QtGui.QPushButton):
 	def post(self, txt, style):
 		self._setStyle(style)
 		self.setText(txt)
-		self.timer.start(MESSAGE_TIME_SEC*1000)
+		self.timer.start(settings.MESSAGE_TIME_SEC*1000)
 
 	def timeoutEvent(self):
 		self.timer.stop()
@@ -283,7 +285,7 @@ class BalancePage(QtGui.QWidget):
 		self.image.setScene(scene)
 
 		# Start timer:
-		self.timer.start(BALANCE_PAGE_TIME_SEC*1000)
+		self.timer.start(settings.BALANCE_PAGE_TIME_SEC*1000)
 
 		# Update parent index:
 		self.parentWidget().setCurrentWidget(self)
@@ -292,8 +294,3 @@ class BalancePage(QtGui.QWidget):
 	def timeoutEvent(self):
 		self.parentWidget().setCurrentIndex(self.reset_index)
 		self.timer.stop()
-
-
-
-
-

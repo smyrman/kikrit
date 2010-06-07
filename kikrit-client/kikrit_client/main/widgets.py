@@ -7,13 +7,15 @@
 
 from PyQt4 import QtCore, QtGui
 
-from django_kikrit.accounts.models import Account, RFIDCard
-from django_kikrit.merchandise.models import Merchandise, buy_merchandise
+# FIXME: Replace all django_kikrit classes/functions with custom kikrit_client
+# ones.
+#from django_kikrit.accounts.models import Account, RFIDCard
+#from django_kikrit.merchandise.models import Merchandise, buy_merchandise
 #from django_kikrit.accounts.models import deposit_to_account,\
 #	withdraw_from_account
-from qt_client.main.models import MerchandiseListModel
-from qt_client.main.gui_components import SearchLine, AmountLine, MessageLine,\
-		OrderPage, BalancePage
+from main.models import MerchandiseListModel
+from main.gui_components import SearchLine, AmountLine, MessageLine,\
+                                OrderPage, BalancePage
 
 
 class MainWidget(QtGui.QWidget):
@@ -401,5 +403,3 @@ class DepositWidget(QtGui.QWidget):
 			else:
 				self._reset()
 				self.balance_page.showPage(card.account)
-
-

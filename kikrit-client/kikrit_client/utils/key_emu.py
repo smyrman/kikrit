@@ -5,6 +5,9 @@
 # This file is part of KiKrit wich is distrebuted under GPLv3. See the file
 # COPYING.txt for more details.
 
+# TODO: This module can probably be replaced by PyQt's emit key signals. That
+# would make the client more likly to work on other OSes then Linux.
+
 from ctypes import CDLL
 Xtst = CDLL("libXtst.so.6")
 Xlib = CDLL("libX11.so.6")
