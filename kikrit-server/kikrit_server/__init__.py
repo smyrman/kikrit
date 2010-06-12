@@ -20,3 +20,5 @@ def get_version(short=False):
 		version += ' pre-alpha'
 	else:
 		version += " %s %d" % version_info[3:]
+
+	return version

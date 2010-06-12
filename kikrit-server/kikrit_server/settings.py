@@ -10,11 +10,11 @@ Note that ALL settings in this file CAN be overriden in the user defined
 settings file. Event those that shouldn't be (i.e. INSTALLED_APPS).
 
 Also note that some user defined settings modifies the default settings:
-  DEBUG ; affects TEMPLATE_DEBUG, SERVE_STATIC_MEDIA
-  BASE_URL ; affects MEDIA_URL, ADMIN_MEDIA_PREFIX, UPLOAD_URL
-  MEDIA_URL ; affects UPLOAD_URL
-  STANDALONE ; affects SERVE_STATIC_MEDIA, CLIENT_AUTHENTICATION_LEVEL,
-               UPLOAD_PATH
+  DEBUG: affects TEMPLATE_DEBUG, SERVE_STATIC_MEDIA
+  BASE_URL: affects MEDIA_URL, ADMIN_MEDIA_PREFIX, UPLOAD_URL
+  MEDIA_URL: affects UPLOAD_URL
+  STANDALONE: affects SERVE_STATIC_MEDIA, CLIENT_AUTHENTICATION_LEVEL,
+              UPLOAD_PATH
 """
 
 import os
@@ -25,11 +25,11 @@ from imp import load_source
 from utils.paths import path4os
 
 
-PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 2)[0]
+PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 1)[0]
 
 ## FIND (USER DEFINED) CONFIG FILE ##
 # Search for server_settings.py and import module as cfg:
-for path in (PROJECT_ROOT, '~user/config/kikrit', '/etc/kikrit'):
+for path in (PROJECT_ROOT+'/..', '~user/config/kikrit', '/etc/kikrit'):
 	file_name = path4os(path+'/server_settings.py')
 	if os.path.exists(file_name):
 		CONFIG_DIR = path4os(path)
@@ -84,8 +84,9 @@ SITE_ID = 1
 # prefix all urls:
 BASE_URL = cfg_get('BASE_URL', '/')
 
-MEDIA_ROOT = path4os(PROJECT_ROOT+'/kikrit_server/media')
+MEDIA_ROOT = path4os(PROJECT_ROOT+'/media')
 UPLOAD_PATH = cfg_get('UPLOAD_PATH', path4os(MEDIA_ROOT+'/upload'))
+BACKUP_DIR = path4os(CONFIG_DIR+'/backup')
 
 MEDIA_URL = cfg_get('MEDIA_URL', BASE_URL+'media/')
 UPLOAD_URL = MEDIA_URL + '/upload/'

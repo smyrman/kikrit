@@ -1,5 +1,2 @@
 *.pyc
-*.svn/
-kikrit_prod.db
-django_kikrit/media/upload
 pyenv

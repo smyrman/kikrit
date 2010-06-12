@@ -1,5 +1,5 @@
 /* -*- coding: utf-8 -*- */
-/* -*- vim:set filetype=css -*- */
+/* vim: set syntax=css: */
 
 MessageLine {
 	border-width: 1px;
@@ -31,4 +31,3 @@ QLabel#balancePage {
 MainWidget QAbstractButton, QLineEdit, QLabel, QListView {
 	font-size: 20px;
 }
-
