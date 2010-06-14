@@ -22,7 +22,7 @@ class Command(NoArgsCommand):
 			dest='load_initial_data', default=True,
 			help="dont load the default data into the database"),
 		make_option('--noinput', action='store_false', dest='interactive',
-			default=False, help="Don't ask the user for any input"),
+			default=True, help="Don't ask the user for any input"),
 		)
 
 	help = "A wrapper to kikrit_server/manage.py's 'syncdb', 'autofake', "\

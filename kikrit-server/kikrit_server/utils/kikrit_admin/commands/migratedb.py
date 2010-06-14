@@ -18,7 +18,7 @@ class Command(NoArgsCommand):
 			dest='load_initial_data', default=False,
 			help="Load default data into the database."),
 		make_option('--noinput', action='store_false', dest='interactive',
-			default=False, help="Don't ask the user for any input"),
+			default=True, help="Don't ask the user for any input"),
 		)
 
 	help = "Preforms exacly the same steps as the 'installdb' commnand; "\

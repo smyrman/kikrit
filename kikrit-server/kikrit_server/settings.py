@@ -1,6 +1,6 @@
 """
 This module includes the default settings for kikrit_server. Any user defined
-settings should be configured in one of PROJECT_ROOT/server_settings.py,
+settings should be configured in one of PROJECT_ROOT/../server_settings.py,
 ~/config/kikrit/server_settings.py, or /etc/kikrit/server_settings.py. On
 Loldos (a.k.a. Windows) this paths will be slightly different. I.e
 '/etc/kikrit/' will be replaced by something like:
@@ -13,8 +13,8 @@ Also note that some user defined settings modifies the default settings:
   DEBUG: affects TEMPLATE_DEBUG, SERVE_STATIC_MEDIA
   BASE_URL: affects MEDIA_URL, ADMIN_MEDIA_PREFIX, UPLOAD_URL
   MEDIA_URL: affects UPLOAD_URL
-  STANDALONE: affects SERVE_STATIC_MEDIA, CLIENT_AUTHENTICATION_LEVEL,
-              UPLOAD_PATH
+  STANDALONE_CLIENT: affects SERVE_STATIC_MEDIA, CLIENT_AUTHENTICATION_,
+                     UPLOAD_PATH
 """
 
 import os
@@ -24,75 +24,9 @@ from imp import load_source
 
 from utils.paths import path4os
 
-
 PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 1)[0]
 
-## FIND (USER DEFINED) CONFIG FILE ##
-# Search for server_settings.py and import module as cfg:
-for path in (PROJECT_ROOT+'/..', '~user/config/kikrit', '/etc/kikrit'):
-	file_name = path4os(path+'/server_settings.py')
-	if os.path.exists(file_name):
-		CONFIG_DIR = path4os(path)
-		CONFIG_FILE = file_name
-		# import CONFIG_FILE as cfg:
-		cfg = load_source('cfg', CONFIG_FILE)
-		break
-del file_name
-
-def cfg_get(attr, default=None):
-	"""Small helper function to get user defined settings or defaults"""
-	return getattr(cfg, attr, default)
-
-## DEBUG ##
-DEBUG = cfg_get('DEBUG', False)
-TEMPLATE_DEBUG = DEBUG
-
-## RUNNING IN LOCALHOST MODE ##
-# If STANDALONE is True, that implies that the server and client are runing on
-# the same machine. It also implies that the server wil run using Django's
-# development server (./manage.py runserver), and that it will only be
-# accesible to localhost.
-
-STANDALONE = cfg_get('STANDALONE', False)
-SERVE_STATIC_MEDIA = STANDALONE or DEBUG
-
-# Clinet authentication levels:
-# 0 - No authentication
-# 1 - CLIENT_KEY needed
-CLIENT_AUTHENTICATON_lEVEL = 1
-if STANDALONE:
-	CLIENT_AUTHENTICATON_LEVEL = 0
-
-### LOCALE ##
-# Local time zone for this installation. Choices can be found here:
-# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
-# although not all choices may be available on all operating systems.
-# If running in a Windows environment this must be set to the same as your
-# system time zone.
-TIME_ZONE = 'Europe/Oslo'
-
-# Language code for this installation. All choices can be found here:
-# http://www.i18nguy.com/unicode/language-identifiers.html
-LANGUAGE_CODE = 'en-us'
-
-USE_I18N = False
-
-
-## URLS AND PATHS ##
-SITE_ID = 1
-
-# prefix all urls:
-BASE_URL = cfg_get('BASE_URL', '/')
-
-MEDIA_ROOT = path4os(PROJECT_ROOT+'/media')
-UPLOAD_PATH = cfg_get('UPLOAD_PATH', path4os(MEDIA_ROOT+'/upload'))
-BACKUP_DIR = path4os(CONFIG_DIR+'/backup')
-
-MEDIA_URL = cfg_get('MEDIA_URL', BASE_URL+'media/')
-UPLOAD_URL = MEDIA_URL + '/upload/'
-ADMIN_MEDIA_PREFIX = BASE_URL + 'media_admin/'
-
-
+## SOME ASORTED DJANGO SETTINGS ##
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
@@ -125,13 +59,89 @@ INSTALLED_APPS = (
 	'south',
 )
 
-## OVERIDE DEFAULTS ##
 
-# The following is eqivalent to something like 'from server_settings import *':
-regex = re.compile(r'^__.*__$')
-for attr in dir(cfg):
-	# Skip attrs like __file__, __bultin__, etc:
-	if regex.match(attr) or attr == 'regex':
-		continue
-	exec('%s = cfg.%s' % (attr, attr))
-del regex, cfg, cfg_get
+### LOCALE ##
+USE_I18N = False
+
+# Local time zone for this installation. Choices can be found here:
+# http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
+# although not all choices may be available on all operating systems.
+# If running in a Windows environment this must be set to the same as your
+# system time zone.
+TIME_ZONE = None
+
+# Language code for this installation. All choices can be found here:
+# http://www.i18nguy.com/unicode/language-identifiers.html
+LANGUAGE_CODE = 'en-us'
+
+
+## FIND (USER DEFINED) CONFIG FILE ##
+# Search for server_settings.py and import module as cfg:
+cfg = None
+for path in (PROJECT_ROOT+'/..', '~user/config/kikrit', '/etc/kikrit'):
+	file_name = path4os(path+'/server_settings.py')
+	if os.path.exists(file_name):
+		CONFIG_DIR = path4os(path)
+		CONFIG_FILE = file_name
+		# import CONFIG_FILE as cfg:
+		cfg = load_source('cfg', CONFIG_FILE)
+		break
+del file_name
+
+# Continue only if cfg was found.
+if not cfg:
+	# If not, souh must be removed from INSTALLED_APPS to allow scripts like
+	# kikrit-admin to run. (South gives an error if the database is not
+	# configured)
+	INSTALLED_APPS = INSTALLED_APPS[:-1]
+	# Also, these variables must be set to some dummy values:
+	UPLOAD_PATH = '.'
+else:
+	def cfg_get(attr, default):
+		"""Small helper function to get user defined settings or defaults"""
+		return getattr(cfg, attr, default)
+
+
+	## DEBUG ##
+	DEBUG = cfg_get('DEBUG', False)
+	TEMPLATE_DEBUG = DEBUG
+
+	## RUNNING IN LOCALHOST MODE ##
+	# If STANDALONE_CLIENT is True, that implies that the server and client are
+	# runing on the same machine. It also implies that the server wil run using
+	# Django's development server (./manage.py runserver), and that it will
+	# only be accesible to localhost.
+	STANDALONE_CLIENT = cfg_get('STANDALONE_CLIENT', False)
+	SERVE_STATIC_MEDIA = (STANDALONE_CLIENT or DEBUG)
+
+	# Clinet authentication for api urls:
+	# False: No authentication needed
+	# True: CLIENT_KEY needed
+	CLIENT_AUTHENTICATON = (not STANDALONE_CLIENT)
+
+	## URLS AND PATHS ##
+	SITE_ID = 1
+
+	# prefix all urls:
+	BASE_URL = cfg_get('BASE_URL', '/')
+
+	MEDIA_ROOT = path4os(PROJECT_ROOT+'/media')
+	UPLOAD_PATH = cfg_get('UPLOAD_PATH', path4os(MEDIA_ROOT+'/upload'))
+	BACKUP_DIR = path4os(CONFIG_DIR+'/backup')
+
+	MEDIA_URL = cfg_get('MEDIA_URL', BASE_URL+'media/')
+	UPLOAD_URL = MEDIA_URL + '/upload/'
+	ADMIN_MEDIA_PREFIX = BASE_URL + 'media_admin/'
+
+
+	## OVERIDE DEFAULTS ##
+
+	# The following is equivalent to 'from server_settings import *' (but works
+	# for a file that is not on the python path):
+	regex = re.compile(r'^__.*__$')
+	for attr in dir(cfg):
+		# Skip attrs like __file__, __bultin__, etc:
+		if regex.match(attr) or attr == 'regex':
+			continue
+		exec('%s = cfg.%s' % (attr, attr))
+	del regex, cfg, cfg_get
