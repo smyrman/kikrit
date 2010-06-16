@@ -10,7 +10,7 @@ from ConfigParser import ConfigParser, NoOptionError
 
 from PyQt4 import QtGui
 
-from utils.os import path4os
+from utils.paths import path4os
 import settings
 
 CFG = ConfigParser()

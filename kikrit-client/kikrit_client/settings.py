@@ -14,9 +14,10 @@ PROJECT_ROOT = os.path.abspath(__file__).rsplit(os.path.sep, 1)[0]
 # Search for client_settings.py file and add configdir to path:
 for path in (PROJECT_ROOT, '~user/config/kikrit', '/etc/kikrit'):
 	cfg_file = path4os(path+'/client_settings.cfg')
-	if os.path.exist(cfg_file):
+	if os.path.exists(cfg_file):
 		CONFIG_DIR = path4os(path)
 		CONFIG_FILE = cfg_file
+		# FIXME: import settings
 		break
 del cfg_file
 
