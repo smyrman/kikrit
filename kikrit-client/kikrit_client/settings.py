@@ -18,6 +18,7 @@ for path in (PROJECT_ROOT, '~user/config/kikrit', '/etc/kikrit'):
 	if os.path.exists(cfg_file):
 		CONFIG_DIR = path4os(path)
 		CONFIG_FILE = cfg_file
+		# FIXME: import settings
 		break
 del cfg_file
 

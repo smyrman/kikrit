@@ -1,0 +1,4 @@
+*.pyc
+server_settings.py
+kikrit_prod.db
+backup
