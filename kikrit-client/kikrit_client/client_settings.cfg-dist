@@ -4,11 +4,10 @@
 standalone = %(stand_alone)s
 
 # An url to your kikrit_server installation. If standalone is set to true, this
-# url should typically be 'http://localhost:8081/', where the protnumber (8081)
-# can be changed to something else if needed. If you connect to a remote
-# server, this setting should point to the base url for your kikrit_server
-# installation, i.e 'https://example.com/kikrit/' or
-# 'https://kikrit.example.com/'.
+# url should typically be 'http://localhost:8081/', where(8081) is the default
+# portnumber. If you connect to a remote server, this setting should point to
+# the base url for your kikrit_server.
+# server_url = 'https://example.com/kikrit/'
 server_url = %(server_url)s
 
 # Get this information from your KiKrit server's admin view (administrative

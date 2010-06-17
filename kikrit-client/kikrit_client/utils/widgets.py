@@ -6,8 +6,9 @@
 # COPYING.txt for more details.
 
 from PyQt4 import QtCore, QtGui
-from django_kikrit.merchandise.models import Merchandise
-from django_kikrit.accounts.models import RFIDCard
+# TODO remove
+#from django_kikrit.merchandise.models import Merchandise
+#from django_kikrit.accounts.models import RFIDCard
 
 from utils.key_emu import KeyEmulator
 

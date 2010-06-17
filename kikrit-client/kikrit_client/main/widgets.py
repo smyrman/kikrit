@@ -13,17 +13,16 @@ from PyQt4 import QtCore, QtGui
 #from django_kikrit.merchandise.models import Merchandise, buy_merchandise
 #from django_kikrit.accounts.models import deposit_to_account,\
 #	withdraw_from_account
-from main.models import MerchandiseListModel
+from main.models import Merchandise, MerchandiseListModel
 from main.gui_components import SearchLine, AmountLine, MessageLine,\
                                 OrderPage, BalancePage
 
 
 class MainWidget(QtGui.QWidget):
-	"""The main tab, featuring the KiKrit client GUI.
-
-	"""
+	"""The main tab, featuring the KiKrit client GUI."""
 	search_line = None
 	merchandise_list = None
+	merchandise_model= None
 
 	stack = None
 	order_page = None
@@ -43,8 +42,8 @@ class MainWidget(QtGui.QWidget):
 		self.search_line.grabKeyboard()
 
 		self.merchandise_list = QtGui.QListView(self)
-		self.merchandise_list.setModel(MerchandiseListModel(self._getItems(),
-			self))
+		self.merchandise_model = MerchandiseListModel( self._getItems(), self)
+		self.merchandise_list.setModel(self.merchandise_model)
 		self.merchandise_list.setSelectionMode(QtGui.QListView.SingleSelection)
 
 		self.stack = QtGui.QStackedWidget()
@@ -104,14 +103,13 @@ class MainWidget(QtGui.QWidget):
 		if parent == None or parent.currentWidget() == self:
 			return True
 		return False
-
+	
 	def _getItems(self):
 		""" Queries the database for all Merchandise objects, and return them
 		as one large list.
 
 		"""
-		return list(Merchandise.objects.all())
-
+		return [Merchandise("<xml>", self)] # TODO xml
 
 	def _setSelected(self, list_view, new_index=None, next=False):
 		"""Takes a QListView object, and int and a bool. Changes selection to
@@ -223,7 +221,7 @@ class MainWidget(QtGui.QWidget):
 
 	def f5Pressed(self):
 		indexes = self.merchandise_list.selectedIndexes()
-		self.merchandise_list.model().setAllData(self._getItems())
+		self.merchandise_list.model().update()
 		self.merchandise_list.model().filter(u"")
 		filter_str = self.search_line.text()
 		self.merchandise_list.model().filter(filter_str)
@@ -266,6 +264,9 @@ class MainWidget(QtGui.QWidget):
 						self.msg.STYLE_ERROR)
 
 			self.balance_page.showPage(account)
+
+
+
 
 
 
