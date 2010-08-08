@@ -10,11 +10,10 @@ from ConfigParser import ConfigParser, NoOptionError
 
 from PyQt4 import QtGui
 
-from utils.os import path4os
+from utils.paths import path4os
 import settings
 
 CFG = ConfigParser()
-CFG.read(path4os(settings.ICONS))
 
 def getIcon(icon_name, size=16):
 	# GUARD: Empty name:
@@ -33,9 +32,9 @@ def getIcon(icon_name, size=16):
 	# Get icon path:
 	try:
 		icon = CFG.get(section, icon_name).replace('/', os.path.sep)
-		path = os.path.join(os.path.abspath(os.path.dirname(ICONS)), icon)
+		path = os.path.join(os.path.abspath(os.path.dirname(settings.ICONS)), icon)
 	except NoOptionError:
-		print "DEBUG: option '%s' not found in '%s'" % (icon_name, ICONS)
+		print "DEBUG: option '%s' not found in '%s'" % (icon_name, settings.ICONS)
 		print "DEBUG: using section '%s'" % section
 		path = ""
 
