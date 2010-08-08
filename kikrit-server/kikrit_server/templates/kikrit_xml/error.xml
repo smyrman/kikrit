@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kikrit version="1.0">
+<head>
+	<status>{{ status }}</status>
+	<msg>{{ msg }}</msg>
+</head>
+<body>
+</body>
+</kikrit>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<kikrit version="1.0">
+<head>
+	<status>000</status>
+	<msg>OK</msg>
+    {% blcok extra_head %}{% endblock %}
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</kikrit>

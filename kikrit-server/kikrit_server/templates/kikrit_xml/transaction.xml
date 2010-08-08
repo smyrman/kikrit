@@ -1,0 +1,11 @@
+{% extend xml_protocol/base.html %}
+
+{% block body %}
+	<transaction>
+		<amount type="decimal">{{transaction.amount}}</amount>
+	</transaction>
+	<account name="{{account.full_name}}">
+		{% if show_balance %}<balance type="decimal">{{account.balance}}</balance>{% endif %}
+		<color type="string/color">{{acount.color_as_str}}</color>
+	</transaction>
+{% endblock %}
