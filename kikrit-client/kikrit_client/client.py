@@ -50,17 +50,22 @@ def main():
 
 	do_firstrun = False
 	try:
-		import setings
-		do_firstrun = not os.path.isfile(settings.DATABASE_NAME)
+		import settings
+		do_firstrun = not os.path.isfile(settings.CONFIG_FILE)
 	except ImportError:
 		do_firstrun = True
-
+	
+	"""
+	# TODO first run wizard is broken after client/server separation,
+	this wizard should not settup the db itself, only a pointer to it,
+	pluss db passwords etc.
 	if "--firstrun" in sys.argv[1:] or do_firstrun:
 		first_run = FirstRunWidget()
 		first_run.setWindowTitle("KiKrit FirstRun Wizard")
 		first_run.setWindowIcon(QtGui.QIcon("graphics/favicon.png"))
 		first_run.show()
 		return app.exec_()
+	"""
 
 	# Splash:
 	splash = QtGui.QSplashScreen(QtGui.QPixmap(settings.SPLASH_SCREEN))

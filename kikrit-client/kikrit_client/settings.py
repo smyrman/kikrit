@@ -6,6 +6,7 @@ Settings modulde for kikrit_client.
 import os
 import sys
 
+# Is this realy needed? windows understands /, as the dir separator...
 from utils.paths import path4os
 
 
@@ -22,6 +23,7 @@ for path in (PROJECT_ROOT, '~user/config/kikrit', '/etc/kikrit'):
 del cfg_file
 
 # FIXME: Actually get stuff from cfg file.
+CONFIG_FILE = PROJECT_ROOT + '/client_settings.cfg-dist'
 
 # URLS for the admin
 RUNSERVER_PORT = '8081'
@@ -33,5 +35,5 @@ RFID_DEVICE = "/dev/ttyS0"
 BALANCE_PAGE_TIME_SEC = 5
 MESSAGE_TIME_SEC = 5
 
-STYLE_SHEET = path4os(PROJECT_ROOT + "/qt_client/styles/base/style.qss")
-ICONS = path4os(PROJECT_ROOT + "/qt_client/styles/base/icons.cfg")
+STYLE_SHEET = path4os(PROJECT_ROOT + "/styles/base/style.qss")
+ICONS = path4os(PROJECT_ROOT + "/styles/base/icons.cfg")

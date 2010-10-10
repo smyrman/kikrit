@@ -21,6 +21,7 @@ urlpatterns = patterns('',
 	#p_url(r'^logout/', logout_view),
 	p_url(r'^admin/', include(admin.site.urls)),
 	p_url(r'^jqw/', include('jquery_widgets.urls', namespace='jquery-widgets')),
+	p_url(r'^kikrit-xml/', include('kikrit_xml.urls', namespace='kikrit-xml')),
 )
 
 # In debug or runserver mode (), serve static media:

@@ -5,8 +5,23 @@
 # This file is part of KiKrit wich is distrebuted under GPLv3. See the file
 # COPYING.txt for more details.
 
-from PyQt4 import QtCore
+from PyQt4 import QtCore, QtGui
 
+
+class Merchandise():
+	name = ""
+	ordinary_price = 0
+	internal_price = 0
+	dbId = 0
+	ean = 0
+	tags = ""
+
+	def __init__(self, xml, parent=None):
+		""" xml = <merchandise name='Hansa' id='1'>...</merchandise> """
+		self.name = "test"
+
+	def show(self):
+		return QtCore.QVariant(self.name)
 
 class MerchandiseListModel(QtCore.QAbstractListModel):
 	items = []
@@ -30,23 +45,21 @@ class MerchandiseListModel(QtCore.QAbstractListModel):
 
 	def data(self, index, role):
 		if index.isValid() and role == QtCore.Qt.DisplayRole:
-			item = self.items[index.row()]
-			return QtCore.QVariant(item.__unicode__())
+			return self.items[index.row()].show()
 		else:
 			return QtCore.QVariant()
 
 
 	def filter(self, filter_str):
-		"""Reduce items to only list those that match the filter_str
-
-		"""
+		"""Reduce items to only list those that match the filter_str"""
+		# TODO fix django shit
 		if self.last_filter_str in filter_str:
 			filter_items = self.items
 		else:
 			filter_items = self.all_items
 
 		self.last_filter_str = filter_str
-		self.items = [item for item in filter_items if item.filter(filter_str)]
+		# self.items = [item for item in filter_items if item.filter(filter_str)]
 		self.reset()
 
 
@@ -73,9 +86,7 @@ class MerchandiseListModel(QtCore.QAbstractListModel):
 
 
 	def setData(self, new_list):
-		"""replace old list with new list
-
-		"""
+		"""replace old list with new list"""
 		self.items = new_list
 		self.reset()
 
