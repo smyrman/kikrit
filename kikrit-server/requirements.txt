@@ -1,4 +1,4 @@
-#django>=1.1
--e svn+http://code.djangoproject.com/svn/django/trunk/#egg=django
+Django>=1.2.3
+#-e svn+http://code.djangoproject.com/svn/django/trunk/#egg=django
 South>=0.7.1
 PIL

@@ -16,7 +16,7 @@ def get_version(short=False):
 
 	if short:
 		mapping = { 'alpha':'a', 'beta':'b', 'rc':'rc', 'final':''}
-		version += '%s%d' % (mappiing[version_info[3]], version_info[4])
+		version += '%s%d' % (mapping[version_info[3]], version_info[4])
 	elif version_info[3] == 'alpha' and version_info[4] == 0:
 		version += ' pre-alpha'
 	else:

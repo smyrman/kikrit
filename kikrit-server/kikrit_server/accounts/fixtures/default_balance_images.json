@@ -1,7 +1,7 @@
 [{"pk": 1, "model": "accounts.balanceimage", "fields": {
     "maximum_balance": null,
     "minimum_balance": null,
-    "image": "django_kikrit/media/upload/white.png",
+    "image": "kikrit_server/media/img/white.png",
     "white": true,
     "grey": false,
     "black": false
@@ -11,7 +11,7 @@
 {"pk": 2, "model": "accounts.balanceimage", "fields": {
     "maximum_balance": null,
     "minimum_balance": null,
-    "image": "django_kikrit/media/upload/grey.png",
+    "image": "kikrit_server/media/img/grey.png",
     "white": false,
     "grey": true,
     "black": false
@@ -21,7 +21,7 @@
 {"pk": 3, "model": "accounts.balanceimage", "fields": {
     "maximum_balance": null,
     "minimum_balance": null,
-    "image": "django_kikrit/media/upload/black.png",
+    "image": "kikrit_server/media/img/black.png",
     "white": false,
     "grey": false,
     "black": true
