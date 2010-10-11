@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import os
-from distutils2.core import setup
+from distutils2.core import setup, find_packages
 from kikrit_server import get_version
 
 def recursive_listdir(package, cur_dir):
@@ -23,12 +23,12 @@ setup(name='kikrit-server',
       author_email='smyrman@gmail.com',
       home_page='http://github.com/smyrman/kikrit',
       summary='A credit system created for student bars (server)',
-      description=open('README.rst').read(),
+      description=open('README').read(),
       keywords=['credit', 'merchandise', 'bar', 'kikrit'],
       license='GPLv3',
       platforms='Linux',
       requires=['Django>=1.2.3', 'South>=0.7.1', 'PIL'],
-      packages=['kikrit_server'],
+      packages=find_packages(),
       package_data={'kikrit_server':
           recursive_listdir('kikrit_server','media') +
           recursive_listdir('kikrit_server','templates') +

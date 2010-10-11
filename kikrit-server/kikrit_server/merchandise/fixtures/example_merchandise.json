@@ -1,0 +1,53 @@
+[
+  {
+    "pk": 1, 
+    "model": "merchandise.merchandisetag", 
+    "fields": {
+      "name": "beer", 
+      "description": ""
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "merchandise.merchandisetag", 
+    "fields": {
+      "name": "spirits", 
+      "description": ""
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "merchandise.merchandisetag", 
+    "fields": {
+      "name": "whiskey", 
+      "description": ""
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "merchandise.merchandise", 
+    "fields": {
+      "ordinary_price": 25, 
+      "ean": null, 
+      "name": "Heiniken 0.5L", 
+      "tags": [
+        1
+      ], 
+      "internal_price": 23
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "merchandise.merchandise", 
+    "fields": {
+      "ordinary_price": 30, 
+      "ean": null, 
+      "name": "Springbank Whiskey (10 years)", 
+      "tags": [
+        3, 
+        2
+      ], 
+      "internal_price": 25
+    }
+  }
+]
