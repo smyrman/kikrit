@@ -40,6 +40,9 @@ class Merchandise(models.Model):
 		return u"%s: %d,- (%d,-)" % (self.name, self.ordinary_price,
 				self.internal_price)
 
+	def generate_filter_str(self):
+		self.filter_str = u"|".join((self.name, unicode(self.ean))+
+			tuple((unicode(tag) for tag in self.tags.all()))).lower()
 
 	def save(self, *args, **kw):
 		# If strings are saved to the database as empty instead of NULL, this

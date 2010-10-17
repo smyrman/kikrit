@@ -38,7 +38,7 @@ class MainWidget(QtGui.QWidget):
 
 		# Views:
 		self.search_line = SearchLine(self)
-		self.search_line.grabKeyboard()
+		#self.search_line.grabKeyboard()
 
 		self.merchandise_list = QtGui.QListView(self)
 		self.merchandise_list.setModel(MerchandiseListModel(self._getItems(),
@@ -142,10 +142,10 @@ class MainWidget(QtGui.QWidget):
 
 	def tabChanged(self, index):
 		if self.parentWidget().widget(index) == self:
-			self.search_line.grabKeyboard()
+			#self.search_line.grabKeyboard()
 			self.f5Pressed() # Re-read merchandise from db.
 		else:
-			self.search_line.releaseKeyboard()
+			#self.search_line.releaseKeyboard()
 
 
 	def addClicked(self):

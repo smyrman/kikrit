@@ -7,7 +7,6 @@
 
 from PyQt4 import QtCore
 
-
 class MerchandiseListModel(QtCore.QAbstractListModel):
 	items = []
 	all_items = []
@@ -16,8 +15,7 @@ class MerchandiseListModel(QtCore.QAbstractListModel):
 
 	def __init__(self, items=[], parent=None):
 		QtCore.QAbstractListModel.__init__(self, parent)
-		self.items = items
-		self.all_items = items
+		self.setAllData(items)
 
 
 	def rowCount(self, parent=QtCore.QModelIndex()):
@@ -46,7 +44,9 @@ class MerchandiseListModel(QtCore.QAbstractListModel):
 			filter_items = self.all_items
 
 		self.last_filter_str = filter_str
-		self.items = [item for item in filter_items if item.filter(filter_str)]
+		filter_str = unicode(filter_str).lower()
+		self.items = [item for item in filter_items if filter_str in
+				item.filter_str]
 		self.reset()
 
 
@@ -67,8 +67,11 @@ class MerchandiseListModel(QtCore.QAbstractListModel):
 
 
 	def setAllData(self, new_list):
+		for item in new_list:
+			item.generate_filter_str()
 		self.all_items = new_list
 		self.items = new_list
+
 		self.reset()
 
 

@@ -121,7 +121,9 @@ def install(*args):
 		exit(1)
 
 	management.call_command('syncdb', interactive=interactive,)
-	management.call_command('safe_migration', interactive=interactive,
+	management.call_command('autofake', interactive=interactive,
+			autoskip=True, no_initial_data=no_initial_data)
+	management.call_command('migrate', interactive=interactive,
 			autoskip=True, no_initial_data=no_initial_data)
 	# If not
 
