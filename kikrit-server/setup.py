@@ -32,6 +32,7 @@ setup(name='kikrit-server',
       package_data={'kikrit_server':
           recursive_listdir('kikrit_server','media') +
           recursive_listdir('kikrit_server','templates') +
+          recursive_listdir('kikrit_server','jquery_widgets/templates') +
           recursive_listdir('kikrit_server','accounts/fixtures') +
           recursive_listdir('kikrit_server','merchandise/fixtures')
           },

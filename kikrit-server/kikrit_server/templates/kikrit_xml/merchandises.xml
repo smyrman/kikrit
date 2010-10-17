@@ -1,0 +1,14 @@
+{% extends "kikrit_xml/base.xml" %}
+
+{% block body %}
+	<merchandises>
+		{% for merchandise in merchandises %}
+		<merchandise name="{{merchandise.name}}" id="{{merchandise.id}}">
+			{% if merchandise.ean != None %}<ean type="string">{{merchandise.ean}}</ean>
+			{% endif %}{% if merchandise.ordinary_price != None %}<ordinary_price type="decimal">{{merchandise.ordinary_price}}</ordinary_price>
+			{% endif %}{% if merchandise.internal_price != None %}<internal_price type="deciaml">{{merchandise.internal_price}}</internal_price>
+			{% endif %}<tags type="string">{{merchandise.tags_as_csv}}</tags>
+		</merchandise>
+		{% endfor %}
+	</merchandises>
+{% endblock %}

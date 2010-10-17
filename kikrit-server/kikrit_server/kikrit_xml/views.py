@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-# Create your views here.
-from django.shortcuts import render_to_resoponse
 
-from accounts import RFIDCard, Account, deposit_to_account,\
+from django.shortcuts import render_to_response
+
+from accounts.models import RFIDCard, Account, deposit_to_account,\
 		withdraw_from_account, purchase_from_account
-from merchnadise import Merchnadise, buy_merchandise
+from merchandise.models import Merchandise, buy_merchandise
 
 def error(status):
 	MSGS = {
@@ -30,14 +30,14 @@ def error(status):
 # FIXME: INsert clinet authentication decorators for all functions except
 # error.
 
-def merchandises(request, post_str):
+def merchandises(request, post_str=None):
 	# Render:
 	t = "kikrit_xml/merchandises.xml"
 	d = {"merchandises": Merchandise.objects.all()}
 	return render_to_response(t, d)
 
 
-def account(request, post_str):
+def account(request, post_str=None):
 	# Get account:
 	account = None
 	if "rfid" in request.POST.keys():

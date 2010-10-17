@@ -55,8 +55,8 @@ class Merchandise(models.Model):
 			# Generate backup information for purchased item, and 'cut it
 			# loose':
 			PurchasedItem.objects.filter(merchandise=self).update(merchandise=None,
-					merchandise_name=self.name[:30], merchandise_tags="|".join(
-					(unicode(t) for t in self.tags.all()))[:30])
+					merchandise_name=self.name[:30], merchandise_tags=",".join(
+						(unicode(t) for t in self.tags.all()))[:30])
 		super(Merchandise, self).save(**kwargs)
 
 
@@ -76,6 +76,10 @@ class Merchandise(models.Model):
 				return True
 
 		return False
+
+	def tags_as_csv(self):
+		"""Return all tags as comma seperated list of strings"""
+		return ",".join((tag.name for tag in self.tags.all()))
 
 
 
