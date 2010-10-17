@@ -146,7 +146,7 @@ class MainWidget(QtGui.QWidget):
 			self.f5Pressed() # Re-read merchandise from db.
 		else:
 			#self.search_line.releaseKeyboard()
-
+			pass
 
 	def addClicked(self):
 		"""Called when the user presses the add-button"""
