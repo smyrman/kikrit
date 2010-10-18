@@ -6,7 +6,7 @@
 # COPYING.txt for more details.
 
 from datetime import datetime, timedelta
-from random import random
+from random import randint
 from os.path import sep as path_sep
 
 from django.db import models
@@ -40,29 +40,19 @@ class LimitGroup(models.Model):
 
 
 # Monkey patch the User not to do cascade delete accounts and transactions:
-def user_delete(self, preserve_transactions=True, preserve_account=False,
-		**kwargs):
+def user_delete(self):
 	"""Extended delete function where you can opt to preserve transactions and
 	account.
 	"""
 	try:
-		account = self.account
-	except Account.DoesNotExist:
-		account = None
-
-	if preserve_transactions:
-		Transaction.objects.filter(responsible=self).update(responsible=None,
-				responsible_name=self.username)
-
-	if account and preserve_account:
 		self.account.user = None
 		self.account.save()
-		super(User, self).delete(**kwargs)
-	elif account:
-		# Make sure pre-delete hooks for self.account is called:
-		account.delete(preserve_transactions, False, **kwargs)
-	else:
-		super(User, self).delete(**kwargs)
+	except Account.DoesNotExist:
+		pass
+
+	Transaction.objects.filter(responsible=self).update(responsible=None,
+	                           responsible_name=self.username)
+	super(User, self).delete()
 
 User.delete = user_delete
 
@@ -118,24 +108,13 @@ class Account(models.Model):
 		super(self.__class__, self).save(*args, **kwargs)
 
 
-	def delete(self, preserve_transactions=True, preserve_user=False, **kwargs):
-		"""Extended delete function where you can opt to preserve transactions,
-		or users.
+	def delete(self):
+		"""Extended delete function where transactions and users are preserved
 
 		"""
-		if preserve_transactions:
-			Transaction.objects.filter(account=self).update(account=None,
-					account_name=self.name)
-
-		if self.user and preserve_user:
-			self.user.account = None
-			self.user.save()
-			super(Account, self).delete(**kwargs)
-		elif self.user:
-			# Make sure the pre-delete hooks for self.user is called:
-			self.user.delete(preserve_transactions, False, **kwargs)
-		else:
-			super(Account, self).delete(**kwargs)
+		Transaction.objects.filter(account=self).update(account=None,
+				account_name=self.name)
+		super(Account, self).delete()
 
 
 	def has_internal_price(self):
@@ -274,8 +253,8 @@ class Account(models.Model):
 		if len(imgs) == 0:
 			raise BalanceImage.DoesNotExist()
 
-		# Return a random image:
-		return imgs[int(random()*len(imgs))]
+		# Return a random imagetransaction "deposit of 100 to TestMann"? All :
+		return imgs[randint(0, len(imgs)-1)]
 
 
 

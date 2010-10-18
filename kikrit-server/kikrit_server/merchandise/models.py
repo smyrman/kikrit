@@ -23,9 +23,8 @@ class MerchandiseTag(models.Model):
 		return self.name
 
 
-class Merchandise(models.Model):
-	SEARCH_FIELDS = ('name', 'ordinary_price', 'internal_price', 'ean')
 
+class Merchandise(models.Model):
 	name = models.CharField(max_length=50, unique=True)
 	ordinary_price = models.PositiveIntegerField()
 	internal_price = models.PositiveIntegerField()
@@ -55,46 +54,14 @@ class Merchandise(models.Model):
 			# Generate backup information for purchased item, and 'cut it
 			# loose':
 			PurchasedItem.objects.filter(merchandise=self).update(merchandise=None,
-					merchandise_name=self.name[:30], merchandise_tags=",".join(
-						(unicode(t) for t in self.tags.all()))[:30])
+					merchandise_name=self.name[:30],
+					merchandise_tags=self.tags_as_csv()[:30])
 		super(Merchandise, self).save(**kwargs)
 
-
-	def filter(self, filter_str):
-		"""Return True if object matches filter_str, and False if not.
-
-		"""
-		filter_str = unicode(filter_str).lower()
-		# Search attributes:
-		for attr in self.SEARCH_FIELDS:
-			if filter_str in unicode(getattr(self, attr)).lower():
-				return True
-
-		# Search tags:
-		for tag in self.tags.all():
-			if filter_str in unicode(tag).lower():
-				return True
-
-		return False
 
 	def tags_as_csv(self):
 		"""Return all tags as comma seperated list of strings"""
 		return ",".join((tag.name for tag in self.tags.all()))
-
-
-
-class TransactionTypeManager(models.Manager):
-    """Custom manager for showing certain kinds of transactions"""
-    type = None
-
-    def __init__(self, type, *args, **kwargs):
-        self.type = type
-        super(self.__class__,self).__init__(*args, **kwargs)
-
-
-    def get_query_set(self):
-        return super(self.__class__,
-                self).get_query_set().filter(type=self.type)
 
 
 
@@ -112,24 +79,6 @@ class PurchasedItem(models.Model):
 
 	def __unicode__(self):
 		return u"%s: %s,-" % (self.merchandise.name, self.price)
-
-
-
-class Purchase(Transaction):
-	default_manager = TransactionTypeManager(type=Transaction.TYPE_PURCHASE)
-
-	class Meta:
-		proxy = True
-
-
-	def undo(self):
-		"""Call this function before delete to undo the effect this purchase
-		has had on the system.
-		"""
-		self.account.balance -= self.amount
-		self.account.save()
-		q = PurchasedItems.objects.filter(transaction__id=self.id)
-		q.delete()
 
 
 
@@ -168,5 +117,4 @@ def buy_merchandise(account, merchandise_list, responsible=None):
 			else:
 				pm.price = m.ordinary_price
 			pm.save()
-
 	return transaction
