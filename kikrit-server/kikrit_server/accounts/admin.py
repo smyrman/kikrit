@@ -11,6 +11,7 @@ from django.contrib.auth.admin import User, UserAdmin, Group, GroupAdmin
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render_to_response
 
+from utils.admin import SimpleDeleteModelAdmin
 from jquery_widgets.admin import ExtendedModelAdmin
 from merchandise.models import PurchasedItem
 from accounts.models import Account, RFIDCard, LimitGroup, BalanceImage,\
@@ -24,13 +25,13 @@ class RFIDCardInline(admin.TabularInline):
 
 
 
-class AccountAdmin(ExtendedModelAdmin):
+class AccountAdmin(ExtendedModelAdmin, SimpleDeleteModelAdmin):
 	related_search_fields = {'user': ('username', 'email'),}
 
 	list_display = ('name', 'user', 'limit_group', 'balance', 'color', 'email',
 			'phone_number')
 	search_fields = ('name', 'user__username', 'limit_group__name', 'balance')
-	list_filter = ('limit_group','color')
+	list_filter = ('limit_group', 'color')
 	ordering = ('name',)
 	inlines = (RFIDCardInline,)
 
@@ -97,6 +98,11 @@ class TransactionAdmin(ExtendedModelAdmin):
 		return None
 	undo.short_description = "Revert selected transactions"
 
+	def get_actions(self, request):
+		actions = super(TransactionAdmin, self).get_actions(request)
+		if 'delete_selected' in actions:
+			 del actions['delete_selected']
+		return actions
 
 	def get_merchandise(self, obj):
 		objs = PurchasedItem.objects.filter(transaction=obj)
@@ -105,12 +111,6 @@ class TransactionAdmin(ExtendedModelAdmin):
 			ret = ret[:37] + u"..."
 		return ret
 	get_merchandise.short_description = "purchased items"
-
-
-	def get_actions(self, request):
-		actions = super(TransactionAdmin, self).get_actions(request)
-		del actions['delete_selected']
-		return actions
 
 
 
