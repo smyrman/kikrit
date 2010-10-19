@@ -292,8 +292,3 @@ class BalancePage(QtGui.QWidget):
 	def timeoutEvent(self):
 		self.parentWidget().setCurrentIndex(self.reset_index)
 		self.timer.stop()
-
-
-
-
-

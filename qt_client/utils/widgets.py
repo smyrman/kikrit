@@ -16,7 +16,7 @@ class DebugWidget(QtGui.QWidget):
 	"""A small gui, used to debug the main/admin GUI
 
 	"""
-	last_merchandise_id = 0
+	last_merchandise_i = -1
 	last_rfidcard_id = 0
 
 	rfid_line = None
@@ -81,14 +81,15 @@ class DebugWidget(QtGui.QWidget):
 
 
 	def barcodeGetClicked(self):
-		id = self.last_merchandise_id + 1
+		i = self.last_merchandise_i + 1
+		mers = Merchandise.objects.filter(ean__isnull=False)
 		try:
-			merchandise = Merchandise.objects.get(id=id)
-		except Merchandise.DoesNotExist:
-			id = 1
-			merchandise = Merchandise.objects.get(id=id)
+			merchandise = mers[i]
+		except IndexError:
+			i = 0
+			merchandise = mers[i]
 
-		self.last_merchandise_id = id
+		self.last_merchandise_i = i
 		self.barcode_line.setText(merchandise.ean)
 
 
@@ -108,4 +109,3 @@ class DebugWidget(QtGui.QWidget):
 		e.sendKeyPress("Return")
 		e.sendKeyRelease("Return")
 		print "barcode submit clicked"
-
