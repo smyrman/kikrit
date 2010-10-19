@@ -16,7 +16,7 @@ def merchandise_ean(request, merchandise_id):
 	try:
 		merchandise = Merchandise.objects.get(id=int(merchandise_id),
 				ean__isnull=False)
-	except merchandise.DoesNotExist:
+	except Merchandise.DoesNotExist:
 		raise Http404
 
 	response = HttpResponse(mimetype='application/svg')

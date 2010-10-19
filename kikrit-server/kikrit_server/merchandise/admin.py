@@ -45,9 +45,10 @@ class MerchandiseAdmin(SimpleDeleteModelAdmin):
 				prod_code = [randint(0,9) for i in range(5)]
 				ean = sys_code + manuf_code + prod_code + [0]
 				# calculate check digit:
-				ean[12] = 10\
-						- (((ean[1]+ean[3]+ean[5]+ean[7]+ean[9]+ean[11])*3\
-						+ (ean[0]+ean[2]+ean[4]+ean[6]+ean[8]+ean[10])) % 10)
+				ean[12] = 10
+				ean[12] -= (ean[1]+ean[3]+ean[5]+ean[7]+ean[9]+ean[11])*3
+				ean[12] -= (ean[0]+ean[2]+ean[4]+ean[6]+ean[8]+ean[10])
+				ean[12] %= 10
 				ean_u = u"".join((unicode(digit) for digit in ean))
 				count = queryset.model.objects.filter(ean=ean_u).count()
 
