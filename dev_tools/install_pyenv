@@ -1,0 +1,4 @@
+#!/bin/bash
+[[ "$1" == "" ]] && echo "supply name of pyenv" && exit 1
+pip install -r requirements.txt -E $1
+dev_tools/post_install.py

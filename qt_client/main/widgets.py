@@ -20,17 +20,23 @@ class MainWidget(QtGui.QWidget):
 	"""The main tab, featuring the KiKrit client GUI.
 
 	"""
-	search_line = None
+	# Widhgets:
+	search_line      = None
 	merchandise_list = None
+	stack            = None
+	order_page       = None
+	balance_page     = None
+	add_button       = None
+	remove_button    = None
+	msg              = None
 
-	stack = None
-	order_page = None
-	balance_page = None
-
-	add_button = None
-	remove_button = None
-
-	msg = None
+	# Keyboard shortcuts:
+	ks_left     = None
+	ks_right    = None
+	ks_enter    = None
+	ks_escape   = None
+	ks_f5       = None
+	ks_alphanum = None
 
 	def __init__(self, rfid_thread, parent=None):
 		QtGui.QWidget.__init__(self, parent)
@@ -56,6 +62,27 @@ class MainWidget(QtGui.QWidget):
 
 		self.msg = MessageLine()
 
+		# Keyboard shortcuts:
+		self.ks_up = QtGui.QShortcut(QtGui.QKeySequence(self.tr("Up",
+			"Item|prev")), self)
+		self.ks_down = QtGui.QShortcut(QtGui.QKeySequence(self.tr("Down",
+			"Item|next")), self)
+		self.ks_left = QtGui.QShortcut(QtGui.QKeySequence(self.tr("Left",
+			"Select|left")), self)
+		self.ks_right = QtGui.QShortcut(QtGui.QKeySequence(self.tr("Right",
+			"Select|right")), self)
+		self.ks_return = QtGui.QShortcut(QtGui.QKeySequence(self.tr("Return",
+			"Item|add/remove")), self)
+		self.ks_escape = QtGui.QShortcut(QtGui.QKeySequence(self.tr("Escape",
+			"Cancel current action")), self)
+		self.ks_f5 = QtGui.QShortcut(QtGui.QKeySequence(self.tr("F5",
+			"Force refresh")), self)
+		self.ks_ctrls = QtGui.QShortcut(QtGui.QKeySequence(self.tr(
+			"Ctrl+s", "Focus search line")),
+			self)
+
+
+
 		# Layout:
 		grid = QtGui.QGridLayout(self)
 		grid.addWidget(self.search_line, 0, 0)
@@ -72,13 +99,14 @@ class MainWidget(QtGui.QWidget):
 			self.parentWidget().currentChanged.connect(self.tabChanged)
 
 		self.search_line.textChanged.connect(self.searchLineChanged)
-		self.search_line.right_pressed.connect(self.rightPressed)
-		self.search_line.left_pressed.connect(self.leftPressed)
-		self.search_line.up_pressed.connect(self.upPressed)
-		self.search_line.down_pressed.connect(self.downPressed)
-		self.search_line.return_pressed.connect(self.returnPressed)
-		self.search_line.escape_pressed.connect(self.escapePressed)
-		self.search_line.f5_pressed.connect(self.f5Pressed)
+		self.ks_right.activated.connect(self.rightPressed)
+		self.ks_left.activated.connect(self.leftPressed)
+		self.ks_up.activated.connect(self.upPressed)
+		self.ks_down.activated.connect(self.downPressed)
+		self.ks_return.activated.connect(self.returnPressed)
+		self.ks_escape.activated.connect(self.escapePressed)
+		self.ks_f5.activated.connect(self.f5Pressed)
+		self.ks_ctrls.activated.connect(self.search_line.setFocus)
 
 		self.add_button.clicked.connect(self.addClicked)
 		self.remove_button.clicked.connect(self.removeClicked)

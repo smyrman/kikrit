@@ -404,5 +404,3 @@ def purchase_from_account(account, amount, responsible):
 				responsible=responsible, type=Transaction.TYPE_PURCHASE)
 		transaction.save()
 	return transaction
-
-
