@@ -106,7 +106,7 @@ class MainWidget(QtGui.QWidget):
 		self.ks_return.activated.connect(self.returnPressed)
 		self.ks_escape.activated.connect(self.escapePressed)
 		self.ks_f5.activated.connect(self.f5Pressed)
-		self.ks_ctrls.activated.connect(self.search_line.setFocus)
+		self.ks_ctrls.activated.connect(self.activateSearchLine)
 
 		self.add_button.clicked.connect(self.addClicked)
 		self.remove_button.clicked.connect(self.removeClicked)
@@ -118,7 +118,7 @@ class MainWidget(QtGui.QWidget):
 			self.stack.setCurrentWidget(self.order_page)
 		self.order_page.emptyList()
 		self.search_line.setText("")
-		self.merchandise_list.setFocus()
+		self.activateSearchLine()
 
 
 	def _tabHasFocus(self):
@@ -189,6 +189,10 @@ class MainWidget(QtGui.QWidget):
 			mdl = self.merchandise_list.model()
 			sel = [mdl.items[i.row()] for i in indexes]
 			self.order_page.addItems(sel)
+		self.activateSearchLine()
+
+	def activateSearchLine(self):
+		self.search_line.setFocus()
 		self.search_line.selectAll()
 
 
