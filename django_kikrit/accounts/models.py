@@ -325,8 +325,10 @@ class Transaction(models.Model):
 
 	# Backup fields that can be used if the related account or user is
 	# deleted:
-	responsible_name = models.CharField(max_length=30, null=True, blank=True)
-	account_name = models.CharField(max_length=30, null=True, blank=True)
+	responsible_name = models.CharField(max_length=30, null=True, blank=True,
+			editable=False)
+	account_name = models.CharField(max_length=30, null=True, blank=True,
+			editable=False)
 
 	def __unicode__(self):
 		type_name = self.TYPE_CHOICES[self.type][1]
