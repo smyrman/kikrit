@@ -12,7 +12,7 @@ class Migration(SchemaMigration):
 		db.create_table('accounts_limitgroup', (
 			('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
 			('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=50)),
-			('black_limit', self.gf('kikrit_server.accounts.fields.NegativeIntegerField')(default=0)),
+			('black_limit', self.gf('accounts.fields.NegativeIntegerField')(default=0)),
 			('max_grey_hours', self.gf('django.db.models.fields.SmallIntegerField')(default=24)),
 			('internal_price', self.gf('django.db.models.fields.BooleanField')(default=False, blank=True)),
 		))
@@ -107,7 +107,7 @@ class Migration(SchemaMigration):
 		},
 		'accounts.limitgroup': {
 			'Meta': {'object_name': 'LimitGroup'},
-			'black_limit': ('kikrit_server.accounts.fields.NegativeIntegerField', [], {'default': '0'}),
+			'black_limit': ('accounts.fields.NegativeIntegerField', [], {'default': '0'}),
 			'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
 			'internal_price': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
 			'max_grey_hours': ('django.db.models.fields.SmallIntegerField', [], {'default': '24'}),

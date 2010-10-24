@@ -50,8 +50,8 @@ def user_delete(self):
 	except Account.DoesNotExist:
 		pass
 
-	Transaction.objects.filter(responsible=self).update(responsible=None,
-	                           responsible_name=self.username)
+	Transaction.objects.filter(operator=self).update(operator=None,
+	                           operator_name=self.username)
 	super(User, self).delete()
 
 User.delete = user_delete
@@ -299,15 +299,17 @@ class Transaction(models.Model):
 	)
 
 	timestamp = models.DateTimeField(auto_now_add=True, editable=False)
-	responsible = models.ForeignKey(User, blank=True, null=True, editable=False)
+	operator = models.ForeignKey(User, blank=True, null=True, editable=False)
 	account = models.ForeignKey(Account, blank=False, null=True)
 	amount = models.IntegerField()
 	type = models.IntegerField(choices=TYPE_CHOICES)
 
 	# Backup fields that can be used if the related account or user is
 	# deleted:
-	responsible_name = models.CharField(max_length=30, null=True, blank=True)
-	account_name = models.CharField(max_length=30, null=True, blank=True)
+	operator_name = models.CharField(max_length=30, null=True, blank=True,
+			editable=False)
+	account_name = models.CharField(max_length=30, null=True, blank=True,
+			editable=False)
 
 	def __unicode__(self):
 		type_name = self.TYPE_CHOICES[self.type][1]
@@ -339,7 +341,7 @@ class Transaction(models.Model):
 # kikrit 0.3
 
 @transaction.commit_on_success
-def deposit_to_account(account, amount, responsible):
+def deposit_to_account(account, amount, operator=None):
 	"""Returns transaction object upon success, or None on failure.
 
 	"""
@@ -350,13 +352,13 @@ def deposit_to_account(account, amount, responsible):
 	transaction = None
 	if account.deposit(amount):
 		transaction = Transaction(account=account, amount=amount,
-				responsible=responsible, type=Transaction.TYPE_DEPOSIT)
+				operator=operator, type=Transaction.TYPE_DEPOSIT)
 		transaction.save()
 	return transaction
 
 
 @transaction.commit_on_success
-def withdraw_from_account(account, amount, responsible):
+def withdraw_from_account(account, amount, operator=None):
 	"""Returns transaction object upon success, or None on failure.
 
 	"""
@@ -367,13 +369,13 @@ def withdraw_from_account(account, amount, responsible):
 	transaction = None
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
-				responsible=responsible, type=Transaction.TYPE_WITHDRAWAL)
+				operator=operator, type=Transaction.TYPE_WITHDRAWAL)
 		transaction.save()
 	return transaction
 
 
 @transaction.commit_on_success
-def purchase_from_account(account, amount, responsible):
+def purchase_from_account(account, amount, operator=None):
 	"""Returns transaction object upon success, or None on failure.
 
 	"""
@@ -384,6 +386,6 @@ def purchase_from_account(account, amount, responsible):
 	transaction = None
 	if account.withdraw(amount):
 		transaction = Transaction(account=account, amount=-amount,
-				responsible=responsible, type=Transaction.TYPE_PURCHASE)
+				operator=operator, type=Transaction.TYPE_PURCHASE)
 		transaction.save()
 	return transaction

@@ -1,4 +1,5 @@
-Django>=1.2.3
+django>=1.2.3
 #-e svn+http://code.djangoproject.com/svn/django/trunk/#egg=django
-South>=0.7.1
-PIL
+south>=0.7.1
+pybarcode
+pil

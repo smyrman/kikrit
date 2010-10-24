@@ -50,11 +50,11 @@ class TransactionAdmin(ExtendedModelAdmin):
 	related_search_fields = {'account': ('name', 'email'),}
 	date_hierarchy = 'timestamp'
 	actions = ['undo']
-	list_display = ('timestamp', 'account', 'amount', 'type', 'responsible',
+	list_display = ('timestamp', 'account', 'amount', 'type', 'operator',
 			'get_merchandise')
 	search_fields = ('timestamp', 'account__name', 'amount',
-			'responsible__username', 'responsible__first_name',
-			'responsible__last_name')
+			'operator__username', 'operator__first_name',
+			'operator__last_name')
 	list_filter = ('type',)
 	formfield_overrides = {models.IntegerField: {'min_value': 1}}
 
