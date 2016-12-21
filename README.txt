@@ -1,3 +1,5 @@
+This project is no longer maintained.
+
 1 INSTALLATION (Stand-alone client setup):
   - New installation instructions expected for v0.3
   - Please see http://wiki.github.com/smyrman/kikrit/getting-started for a more
